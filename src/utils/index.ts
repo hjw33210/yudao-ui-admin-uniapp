@@ -185,11 +185,16 @@ export function redirectAfterLogin(redirectUrl?: string) {
   if (!path.startsWith('/')) {
     path = `/${path}`
   }
-  const { path: _path } = parseUrlToObj(path)
+  const { path: _path,query } = parseUrlToObj(path)
   if (isPageTabbar(_path)) {
     uni.switchTab({ url: path })
   } else {
-    uni.navigateBack()
+    // 如果 query 有值则通过reLaunch方式跳转过来所以不能用back
+    if(Object.keys(query).length > 0){
+        uni.reLaunch({ url: path })
+    }else{
+        uni.navigateBack()
+    }
   }
 }
 
