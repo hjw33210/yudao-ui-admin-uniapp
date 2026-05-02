@@ -25,7 +25,7 @@
           <dict-tag :type="DICT_TYPE.SYSTEM_USER_SEX" :value="formData?.sex" />
         </wd-cell>
         <wd-cell title="状态">
-          <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="formData?.sex" />
+          <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="formData?.status" />
         </wd-cell>
         <wd-cell title="备注" :value="formData?.remark || '-'" />
         <wd-cell title="最后登录 IP" :value="formData?.loginIp || '-'" />
