@@ -28,7 +28,7 @@ export const useUserStore = defineStore(
     const setUserInfo = (val: AuthPermissionInfo) => {
       // console.log('设置用户信息', val)
       // 若头像为空 则使用默认头像
-      if (!val.user) {
+      if (!val.user.avatar) {
         val.user.avatar = userInfoState.avatar
       }
       userInfo.value = val.user
