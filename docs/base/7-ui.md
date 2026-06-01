@@ -10,7 +10,7 @@
 
 `wot-ui` 是 `vue3+ts` 编写的全端支持的 UI 库，编码体验比 `uv-ui` 更好；而官方维护的 `uni-ui` 则样式略丑，组件较少，故弃之。
 
-> `wot-ui` 全称 `wot-design-uni`，是 `wot-design` 的 `uniapp` 版本，文档地址：[https://wot-design-uni.netlify.app/](https://wot-design-uni.netlify.app/).
+> `wot-ui` 是 `vue3+ts` 编写的全端支持 UI 库，文档地址：[https://wot-ui.cn/](https://wot-ui.cn/).
 
 ---
 
@@ -30,7 +30,7 @@
 - 1. 删除 `wot-ui` 库：
 
 ```sh
-  pnpm un wot-design-uni
+  pnpm un @wot-ui/ui
 ```
 
 - 2. `pages.config.ts` 文件 `easycom.custom` 删除相关配置：
@@ -39,7 +39,7 @@
 easycom: {
     autoscan: true,
     custom: {
--     '^wd-(.*)': 'wot-design-uni/components/wd-$1/wd-$1.vue',
+-     '^wd-(.*)': '@wot-ui/ui/components/wd-$1/wd-$1.vue',
     },
 },
 ```
@@ -50,7 +50,7 @@ easycom: {
 "types": [
     "@dcloudio/types",
     "@types/wechat-miniprogram",
--   "wot-design-uni/global.d.ts",
+-   "./src/wot-ui.d.ts",
     "./components.d.ts",
     "./global.d.ts"
 ]

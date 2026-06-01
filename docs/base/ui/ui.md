@@ -18,7 +18,7 @@
 
 - uv-ui (uveiw 系) - [文档地址](https://www.uvui.cn/)
 - uview-plus (uveiw 系) - [文档地址](https://uiadmin.net/uview-plus/)
-- Wot Design Uni (wot 系) - [文档地址](https://wot-design-uni.netlify.app/)
+- Wot Design Uni (wot 系) - [文档地址](https://wot-ui.cn/)
 - TuniaoUI （图鸟系） - [文档地址](https://vue3.tuniaokj.com/zh-CN/)
 - Sard uniapp （Sard系） - [文档地址](https://sard.wzt.zone/sard-uniapp-docs/)
 
@@ -46,7 +46,7 @@
 
 其实到这里就一决高下了，`github star 数`： `uv-ui(568)` > `wot-ui(492)` > `uview-plus(362)` > `TuniaoUI(192)`，其中 `uv-ui` 和 `wot-ui` 拔得头筹。
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Moonofweisheng/wot-design-uni,climblee/uv-ui,ijry/uview-plus,tuniaoTech/tuniaoui-rc-vue3-uniapp&type=Date)](https://star-history.com/#Moonofweisheng/wot-design-uni&climblee/uv-ui&ijry/uview-plus&tuniaoTech/tuniaoui-rc-vue3-uniapp&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=wot-ui/wot-ui,climblee/uv-ui,ijry/uview-plus,tuniaoTech/tuniaoui-rc-vue3-uniapp&type=Date)](https://star-history.com/#wot-ui/wot-ui&climblee/uv-ui&ijry/uview-plus&tuniaoTech/tuniaoui-rc-vue3-uniapp&Date)
 
 源码仓库地址展示如下，_纯粹为了方便大家查阅_ （虽然大概率你们也不会去访问，/手动狗头）
 
@@ -54,7 +54,7 @@
 | ---------- | ------------------------------------- | ------------------------------------------------------- | ------------------------------------------------- |
 | uv-ui      | <https://www.uvui.cn/>                | <https://github.com/climblee/uv-ui>                     | <https://gitee.com/climblee/uv-ui>                |
 | uview-plus | <https://uiadmin.net/uview-plus/>     | <https://github.com/ijry/uview-plus>                    | <https://gitee.com/uiadmin/uview-plus>            |
-| wot-ui     | <https://wot-design-uni.netlify.app/> | <https://github.com/Moonofweisheng/wot-design-uni>      | <https://gitee.com/wot-design-uni/wot-design-uni> |
+| wot-ui     | <https://wot-ui.cn/>                  | <https://github.com/wot-ui/wot-ui>                      | -                                                 |
 | TuniaoUI   | <https://vue3.tuniaokj.com/zh-CN/>    | <https://github.com/tuniaoTech/tuniaoui-rc-vue3-uniapp> | -                                                 |
 
 > 接着奏乐接着舞，我们继续正文 ^\_^
@@ -115,7 +115,7 @@
 
 `wot-ui` 和 `uv-ui` 皇城 `PK`
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Moonofweisheng/wot-design-uni,climblee/uv-ui&type=Date)](https://star-history.com/#Moonofweisheng/wot-design-uni&climblee/uv-ui&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=wot-ui/wot-ui,climblee/uv-ui&type=Date)](https://star-history.com/#wot-ui/wot-ui&climblee/uv-ui&Date)
 
 目前 `wot-ui` 还是比不过 `uv-ui` 的，但是我 `wot-ui` 有反超的势头。主要是看了源码后，还是选定了 `vue3+ts` 编写的 `wot-ui`。
 

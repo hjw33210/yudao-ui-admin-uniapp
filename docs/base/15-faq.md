@@ -1,8 +1,8 @@
 # 常见问题 2
 
-## 1. `wot-ui` 的 `toast` + `message-box` 不生效。
+## 1. `wot-ui` 的 `toast` + `dialog` 不生效。
 
-- 1. `layout` 引入 `wot-ui` 的 `toast` + `message-box`。
+- 1. `layout` 引入 `wot-ui` 的 `toast` + `dialog`。
 
 ```vue [src/layouts/default.vue]
 <!-- src/layouts/default.vue -->
@@ -10,7 +10,7 @@
   <view>
     <slot />
     <wd-toast />
-    <wd-message-box />
+    <wd-dialog />
   </view>
 </template>
 ```
@@ -20,12 +20,14 @@
 - 2.页面使用
 
 ```ts
-import { useMessage } from 'wot-design-uni'
+import { useDialog } from '@wot-ui/ui/components/wd-dialog'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 
-const message = useMessage()
+const dialog = useDialog()
+const toast = useToast()
 const handleClick = () => {
-  // 顺便测试 message 的使用
-  message.show('显示隐藏切换')
+  toast.show('显示隐藏切换')
+  dialog.alert({ msg: '确认提示' })
 }
 ```
 

@@ -8,8 +8,7 @@
 
 ## UI 组件库
 
-- [wot-ui](https://wot-design-uni.cn) -- `五星推荐⭐⭐⭐⭐⭐，unibest默认内置`
-  > [wot-ui 备用地址](https://wot-design-uni.netlify.app)
+- [wot-ui](https://wot-ui.cn) -- `五星推荐⭐⭐⭐⭐⭐，unibest默认内置`
 - [uni-ui](https://uniapp.dcloud.net.cn/component/uniui/uni-ui.html)
 - [uv-ui](https://www.uvui.cn/)
 - [uview-plus](https://uiadmin.net/uview-plus/)
