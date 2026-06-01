@@ -31,7 +31,7 @@
         <view class="yd-search-form-label">
           开启状态
         </view>
-        <wd-radio-group v-model="formData.status" shape="button">
+        <wd-radio-group v-model="formData.status" type="button">
           <wd-radio :value="-1">
             全部
           </wd-radio>
@@ -48,10 +48,20 @@
         <view class="yd-search-form-label">
           邮箱账号
         </view>
+        <view
+          class="flex items-center justify-between rounded-12rpx bg-[#f7f8fa] p-24rpx"
+          @click="pickerVisible.accountId = true"
+        >
+          <text class="text-28rpx text-[#333]">
+            {{ getWotPickerDisplay(accountOptions, formData.accountId, { placeholder: '请选择邮箱账号' }) }}
+          </text>
+          <wd-icon name="arrow-down" size="32rpx" color="#666" />
+        </view>
         <wd-picker
-          v-model="formData.accountId"
+          v-model:visible="pickerVisible.accountId"
+          :model-value="formData.accountId"
           :columns="accountOptions"
-          placeholder="请选择邮箱账号"
+          @confirm="({ value }) => formData.accountId = value[0]"
         />
       </view>
       <view class="yd-search-form-item">
@@ -73,7 +83,7 @@
         </view>
         <wd-datetime-picker-view v-if="visibleCreateTime[0]" v-model="tempCreateTime[0]" type="date" />
         <view v-if="visibleCreateTime[0]" class="yd-search-form-date-range-actions">
-          <wd-button size="small" plain @click="visibleCreateTime[0] = false">
+          <wd-button size="small" variant="plain" @click="visibleCreateTime[0] = false">
             取消
           </wd-button>
           <wd-button size="small" type="primary" @click="handleCreateTime0Confirm">
@@ -82,7 +92,7 @@
         </view>
         <wd-datetime-picker-view v-if="visibleCreateTime[1]" v-model="tempCreateTime[1]" type="date" />
         <view v-if="visibleCreateTime[1]" class="yd-search-form-date-range-actions">
-          <wd-button size="small" plain @click="visibleCreateTime[1] = false">
+          <wd-button size="small" variant="plain" @click="visibleCreateTime[1] = false">
             取消
           </wd-button>
           <wd-button size="small" type="primary" @click="handleCreateTime1Confirm">
@@ -91,7 +101,7 @@
         </view>
       </view>
       <view class="yd-search-form-actions">
-        <wd-button class="flex-1" plain @click="handleReset">
+        <wd-button class="flex-1" variant="plain" @click="handleReset">
           重置
         </wd-button>
         <wd-button class="flex-1" type="primary" @click="handleSearch">
@@ -109,13 +119,13 @@ import { getDictLabel, getIntDictOptions } from '@/hooks/useDict'
 import { getNavbarHeight } from '@/utils'
 import { DICT_TYPE } from '@/utils/constants'
 import { formatDate, formatDateRange } from '@/utils/date'
+import { getWotPickerDisplay } from '@/utils/wot'
 
 const emit = defineEmits<{
   search: [data: Record<string, any>]
   reset: []
 }>()
 
-const visible = ref(false)
 const formData = reactive({
   status: -1,
   code: undefined as string | undefined,
@@ -123,6 +133,8 @@ const formData = reactive({
   accountId: undefined as number | undefined,
   createTime: [undefined, undefined] as [number | undefined, number | undefined],
 })
+const visible = ref(false)
+const pickerVisible = ref<Record<string, boolean>>({})
 
 /** 邮箱账号列表 */
 const accountList = ref<{ id?: number, mail: string }[]>([])

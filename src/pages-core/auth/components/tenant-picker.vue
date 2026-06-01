@@ -1,28 +1,32 @@
 <template>
   <view v-if="tenantEnabled" class="input-item">
     <wd-icon name="home" size="20px" color="#1890ff" />
+    <view class="ml-16rpx flex flex-1 items-center justify-between" @click="pickerVisible.tenantId = true">
+      <text class="text-28rpx text-[#333]">
+        {{ getWotPickerDisplay(tenantList, tenantId, { valueKey: 'id', labelKey: 'name', placeholder: '请选择租户' }) }}
+      </text>
+    </view>
     <wd-picker
+      v-model:visible="pickerVisible.tenantId"
       :model-value="tenantId"
       :columns="tenantList"
       label-key="name"
       value-key="id"
-      label=""
-      placeholder="请选择租户"
-      @confirm="handleConfirm"
+      @confirm="({ value }) => handleTenantConfirm(value[0])"
     />
   </view>
 </template>
 
 <script lang="ts" setup>
 import type { TenantVO } from '@/api/login'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { computed, onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import {
   getTenantByWebsite,
   getTenantSimpleList,
-
 } from '@/api/login'
 import { useUserStore } from '@/store/user'
+import { getWotPickerDisplay } from '@/utils/wot'
 
 const toast = useToast()
 const userStore = useUserStore()
@@ -31,6 +35,7 @@ const tenantEnabled = computed(
   () => import.meta.env.VITE_APP_TENANT_ENABLE === 'true',
 ) // 租户开关：通过环境变量控制
 const tenantList = ref<TenantVO[]>([]) // 租户列表数据
+const pickerVisible = ref<Record<string, boolean>>({})
 
 const tenantId = computed(
   () =>
@@ -105,9 +110,11 @@ async function fetchTenantByWebsite(): Promise<TenantVO | null> {
   return null
 }
 
-/** 租户选择确认 */
-function handleConfirm({ value }: { value: number }) {
-  userStore.setTenantId(value)
+/** 切换当前租户 */
+function handleTenantConfirm(value?: number | string) {
+  if (value !== undefined && value !== '') {
+    userStore.setTenantId(Number(value))
+  }
 }
 
 /** 校验租户是否已选择 */

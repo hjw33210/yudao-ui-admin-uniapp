@@ -11,12 +11,20 @@
         <view class="yd-search-form-label">
           字典类型
         </view>
+        <view
+          class="flex items-center justify-between rounded-12rpx bg-[#f7f8fa] p-24rpx"
+          @click="pickerVisible.dictType = true"
+        >
+          <text class="text-28rpx text-[#333]">
+            {{ getWotPickerDisplay(dictTypeOptions, formData.dictType, { placeholder: '请选择字典类型' }) }}
+          </text>
+          <wd-icon name="arrow-down" size="32rpx" color="#666" />
+        </view>
         <wd-picker
-          v-model="formData.dictType"
+          v-model:visible="pickerVisible.dictType"
+          :model-value="formData.dictType"
           :columns="dictTypeOptions"
-          label-key="label"
-          value-key="value"
-          placeholder="请选择字典类型"
+          @confirm="({ value }) => formData.dictType = value[0]"
         />
       </view>
       <view class="yd-search-form-item">
@@ -33,7 +41,7 @@
         <view class="yd-search-form-label">
           状态
         </view>
-        <wd-radio-group v-model="formData.status" shape="button">
+        <wd-radio-group v-model="formData.status" type="button">
           <wd-radio :value="-1">
             全部
           </wd-radio>
@@ -47,7 +55,7 @@
         </wd-radio-group>
       </view>
       <view class="yd-search-form-actions">
-        <wd-button class="flex-1" plain @click="handleReset">
+        <wd-button class="flex-1" variant="plain" @click="handleReset">
           重置
         </wd-button>
         <wd-button class="flex-1" type="primary" @click="handleSearch">
@@ -64,6 +72,7 @@ import { getSimpleDictTypeList } from '@/api/system/dict/type'
 import { getDictLabel, getIntDictOptions } from '@/hooks/useDict'
 import { getNavbarHeight } from '@/utils'
 import { DICT_TYPE } from '@/utils/constants'
+import { getWotPickerDisplay } from '@/utils/wot'
 
 const props = defineProps<{
   dictType?: string
@@ -74,12 +83,13 @@ const emit = defineEmits<{
   reset: []
 }>()
 
-const visible = ref(false)
 const formData = reactive({
   dictType: undefined as string | undefined,
   label: undefined as string | undefined,
   status: -1,
 })
+const visible = ref(false)
+const pickerVisible = ref<Record<string, boolean>>({})
 
 /** 字典类型选项 */
 const dictTypeOptions = ref<{ label: string, value: string }[]>([])

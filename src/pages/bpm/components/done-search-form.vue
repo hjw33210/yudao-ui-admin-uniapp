@@ -21,31 +21,51 @@
         <view class="yd-search-form-label">
           所属流程
         </view>
+        <view
+          class="flex items-center justify-between rounded-12rpx bg-[#f7f8fa] p-24rpx"
+          @click="pickerVisible.processDefinitionKey = true"
+        >
+          <text class="text-28rpx text-[#333]">
+            {{ getWotPickerDisplay(processDefinitionList, formData.processDefinitionKey, { valueKey: 'key', labelKey: 'name', placeholder: '请选择' }) }}
+          </text>
+          <wd-icon name="arrow-down" size="32rpx" color="#666" />
+        </view>
         <wd-picker
-          v-model="formData.processDefinitionKey"
+          v-model:visible="pickerVisible.processDefinitionKey"
+          :model-value="formData.processDefinitionKey"
           :columns="processDefinitionList"
           label-key="name"
           value-key="key"
-          label=""
+          @confirm="({ value }) => formData.processDefinitionKey = value[0]"
         />
       </view>
       <view v-if="categoryList.length > 0" class="yd-search-form-item">
         <view class="yd-search-form-label">
           流程分类
         </view>
+        <view
+          class="flex items-center justify-between rounded-12rpx bg-[#f7f8fa] p-24rpx"
+          @click="pickerVisible.category = true"
+        >
+          <text class="text-28rpx text-[#333]">
+            {{ getWotPickerDisplay(categoryList, formData.category, { valueKey: 'code', labelKey: 'name', placeholder: '请选择' }) }}
+          </text>
+          <wd-icon name="arrow-down" size="32rpx" color="#666" />
+        </view>
         <wd-picker
-          v-model="formData.category"
+          v-model:visible="pickerVisible.category"
+          :model-value="formData.category"
           :columns="categoryList"
           label-key="name"
           value-key="code"
-          label=""
+          @confirm="({ value }) => formData.category = value[0]"
         />
       </view>
       <view class="yd-search-form-item">
         <view class="yd-search-form-label">
           审批状态
         </view>
-        <wd-radio-group v-model="formData.status" shape="button">
+        <wd-radio-group v-model="formData.status" type="button">
           <wd-radio :value="-1">
             全部
           </wd-radio>
@@ -73,7 +93,7 @@
         </view>
         <wd-datetime-picker-view v-if="visibleCreateTime[0]" v-model="tempCreateTime[0]" type="date" />
         <view v-if="visibleCreateTime[0]" class="yd-search-form-date-range-actions">
-          <wd-button size="small" plain @click="visibleCreateTime[0] = false">
+          <wd-button size="small" variant="plain" @click="visibleCreateTime[0] = false">
             取消
           </wd-button>
           <wd-button size="small" type="primary" @click="handleCreateTime0Confirm">
@@ -82,7 +102,7 @@
         </view>
         <wd-datetime-picker-view v-if="visibleCreateTime[1]" v-model="tempCreateTime[1]" type="date" />
         <view v-if="visibleCreateTime[1]" class="yd-search-form-date-range-actions">
-          <wd-button size="small" plain @click="visibleCreateTime[1] = false">
+          <wd-button size="small" variant="plain" @click="visibleCreateTime[1] = false">
             取消
           </wd-button>
           <wd-button size="small" type="primary" @click="handleCreateTime1Confirm">
@@ -91,7 +111,7 @@
         </view>
       </view>
       <view class="yd-search-form-actions">
-        <wd-button class="flex-1" plain @click="handleReset">
+        <wd-button class="flex-1" variant="plain" @click="handleReset">
           重置
         </wd-button>
         <wd-button class="flex-1" type="primary" @click="handleSearch">
@@ -112,13 +132,13 @@ import { getDictLabel, getIntDictOptions } from '@/hooks/useDict'
 import { getNavbarHeight } from '@/utils'
 import { DICT_TYPE } from '@/utils/constants'
 import { formatDate, formatDateRange } from '@/utils/date'
+import { getWotPickerDisplay } from '@/utils/wot'
 
 const emit = defineEmits<{
   search: [data: Record<string, any>]
   reset: []
 }>()
 
-const visible = ref(false)
 const formData = reactive({
   name: undefined as string | undefined,
   processDefinitionKey: undefined as string | undefined,
@@ -126,6 +146,8 @@ const formData = reactive({
   status: -1, // -1 表示全部
   createTime: [undefined, undefined] as [number | undefined, number | undefined],
 })
+const visible = ref(false)
+const pickerVisible = ref<Record<string, boolean>>({})
 
 /** 搜索条件 placeholder 拼接 */
 const placeholder = computed(() => {

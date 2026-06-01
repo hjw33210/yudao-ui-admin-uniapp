@@ -1,20 +1,28 @@
 <template>
+  <wd-form-item
+    title="岗位"
+    title-width="180rpx"
+    is-link
+    :value="selectedLabel"
+    placeholder="请选择岗位"
+    @click="visible = true"
+  />
   <wd-select-picker
     v-model="selectedIds"
-    label="岗位"
-    label-width="180rpx"
+    v-model:visible="visible"
+    title="请选择岗位"
     :columns="postList"
     value-key="id"
     label-key="name"
     type="checkbox"
     filterable
-    @confirm="handleConfirm"
+    @update:model-value="handleChange"
   />
 </template>
 
 <script lang="ts" setup>
 import type { Post } from '@/api/system/post'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { getSimplePostList } from '@/api/system/post'
 
 const props = defineProps<{
@@ -27,6 +35,17 @@ const emit = defineEmits<{
 
 const postList = ref<Post[]>([])
 const selectedIds = ref<number[]>([])
+const visible = ref(false)
+
+const selectedLabel = computed(() => {
+  if (selectedIds.value.length === 0) {
+    return ''
+  }
+  return selectedIds.value
+    .map(id => postList.value.find(post => post.id === id)?.name)
+    .filter(Boolean)
+    .join('、')
+})
 
 watch(
   () => props.modelValue,
@@ -40,8 +59,8 @@ async function loadPostList() {
   postList.value = await getSimplePostList()
 }
 
-function handleConfirm({ value }: { value: number[] }) {
-  emit('update:modelValue', value)
+function handleChange(value: Array<boolean | number | string>) {
+  emit('update:modelValue', value.map(Number))
 }
 
 onMounted(() => {

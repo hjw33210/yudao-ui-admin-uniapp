@@ -11,25 +11,30 @@
     <view>
       <wd-form ref="formRef" :model="formData" :schema="formSchema">
         <wd-cell-group border>
-          <wd-input
-            v-model="formData.name"
-            label="应用名"
-            label-width="200rpx"
-            prop="name"
-            clearable
-            placeholder="请输入应用名"
-          />
-          <wd-cell title="社交平台" title-width="200rpx" prop="socialType" center>
-            <wd-picker
-              v-model="formData.socialType"
-              :columns="getIntDictOptions(DICT_TYPE.SYSTEM_SOCIAL_TYPE)"
-              label-key="label"
-              value-key="value"
-              placeholder="请选择社交平台"
+          <wd-form-item title="应用名" title-width="200rpx" prop="name">
+            <wd-input
+              v-model="formData.name"
+              clearable
+              placeholder="请输入应用名"
             />
-          </wd-cell>
-          <wd-cell title="用户类型" title-width="200rpx" prop="userType" center>
-            <wd-radio-group v-model="formData.userType" shape="button">
+          </wd-form-item>
+          <wd-form-item
+            title="社交平台"
+            title-width="200rpx"
+            prop="socialType"
+            is-link
+            :value="getWotPickerFormValue(getIntDictOptions(DICT_TYPE.SYSTEM_SOCIAL_TYPE), formData.socialType)"
+            placeholder="请选择社交平台"
+            @click="pickerVisible.socialType = true"
+          />
+          <wd-picker
+            v-model:visible="pickerVisible.socialType"
+            :model-value="formData.socialType"
+            :columns="getIntDictOptions(DICT_TYPE.SYSTEM_SOCIAL_TYPE)"
+            @confirm="({ value }) => formData.socialType = value[0]"
+          />
+          <wd-form-item title="用户类型" title-width="200rpx" prop="userType" center>
+            <wd-radio-group v-model="formData.userType" type="button">
               <wd-radio
                 v-for="dict in getIntDictOptions(DICT_TYPE.USER_TYPE)"
                 :key="dict.value"
@@ -107,6 +112,7 @@ import { createSocialClient, getSocialClient, updateSocialClient } from '@/api/s
 import { getIntDictOptions } from '@/hooks/useDict'
 import { navigateBackPlus } from '@/utils'
 import { CommonStatusEnum, DICT_TYPE } from '@/utils/constants'
+import { createFormSchema, getWotPickerFormValue } from '@/utils/wot'
 
 const props = defineProps<{
   id?: number | any
@@ -122,7 +128,6 @@ definePage({
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑三方应用' : '新增三方应用')
 const formLoading = ref(false)
-const pickerVisible = ref<Record<string, boolean>>({})
 const formData = ref<SocialClient>({
   id: undefined,
   name: '',
@@ -142,6 +147,7 @@ const formSchema = createFormSchema({
   clientSecret: [{ required: true, message: '应用密钥不能为空' }],
 })
 const formRef = ref<FormInstance>()
+const pickerVisible = ref<Record<string, boolean>>({})
 
 /** 返回上一页 */
 function handleBack() {

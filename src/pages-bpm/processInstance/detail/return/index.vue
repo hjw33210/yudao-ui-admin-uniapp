@@ -9,30 +9,35 @@
 
     <!-- 操作表单 -->
     <view class="p-24rpx">
-      <wd-form ref="formRef" :model="formData" :rules="formRules">
+      <wd-form ref="formRef" :model="formData" :schema="formSchema">
         <wd-cell-group border>
           <!-- 退回节点选择 -->
-          <wd-picker
-            v-model="formData.targetActivityId"
-            label="退回节点："
+          <wd-form-item
+            title="退回节点："
             prop="targetActivityId"
-            :columns="activityOptions"
-            value-key="taskDefinitionKey"
-            label-key="name"
+            is-link
+            :value="getWotPickerFormValue(activityOptions, formData.targetActivityId, { valueKey: 'taskDefinitionKey', labelKey: 'name' })"
             placeholder="请选择退回节点"
+            @click="pickerVisible.targetActivityId = true"
           />
-
+          <wd-picker
+            v-model:visible="pickerVisible.targetActivityId"
+            :model-value="formData.targetActivityId"
+            :columns="activityOptions"
+            label-key="name"
+            value-key="taskDefinitionKey"
+            @confirm="({ value }) => formData.targetActivityId = value[0]"
+          />
           <!-- 退回原因 -->
-          <wd-textarea
-            v-model="formData.reason"
-            prop="reason"
-            label="退回原因："
-            label-width="180rpx"
-            placeholder="请输入退回原因"
-            :maxlength="500"
-            show-word-limit
-            clearable
-          />
+          <wd-form-item prop="reason" title="退回原因：" title-width="180rpx">
+            <wd-textarea
+              v-model="formData.reason"
+              placeholder="请输入退回原因"
+              :maxlength="500"
+              show-word-limit
+              clearable
+            />
+          </wd-form-item>
         </wd-cell-group>
         <!-- 提交按钮 -->
         <view class="mt-48rpx">
@@ -52,11 +57,12 @@
 </template>
 
 <script lang="ts" setup>
-import type { FormInstance } from 'wot-design-uni/components/wd-form/types'
+import type { FormInstance } from '@wot-ui/ui/components/wd-form/types'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { computed, onMounted, reactive, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { getTaskListByReturn, returnTask } from '@/api/bpm/task'
 import { navigateBackPlus } from '@/utils'
+import { createFormSchema, getWotPickerFormValue } from '@/utils/wot'
 
 const props = defineProps<{
   processInstanceId: string
@@ -74,20 +80,17 @@ const taskId = computed(() => props.taskId)
 const processInstanceId = computed(() => props.processInstanceId)
 const toast = useToast()
 const formLoading = ref(false)
-const activityOptions = ref<any[]>([])
 const formData = reactive({
   targetActivityId: '',
   reason: '',
 })
-const formRules = {
-  targetActivityId: [
-    { required: true, message: '退回节点不能为空' },
-  ],
-  reason: [
-    { required: true, message: '退回原因不能为空' },
-  ],
-}
+const formSchema = createFormSchema({
+  targetActivityId: [{ required: true, message: '退回节点不能为空' }],
+  reason: [{ required: true, message: '退回原因不能为空' }],
+})
 const formRef = ref<FormInstance>()
+const pickerVisible = ref<Record<string, boolean>>({})
+const activityOptions = ref<any[]>([])
 
 /** 返回上一页 */
 function handleBack() {

@@ -22,13 +22,13 @@ defineOptions({
 
 /** Banner 轮播图数据 */
 const banners: string[] = [
-  staticUrl('/static/banner/banner01.png'),
-  staticUrl('/static/banner/banner02.png'),
-  staticUrl('/static/banner/banner03.png'),
+  staticUrl('/static/banner/20260602/banner01.png'),
+  staticUrl('/static/banner/20260602/banner02.png'),
+  staticUrl('/static/banner/20260602/banner03.png'),
 ]
 
 /** 处理点击 */
-function handleClick(index: number) {
+function handleClick({ index }: { index: number }) {
   // TODO @芋艿：看看后续要不要支持跳转
   console.log('点击了第', index + 1, '张 Banner')
 }

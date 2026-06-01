@@ -5,18 +5,18 @@
       <view class="mb-24rpx text-32rpx text-[#333] font-semibold">
         发送测试站内信
       </view>
-      <wd-form ref="sendFormRef" :model="sendFormData" :rules="sendFormRules">
+      <wd-form ref="sendFormRef" :model="sendFormData" :schema="sendFormSchema">
         <wd-cell-group border>
-          <wd-textarea
-            v-model="sendFormData.content"
-            label="模板内容"
-            label-width="180rpx"
-            disabled
-            :rows="3"
-          />
+          <wd-form-item title="模板内容" title-width="180rpx">
+            <wd-textarea
+              v-model="sendFormData.content"
+              disabled
+              :rows="3"
+            />
+          </wd-form-item>
           <!-- 用户类型 -->
-          <wd-cell title="用户类型" title-width="180rpx" prop="userType" center>
-            <wd-radio-group v-model="sendFormData.userType" shape="button">
+          <wd-form-item title="用户类型" title-width="180rpx" prop="userType" center>
+            <wd-radio-group v-model="sendFormData.userType" type="button">
               <wd-radio
                 v-for="dict in getIntDictOptions(DICT_TYPE.USER_TYPE)"
                 :key="dict.value"
@@ -25,41 +25,42 @@
                 {{ dict.label }}
               </wd-radio>
             </wd-radio-group>
-          </wd-cell>
+          </wd-form-item>
           <!-- 会员用户：输入用户编号 -->
-          <wd-input
-            v-if="sendFormData.userType === UserTypeEnum.MEMBER"
-            v-model="sendFormData.userId"
-            label="接收人 ID"
-            label-width="180rpx"
-            prop="userId"
-            clearable
-            placeholder="请输入用户编号"
-          />
+          <wd-form-item v-if="sendFormData.userType === UserTypeEnum.MEMBER" title="接收人 ID" title-width="180rpx" prop="userId">
+            <wd-input
+              v-model="sendFormData.userId"
+              clearable
+              placeholder="请输入用户编号"
+            />
+          </wd-form-item>
           <!-- 管理员用户：选择用户 -->
-          <wd-cell
-            v-if="sendFormData.userType === UserTypeEnum.ADMIN"
+          <wd-form-item
+            v-if="sendFormData.userType !== UserTypeEnum.MEMBER"
             title="接收人"
             title-width="180rpx"
             prop="userId"
-            center
-          >
-            <wd-picker
-              v-model="sendFormData.userId"
-              :columns="userOptions"
-              placeholder="请选择接收人"
-            />
-          </wd-cell>
+            is-link
+            :value="getWotPickerFormValue(userOptions, sendFormData.userId)"
+            placeholder="请选择接收人"
+            @click="pickerVisible.userId = true"
+          />
+          <wd-picker
+            v-if="sendFormData.userType !== UserTypeEnum.MEMBER"
+            v-model:visible="pickerVisible.userId"
+            :model-value="sendFormData.userId"
+            :columns="userOptions"
+            @confirm="({ value }) => sendFormData.userId = value[0]"
+          />
           <!-- 动态参数 -->
           <template v-for="param in template?.params" :key="param">
-            <wd-input
-              v-model="sendFormData.templateParams[param]"
-              :label="`参数 ${param}`"
-              label-width="180rpx"
-              :prop="`templateParams.${param}`"
-              clearable
-              :placeholder="`请输入参数 ${param}`"
-            />
+            <wd-form-item :title="`参数 ${param}`" title-width="180rpx" :prop="`templateParams.${param}`">
+              <wd-input
+                v-model="sendFormData.templateParams[param]"
+                clearable
+                :placeholder="`请输入参数 ${param}`"
+              />
+            </wd-form-item>
           </template>
         </wd-cell-group>
       </wd-form>
@@ -75,12 +76,13 @@
 <script lang="ts" setup>
 import type { NotifyTemplate } from '@/api/system/notify/template'
 import type { User } from '@/api/system/user'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { computed, ref, watch } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { sendNotify } from '@/api/system/notify/template'
 import { getSimpleUserList } from '@/api/system/user'
 import { getIntDictOptions } from '@/hooks/useDict'
 import { DICT_TYPE, UserTypeEnum } from '@/utils/constants'
+import { createFormSchema, getWotPickerFormValue } from '@/utils/wot'
 
 const props = defineProps<{
   modelValue: boolean
@@ -104,13 +106,26 @@ const visible = computed({
 })
 
 const sendLoading = ref(false)
-const sendFormRef = ref<any>()
 const sendFormData = ref({
   content: '',
   userType: UserTypeEnum.MEMBER,
   userId: undefined as number | string | undefined,
   templateParams: {} as Record<string, string>,
 })
+const sendFormSchema = createFormSchema(() => {
+  return {
+    userType: [{ required: true, message: '用户类型不能为空' }],
+    userId: [{ required: true, message: '接收人不能为空' }],
+    ...Object.fromEntries(
+      (props.template?.params || []).map(param => [
+        `templateParams.${param}`,
+        [{ required: true, message: `参数 ${param} 不能为空` }],
+      ]),
+    ),
+  }
+})
+const sendFormRef = ref<any>()
+const pickerVisible = ref<Record<string, boolean>>({})
 
 /** 用户列表 */
 const userList = ref<User[]>([])
@@ -119,20 +134,6 @@ const userOptions = computed(() => {
     value: item.id,
     label: item.nickname,
   }))
-})
-
-/** 发送表单校验规则 */
-const sendFormRules = computed(() => {
-  const rules: Record<string, any> = {
-    userType: [{ required: true, message: '用户类型不能为空' }],
-    userId: [{ required: true, message: '接收人不能为空' }],
-  }
-  if (props.template?.params) {
-    props.template.params.forEach((param) => {
-      rules[`templateParams.${param}`] = [{ required: true, message: `参数 ${param} 不能为空` }]
-    })
-  }
-  return rules
 })
 
 /** 加载用户列表 */

@@ -8,43 +8,59 @@
     />
     <view class="mx-24rpx mt-24rpx overflow-hidden rounded-16rpx bg-white">
       <!-- 表单内容 -->
-      <wd-form ref="formRef" :model="formData" :rules="formRules">
+      <wd-form ref="formRef" :model="formData" :schema="formSchema">
         <wd-cell-group border title="请假信息">
-          <wd-picker
-            v-model="formData.type"
-            :columns="getIntDictOptions(DICT_TYPE.BPM_OA_LEAVE_TYPE)"
-            label="请假类型"
-            label-width="200rpx"
+          <wd-form-item
+            title="请假类型"
+            title-width="200rpx"
             prop="type"
-            :rules="[{ required: true, message: '请选择请假类型' }]"
+            is-link
+            :value="getWotPickerFormValue(getIntDictOptions(DICT_TYPE.BPM_OA_LEAVE_TYPE), formData.type)"
             placeholder="请选择请假类型"
+            @click="pickerVisible.type = true"
+          />
+          <wd-picker
+            v-model:visible="pickerVisible.type"
+            :model-value="formData.type"
+            :columns="getIntDictOptions(DICT_TYPE.BPM_OA_LEAVE_TYPE)"
+            @confirm="({ value }) => formData.type = value[0]"
+          />
+          <wd-form-item
+            title="开始时间"
+            title-width="200rpx"
+            prop="startTime"
+            is-link
+            :value="formatDateTime(formData.startTime)"
+            placeholder="请选择开始时间"
+            @click="pickerVisible.startTime = true"
           />
           <wd-datetime-picker
             v-model="formData.startTime"
-            label="开始时间"
-            label-width="200rpx"
-            prop="startTime"
-            :rules="[{ required: true, message: '请选择开始时间' }]"
-            placeholder="请选择开始时间"
+            v-model:visible="pickerVisible.startTime"
+            title="请选择开始时间"
+          />
+          <wd-form-item
+            title="结束时间"
+            title-width="200rpx"
+            prop="endTime"
+            is-link
+            :value="formatDateTime(formData.endTime)"
+            placeholder="请选择结束时间"
+            @click="pickerVisible.endTime = true"
           />
           <wd-datetime-picker
             v-model="formData.endTime"
-            label="结束时间"
-            label-width="200rpx"
-            prop="endTime"
-            :rules="[{ required: true, message: '请选择结束时间' }]"
-            placeholder="请选择结束时间"
+            v-model:visible="pickerVisible.endTime"
+            title="请选择结束时间"
           />
-          <wd-textarea
-            v-model="formData.reason"
-            label="请假原因"
-            label-width="200rpx"
-            prop="reason"
-            :rules="[{ required: true, message: '请输入请假原因' }]"
-            placeholder="请输入请假原因"
-            :maxlength="200"
-            show-word-limit
-          />
+          <wd-form-item title="请假原因" title-width="200rpx" prop="reason">
+            <wd-textarea
+              v-model="formData.reason"
+              placeholder="请输入请假原因"
+              :maxlength="200"
+              show-word-limit
+            />
+          </wd-form-item>
         </wd-cell-group>
       </wd-form>
     </view>
@@ -83,11 +99,12 @@
 </template>
 
 <script lang="ts" setup>
-import type { FormInstance } from 'wot-design-uni/components/wd-form/types'
+import type { FormInstance } from '@wot-ui/ui/components/wd-form/types'
 import type { Leave } from '@/api/bpm/oa/leave'
 import type { ApprovalNodeInfo } from '@/api/bpm/processInstance'
+import { useDialog } from '@wot-ui/ui/components/wd-dialog'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { computed, onMounted, ref, watch } from 'vue'
-import { useMessage, useToast } from 'wot-design-uni'
 import { getProcessDefinition } from '@/api/bpm/definition'
 import { createLeave } from '@/api/bpm/oa/leave'
 import { getApprovalDetail } from '@/api/bpm/processInstance'
@@ -95,6 +112,8 @@ import { getIntDictOptions } from '@/hooks/useDict'
 import ProcessInstanceTimeline from '@/pages-bpm/processInstance/detail/components/time-line.vue'
 import { navigateBackPlus } from '@/utils'
 import { BpmCandidateStrategyEnum, BpmNodeIdEnum, DICT_TYPE } from '@/utils/constants'
+import { formatDateTime } from '@/utils/date'
+import { createFormSchema, getWotPickerFormValue } from '@/utils/wot'
 
 definePage({
   style: {
@@ -104,7 +123,7 @@ definePage({
 })
 
 const toast = useToast()
-const message = useMessage()
+const dialog = useDialog()
 const formLoading = ref(false)
 const processTimeLineLoading = ref(false) // 流程预览加载状态
 
@@ -122,13 +141,14 @@ const formData = ref<Partial<Leave>>({
   endTime: undefined,
   reason: undefined,
 })
-const formRules = {
+const formSchema = createFormSchema({
   type: [{ required: true, message: '请选择请假类型' }],
   startTime: [{ required: true, message: '请选择开始时间' }],
   endTime: [{ required: true, message: '请选择结束时间' }],
   reason: [{ required: true, message: '请输入请假原因' }],
-}
+})
 const formRef = ref<FormInstance>()
+const pickerVisible = ref<Record<string, boolean>>({})
 
 // 计算请假天数
 const leaveDays = computed(() => {
@@ -141,15 +161,16 @@ const leaveDays = computed(() => {
 })
 
 /** 返回上一页 */
-function handleBack() {
-  message.confirm({
-    title: '提示',
-    msg: '确定要返回吗？请先保存您填写的信息！',
-  }).then(({ action }) => {
-    if (action === 'confirm') {
-      navigateBackPlus('/pages-bpm/oa/leave/index')
-    }
-  })
+async function handleBack() {
+  try {
+    await dialog.confirm({
+      title: '提示',
+      msg: '确定要返回吗？请先保存您填写的信息！',
+    })
+  } catch {
+    return
+  }
+  navigateBackPlus('/pages-bpm/oa/leave/index')
 }
 
 /** 获取流程审批详情 */
@@ -237,7 +258,7 @@ async function handleSubmit() {
     }
 
     await createLeave(submitData)
-    uni.showToast({ title: '提交成功', icon: 'success' })
+    toast.success('提交成功')
     setTimeout(() => {
       navigateBackPlus('/pages-bpm/oa/leave/index')
     }, 1500)

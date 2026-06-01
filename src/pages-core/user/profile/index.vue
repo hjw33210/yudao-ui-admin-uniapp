@@ -102,18 +102,23 @@ function handleEditAvatar() {
 
 /** 头像裁剪确认 */
 async function handleCropperConfirm(event: { tempFilePath: string }) {
-  // 1.1 上传文件，获取 URL
-  const avatarUrl = await uploadFileFromPath(event.tempFilePath, 'avatar')
-  // 1.2 更新用户头像
-  await updateUserProfile({ avatar: avatarUrl })
+  try {
+    // 1.1 上传文件，获取 URL
+    const avatarUrl = await uploadFileFromPath(event.tempFilePath, 'avatar')
+    // 1.2 更新用户头像
+    await updateUserProfile({ avatar: avatarUrl })
 
-  // 2.1 直接更新本地状态，避免重新加载
-  if (userProfile.value) {
-    userProfile.value.avatar = avatarUrl
+    // 2.1 直接更新本地状态，避免重新加载
+    if (userProfile.value) {
+      userProfile.value.avatar = avatarUrl
+    }
+    // 2.2 同步更新 userStore 中的头像
+    userStore.setUserAvatar(avatarUrl)
+    toast.success('头像修改成功')
+  } catch (err) {
+    console.error('头像修改失败：', err)
+    toast.show('头像修改失败，请重试')
   }
-  // 2.2 同步更新 userStore 中的头像
-  userStore.setUserAvatar(avatarUrl)
-  toast.success('头像修改成功')
 }
 
 /** 编辑字段 */

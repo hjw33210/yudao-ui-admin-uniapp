@@ -1,44 +1,45 @@
 <template>
-  <wd-select-picker
-    v-if="useDefaultSlot"
-    v-model="selectedId"
-    :label="label"
-    :label-width="label ? '180rpx' : '0'"
-    :columns="userList"
-    value-key="id"
-    label-key="nickname"
-    :type="type"
-    :prop="prop"
-    use-default-slot
-    filterable
-    :placeholder="placeholder"
-    @confirm="handleConfirm"
-  >
+  <view v-if="useDefaultSlot" @click="visible = true">
     <slot />
-  </wd-select-picker>
+  </view>
+  <wd-form-item
+    v-else-if="label || prop"
+    :title="label"
+    :title-width="labelWidth"
+    :prop="prop || undefined"
+    is-link
+    :value="selectedLabel"
+    :placeholder="placeholder"
+    @click="visible = true"
+  />
+  <wd-cell
+    v-else
+    is-link
+    :value="selectedLabel"
+    :placeholder="placeholder"
+    @click="visible = true"
+  />
 
   <wd-select-picker
-    v-else
     v-model="selectedId"
-    :label="label"
-    :label-width="label ? '180rpx' : '0'"
+    v-model:visible="visible"
+    :title="label || placeholder"
     :columns="userList"
     value-key="id"
     label-key="nickname"
     :type="type"
-    :prop="prop"
     filterable
-    :placeholder="placeholder"
     @confirm="handleConfirm"
   />
 </template>
 
 <script lang="ts" setup>
 import type { User } from '@/api/system/user'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { getSimpleUserList } from '@/api/system/user'
 
 const props = withDefaults(defineProps<{
+  labelWidth?: string
   modelValue?: number | number[]
   type?: 'radio' | 'checkbox'
   label?: string
@@ -46,6 +47,7 @@ const props = withDefaults(defineProps<{
   prop?: string
   useDefaultSlot?: boolean
 }>(), {
+  labelWidth: '180rpx',
   type: 'checkbox',
   label: '',
   placeholder: '请选择',
@@ -59,7 +61,18 @@ const emit = defineEmits<{
 }>()
 
 const userList = ref<User[]>([])
-const selectedId = ref<number | string | number[]>([])
+const selectedId = ref<number | string | number[]>(props.type === 'radio' ? '' : [])
+const visible = ref(false)
+
+const selectedLabel = computed(() => {
+  if (Array.isArray(selectedId.value)) {
+    if (selectedId.value.length === 0) {
+      return ''
+    }
+    return selectedId.value.map(id => getUserNickname(Number(id))).filter(Boolean).join('、')
+  }
+  return getUserNickname(Number(selectedId.value))
+})
 
 /** 根据用户 ID 获取昵称 */
 function getUserNickname(userId: number | undefined): string {

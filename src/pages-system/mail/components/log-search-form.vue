@@ -66,9 +66,9 @@
         </view>
         <wd-picker
           v-model:visible="pickerVisible.accountId"
-          :model-value="toWotPickerValue(formData.accountId)"
+          :model-value="formData.accountId"
           :columns="accountOptions"
-          @update:model-value="formData.accountId = fromWotPickerNumber($event)"
+          @confirm="({ value }) => formData.accountId = value[0]"
         />
       </view>
       <view class="yd-search-form-item">
@@ -136,15 +136,13 @@ import { getDictLabel, getIntDictOptions } from '@/hooks/useDict'
 import { getNavbarHeight } from '@/utils'
 import { DICT_TYPE } from '@/utils/constants'
 import { formatDate, formatDateRange } from '@/utils/date'
-import { fromWotPickerNumber, getWotPickerDisplay, toWotPickerValue } from '@/utils/wot'
+import { getWotPickerDisplay } from '@/utils/wot'
 
 const emit = defineEmits<{
   search: [data: Record<string, any>]
   reset: []
 }>()
 
-const visible = ref(false)
-const pickerVisible = ref<Record<string, boolean>>({})
 const formData = reactive({
   sendTime: [undefined, undefined] as [number | undefined, number | undefined],
   userId: undefined as number | undefined,
@@ -153,6 +151,8 @@ const formData = reactive({
   accountId: undefined as number | undefined,
   templateId: undefined as number | undefined,
 })
+const visible = ref(false)
+const pickerVisible = ref<Record<string, boolean>>({})
 
 /** 邮箱账号列表 */
 const accountList = ref<{ id?: number, mail: string }[]>([])

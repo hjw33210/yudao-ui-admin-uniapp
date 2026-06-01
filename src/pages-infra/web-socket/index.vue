@@ -35,7 +35,7 @@
         <!-- 连接按钮 -->
         <wd-button
           block
-          :type="isConnected ? 'error' : 'primary'"
+          :type="isConnected ? 'danger' : 'primary'"
           @click="toggleConnection"
         >
           {{ isConnected ? '断开连接' : '建立连接' }}
@@ -47,25 +47,27 @@
     <view class="mx-24rpx mt-24rpx overflow-hidden rounded-16rpx bg-white shadow-sm">
       <view class="p-32rpx">
         <view class="mb-24rpx flex items-center">
-          <wd-icon name="chat" size="36rpx" color="#1989fa" class="mr-12rpx" />
+          <wd-icon name="message" size="36rpx" color="#1989fa" class="mr-12rpx" />
           <text class="text-32rpx text-[#333] font-semibold">发送消息</text>
         </view>
         <!-- 接收人选择 -->
         <view class="mb-24rpx">
           <text class="mb-12rpx block text-26rpx text-[#999]">接收人</text>
-          <wd-picker
-            v-model="sendUserId"
-            :columns="userColumns"
-            :disabled="!isConnected"
-            @confirm="handleUserChange"
+          <view
+            class="flex items-center justify-between rounded-12rpx bg-[#f7f8fa] p-24rpx"
+            @click="isConnected && (pickerVisible.sendUserId = true)"
           >
-            <view class="flex items-center justify-between rounded-12rpx bg-[#f7f8fa] p-24rpx">
-              <text class="text-28rpx" :class="isConnected ? 'text-[#333]' : 'text-[#c8c9cc]'">
-                {{ selectedUserLabel }}
-              </text>
-              <wd-icon name="arrow-down" size="32rpx" :color="isConnected ? '#666' : '#c8c9cc'" />
-            </view>
-          </wd-picker>
+            <text class="text-28rpx" :class="isConnected ? 'text-[#333]' : 'text-[#c8c9cc]'">
+              {{ selectedUserLabel }}
+            </text>
+            <wd-icon name="arrow-down" size="32rpx" :color="isConnected ? '#666' : '#c8c9cc'" />
+          </view>
+          <wd-picker
+            v-model:visible="pickerVisible.sendUserId"
+            :model-value="sendUserId"
+            :columns="userColumns"
+            @confirm="({ value }) => sendUserId = value[0] !== undefined ? String(value[0]) : 'all'"
+          />
         </view>
         <!-- 消息内容 -->
         <view class="mb-24rpx">
@@ -101,15 +103,15 @@
           <view class="flex items-center">
             <wd-icon name="list" size="36rpx" color="#1989fa" class="mr-12rpx" />
             <text class="text-32rpx text-[#333] font-semibold">消息记录</text>
-            <wd-tag v-if="messageList.length > 0" type="primary" plain class="ml-16rpx">
+            <wd-tag v-if="messageList.length > 0" type="primary" variant="plain" class="ml-16rpx">
               {{ messageList.length }} 条
             </wd-tag>
           </view>
           <wd-button
             v-if="messageList.length > 0"
             size="small"
-            type="error"
-            plain
+            type="danger"
+            variant="plain"
             @click="clearMessages"
           >
             清空
@@ -123,7 +125,7 @@
           :style="{ height: '600rpx' }"
         >
           <view v-if="messageList.length === 0" class="h-full flex flex-col items-center justify-center">
-            <wd-icon name="inbox" size="80rpx" color="#c8c9cc" />
+            <wd-icon name="message" size="80rpx" color="#c8c9cc" />
             <text class="mt-16rpx text-26rpx text-[#c8c9cc]">暂无消息记录</text>
           </view>
           <view v-else class="p-20rpx">
@@ -165,8 +167,8 @@
 
 <script lang="ts" setup>
 import type { User } from '@/api/system/user'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { getSimpleUserList } from '@/api/system/user'
 import { useTokenStore } from '@/store/token'
 import { getEnvBaseUrlRoot, navigateBackPlus } from '@/utils'
@@ -209,6 +211,7 @@ const messageReverseList = computed(() => [...messageList.value].reverse())
 
 // 发送消息相关
 const sendText = ref('')
+const pickerVisible = ref<Record<string, boolean>>({})
 const sendUserId = ref('all')
 const userList = ref<User[]>([])
 const userColumns = computed(() => {
@@ -451,11 +454,6 @@ function getMessageTypeText(type?: string) {
     default:
       return '未知'
   }
-}
-
-/** 处理用户选择变化 */
-function handleUserChange({ value }: { value: string[] }) {
-  sendUserId.value = value[0] || 'all'
 }
 
 /** 返回上一页 */

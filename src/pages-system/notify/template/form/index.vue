@@ -9,41 +9,46 @@
 
     <!-- 表单区域 -->
     <view>
-      <wd-form ref="formRef" :model="formData" :rules="formRules">
+      <wd-form ref="formRef" :model="formData" :schema="formSchema">
         <wd-cell-group border>
-          <wd-input
-            v-model="formData.name"
-            label="模板名称"
-            label-width="200rpx"
-            prop="name"
-            clearable
-            placeholder="请输入模板名称"
-          />
-          <wd-input
-            v-model="formData.code"
-            label="模板编码"
-            label-width="200rpx"
-            prop="code"
-            clearable
-            placeholder="请输入模板编码"
-          />
-          <wd-input
-            v-model="formData.nickname"
-            label="发送人名称"
-            label-width="200rpx"
-            prop="nickname"
-            clearable
-            placeholder="请输入发送人名称"
-          />
-          <wd-cell title="模板类型" title-width="200rpx" prop="type" center>
-            <wd-picker
-              v-model="formData.type"
-              :columns="templateTypeOptions"
-              placeholder="请选择模板类型"
+          <wd-form-item title="模板名称" title-width="200rpx" prop="name">
+            <wd-input
+              v-model="formData.name"
+              clearable
+              placeholder="请输入模板名称"
             />
-          </wd-cell>
-          <wd-cell title="状态" title-width="200rpx" prop="status" center>
-            <wd-radio-group v-model="formData.status" shape="button">
+          </wd-form-item>
+          <wd-form-item title="模板编码" title-width="200rpx" prop="code">
+            <wd-input
+              v-model="formData.code"
+              clearable
+              placeholder="请输入模板编码"
+            />
+          </wd-form-item>
+          <wd-form-item title="发送人名称" title-width="200rpx" prop="nickname">
+            <wd-input
+              v-model="formData.nickname"
+              clearable
+              placeholder="请输入发送人名称"
+            />
+          </wd-form-item>
+          <wd-form-item
+            title="模板类型"
+            title-width="200rpx"
+            prop="type"
+            is-link
+            :value="getWotPickerFormValue(templateTypeOptions, formData.type)"
+            placeholder="请选择模板类型"
+            @click="pickerVisible.type = true"
+          />
+          <wd-picker
+            v-model:visible="pickerVisible.type"
+            :model-value="formData.type"
+            :columns="templateTypeOptions"
+            @confirm="({ value }) => formData.type = value[0]"
+          />
+          <wd-form-item title="状态" title-width="200rpx" prop="status" center>
+            <wd-radio-group v-model="formData.status" type="button">
               <wd-radio
                 v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
                 :key="dict.value"
@@ -52,24 +57,22 @@
                 {{ dict.label }}
               </wd-radio>
             </wd-radio-group>
-          </wd-cell>
-          <wd-textarea
-            v-model="formData.content"
-            label="模板内容"
-            label-width="200rpx"
-            prop="content"
-            clearable
-            placeholder="请输入模板内容"
-            :rows="4"
-          />
-          <wd-textarea
-            v-model="formData.remark"
-            label="备注"
-            label-width="200rpx"
-            prop="remark"
-            clearable
-            placeholder="请输入备注"
-          />
+          </wd-form-item>
+          <wd-form-item title="模板内容" title-width="200rpx" prop="content">
+            <wd-textarea
+              v-model="formData.content"
+              clearable
+              placeholder="请输入模板内容"
+              :rows="4"
+            />
+          </wd-form-item>
+          <wd-form-item title="备注" title-width="200rpx" prop="remark">
+            <wd-textarea
+              v-model="formData.remark"
+              clearable
+              placeholder="请输入备注"
+            />
+          </wd-form-item>
         </wd-cell-group>
       </wd-form>
     </view>
@@ -89,14 +92,15 @@
 </template>
 
 <script lang="ts" setup>
-import type { FormInstance } from 'wot-design-uni/components/wd-form/types'
+import type { FormInstance } from '@wot-ui/ui/components/wd-form/types'
 import type { NotifyTemplate } from '@/api/system/notify/template'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { computed, onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { createNotifyTemplate, getNotifyTemplate, updateNotifyTemplate } from '@/api/system/notify/template'
 import { getIntDictOptions } from '@/hooks/useDict'
 import { navigateBackPlus } from '@/utils'
 import { CommonStatusEnum, DICT_TYPE } from '@/utils/constants'
+import { createFormSchema, getWotPickerFormValue } from '@/utils/wot'
 
 const props = defineProps<{
   id?: number | any
@@ -122,15 +126,16 @@ const formData = ref<NotifyTemplate>({
   status: CommonStatusEnum.ENABLE,
   remark: '',
 })
-const formRules = {
+const formSchema = createFormSchema({
   name: [{ required: true, message: '模板名称不能为空' }],
   code: [{ required: true, message: '模板编码不能为空' }],
   nickname: [{ required: true, message: '发送人名称不能为空' }],
   type: [{ required: true, message: '模板类型不能为空' }],
   status: [{ required: true, message: '状态不能为空' }],
   content: [{ required: true, message: '模板内容不能为空' }],
-}
+})
 const formRef = ref<FormInstance>()
+const pickerVisible = ref<Record<string, boolean>>({})
 
 /** 模板类型选项 */
 const templateTypeOptions = computed(() => {

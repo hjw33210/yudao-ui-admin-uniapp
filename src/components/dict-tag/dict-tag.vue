@@ -54,7 +54,7 @@ const dictTag = computed(() => {
   <wd-tag
     v-if="dictTag"
     :type="dictTag.tagType"
-    :plain="plain"
+    :variant="props.plain ? 'plain' : undefined"
     :custom-class="dictTag.cssClass"
   >
     {{ dictTag.label }}

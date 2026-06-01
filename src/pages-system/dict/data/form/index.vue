@@ -9,45 +9,47 @@
 
     <!-- 表单区域 -->
     <view>
-      <wd-form ref="formRef" :model="formData" :rules="formRules">
+      <wd-form ref="formRef" :model="formData" :schema="formSchema">
         <wd-cell-group border>
-          <wd-cell title="字典类型" title-width="200rpx" prop="dictType" center>
-            <wd-picker
-              v-model="formData.dictType"
-              :columns="dictTypeOptions"
-              label-key="label"
-              value-key="value"
-              :disabled="!!formData.id"
-              placeholder="请选择字典类型"
+          <wd-form-item
+            title="字典类型"
+            title-width="200rpx"
+            prop="dictType"
+            :is-link="!formData.id"
+            :value="getWotPickerFormValue(dictTypeOptions, formData.dictType)"
+            placeholder="请选择字典类型"
+            @click="!formData.id && (pickerVisible.dictType = true)"
+          />
+          <wd-picker
+            v-model:visible="pickerVisible.dictType"
+            :model-value="formData.dictType"
+            :columns="dictTypeOptions"
+            @confirm="({ value }) => formData.dictType = value[0]"
+          />
+          <wd-form-item title="数据标签" title-width="200rpx" prop="label">
+            <wd-input
+              v-model="formData.label"
+              clearable
+              placeholder="请输入数据标签"
             />
-          </wd-cell>
-          <wd-input
-            v-model="formData.label"
-            label="数据标签"
-            label-width="200rpx"
-            prop="label"
-            clearable
-            placeholder="请输入数据标签"
-          />
-          <wd-input
-            v-model="formData.value"
-            label="数据键值"
-            label-width="200rpx"
-            prop="value"
-            clearable
-            placeholder="请输入数据键值"
-          />
-          <wd-input
-            v-model.number="formData.sort"
-            label="显示排序"
-            label-width="200rpx"
-            prop="sort"
-            type="number"
-            clearable
-            placeholder="请输入显示排序"
-          />
-          <wd-cell title="状态" title-width="200rpx" prop="status" center>
-            <wd-radio-group v-model="formData.status" shape="button">
+          </wd-form-item>
+          <wd-form-item title="数据键值" title-width="200rpx" prop="value">
+            <wd-input
+              v-model="formData.value"
+              clearable
+              placeholder="请输入数据键值"
+            />
+          </wd-form-item>
+          <wd-form-item title="显示排序" title-width="200rpx" prop="sort">
+            <wd-input
+              v-model.number="formData.sort"
+              type="number"
+              clearable
+              placeholder="请输入显示排序"
+            />
+          </wd-form-item>
+          <wd-form-item title="状态" title-width="200rpx" prop="status" center>
+            <wd-radio-group v-model="formData.status" type="button">
               <wd-radio
                 v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
                 :key="dict.value"
@@ -56,32 +58,36 @@
                 {{ dict.label }}
               </wd-radio>
             </wd-radio-group>
-          </wd-cell>
-          <wd-cell title="颜色类型" title-width="200rpx" prop="colorType" center>
-            <wd-picker
-              v-model="formData.colorType"
-              :columns="getStrDictOptions(DICT_TYPE.SYSTEM_DICT_COLOR_TYPE)"
-              label-key="label"
-              value-key="value"
-              placeholder="请选择颜色类型"
+          </wd-form-item>
+          <wd-form-item
+            title="颜色类型"
+            title-width="200rpx"
+            prop="colorType"
+            is-link
+            :value="getWotPickerFormValue(getStrDictOptions(DICT_TYPE.SYSTEM_DICT_COLOR_TYPE), formData.colorType)"
+            placeholder="请选择颜色类型"
+            @click="pickerVisible.colorType = true"
+          />
+          <wd-picker
+            v-model:visible="pickerVisible.colorType"
+            :model-value="formData.colorType"
+            :columns="getStrDictOptions(DICT_TYPE.SYSTEM_DICT_COLOR_TYPE)"
+            @confirm="({ value }) => formData.colorType = value[0]"
+          />
+          <wd-form-item title="CSS Class" title-width="200rpx" prop="cssClass">
+            <wd-input
+              v-model="formData.cssClass"
+              clearable
+              placeholder="请输入 CSS Class，如 #108ee9"
             />
-          </wd-cell>
-          <wd-input
-            v-model="formData.cssClass"
-            label="CSS Class"
-            label-width="200rpx"
-            prop="cssClass"
-            clearable
-            placeholder="请输入 CSS Class，如 #108ee9"
-          />
-          <wd-textarea
-            v-model="formData.remark"
-            label="备注"
-            label-width="200rpx"
-            prop="remark"
-            clearable
-            placeholder="请输入备注"
-          />
+          </wd-form-item>
+          <wd-form-item title="备注" title-width="200rpx" prop="remark">
+            <wd-textarea
+              v-model="formData.remark"
+              clearable
+              placeholder="请输入备注"
+            />
+          </wd-form-item>
         </wd-cell-group>
       </wd-form>
     </view>
@@ -101,15 +107,16 @@
 </template>
 
 <script lang="ts" setup>
-import type { FormInstance } from 'wot-design-uni/components/wd-form/types'
+import type { FormInstance } from '@wot-ui/ui/components/wd-form/types'
 import type { DictData } from '@/api/system/dict/data'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { computed, onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { createDictData, getDictData, updateDictData } from '@/api/system/dict/data'
 import { getSimpleDictTypeList } from '@/api/system/dict/type'
 import { getIntDictOptions, getStrDictOptions } from '@/hooks/useDict'
 import { navigateBackPlus } from '@/utils'
 import { CommonStatusEnum, DICT_TYPE } from '@/utils/constants'
+import { createFormSchema, getWotPickerFormValue } from '@/utils/wot'
 
 const props = defineProps<{
   id?: number | any
@@ -137,14 +144,15 @@ const formData = ref<DictData>({
   cssClass: '',
   remark: '',
 })
-const formRules = {
+const formSchema = createFormSchema({
   dictType: [{ required: true, message: '字典类型不能为空' }],
   label: [{ required: true, message: '数据标签不能为空' }],
   value: [{ required: true, message: '数据键值不能为空' }],
   sort: [{ required: true, message: '显示排序不能为空' }],
   status: [{ required: true, message: '状态不能为空' }],
-}
+})
 const formRef = ref<FormInstance>()
+const pickerVisible = ref<Record<string, boolean>>({})
 
 /** 字典类型选项 */
 const dictTypeOptions = ref<{ label: string, value: string }[]>([])

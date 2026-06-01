@@ -9,27 +9,32 @@
 
     <!-- 表单区域 -->
     <view>
-      <wd-form ref="formRef" :model="formData" :rules="formRules">
+      <wd-form ref="formRef" :model="formData" :schema="formSchema">
         <wd-cell-group border>
-          <wd-input
-            v-model="formData.signature"
-            label="短信签名"
-            label-width="200rpx"
-            prop="signature"
-            clearable
-            placeholder="请输入短信签名"
-          />
-          <wd-cell title="渠道编码" title-width="200rpx" prop="code" center>
-            <wd-picker
-              v-model="formData.code"
-              :columns="getStrDictOptions(DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE)"
-              label-key="label"
-              value-key="value"
-              placeholder="请选择渠道编码"
+          <wd-form-item title="短信签名" title-width="200rpx" prop="signature">
+            <wd-input
+              v-model="formData.signature"
+              clearable
+              placeholder="请输入短信签名"
             />
-          </wd-cell>
-          <wd-cell title="启用状态" title-width="200rpx" prop="status" center>
-            <wd-radio-group v-model="formData.status" shape="button">
+          </wd-form-item>
+          <wd-form-item
+            title="渠道编码"
+            title-width="200rpx"
+            prop="code"
+            is-link
+            :value="getWotPickerFormValue(getStrDictOptions(DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE), formData.code)"
+            placeholder="请选择渠道编码"
+            @click="pickerVisible.code = true"
+          />
+          <wd-picker
+            v-model:visible="pickerVisible.code"
+            :model-value="formData.code"
+            :columns="getStrDictOptions(DICT_TYPE.SYSTEM_SMS_CHANNEL_CODE)"
+            @confirm="({ value }) => formData.code = value[0]"
+          />
+          <wd-form-item title="启用状态" title-width="200rpx" prop="status" center>
+            <wd-radio-group v-model="formData.status" type="button">
               <wd-radio
                 v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
                 :key="dict.value"
@@ -38,39 +43,35 @@
                 {{ dict.label }}
               </wd-radio>
             </wd-radio-group>
-          </wd-cell>
-          <wd-input
-            v-model="formData.apiKey"
-            label="API 账号"
-            label-width="200rpx"
-            prop="apiKey"
-            clearable
-            placeholder="请输入短信 API 账号"
-          />
-          <wd-input
-            v-model="formData.apiSecret"
-            label="API 密钥"
-            label-width="200rpx"
-            prop="apiSecret"
-            clearable
-            placeholder="请输入短信 API 密钥"
-          />
-          <wd-input
-            v-model="formData.callbackUrl"
-            label="回调 URL"
-            label-width="200rpx"
-            prop="callbackUrl"
-            clearable
-            placeholder="请输入短信发送回调 URL"
-          />
-          <wd-textarea
-            v-model="formData.remark"
-            label="备注"
-            label-width="200rpx"
-            prop="remark"
-            clearable
-            placeholder="请输入备注"
-          />
+          </wd-form-item>
+          <wd-form-item title="API 账号" title-width="200rpx" prop="apiKey">
+            <wd-input
+              v-model="formData.apiKey"
+              clearable
+              placeholder="请输入短信 API 账号"
+            />
+          </wd-form-item>
+          <wd-form-item title="API 密钥" title-width="200rpx" prop="apiSecret">
+            <wd-input
+              v-model="formData.apiSecret"
+              clearable
+              placeholder="请输入短信 API 密钥"
+            />
+          </wd-form-item>
+          <wd-form-item title="回调 URL" title-width="200rpx" prop="callbackUrl">
+            <wd-input
+              v-model="formData.callbackUrl"
+              clearable
+              placeholder="请输入短信发送回调 URL"
+            />
+          </wd-form-item>
+          <wd-form-item title="备注" title-width="200rpx" prop="remark">
+            <wd-textarea
+              v-model="formData.remark"
+              clearable
+              placeholder="请输入备注"
+            />
+          </wd-form-item>
         </wd-cell-group>
       </wd-form>
     </view>
@@ -90,14 +91,15 @@
 </template>
 
 <script lang="ts" setup>
-import type { FormInstance } from 'wot-design-uni/components/wd-form/types'
+import type { FormInstance } from '@wot-ui/ui/components/wd-form/types'
 import type { SmsChannel } from '@/api/system/sms/channel'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { computed, onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { createSmsChannel, getSmsChannel, updateSmsChannel } from '@/api/system/sms/channel'
 import { getIntDictOptions, getStrDictOptions } from '@/hooks/useDict'
 import { navigateBackPlus } from '@/utils'
 import { CommonStatusEnum, DICT_TYPE } from '@/utils/constants'
+import { createFormSchema, getWotPickerFormValue } from '@/utils/wot'
 
 const props = defineProps<{
   id?: number | any
@@ -123,13 +125,14 @@ const formData = ref<SmsChannel>({
   callbackUrl: '',
   remark: '',
 })
-const formRules = {
+const formSchema = createFormSchema({
   signature: [{ required: true, message: '短信签名不能为空' }],
   code: [{ required: true, message: '渠道编码不能为空' }],
   status: [{ required: true, message: '启用状态不能为空' }],
   apiKey: [{ required: true, message: 'API 账号不能为空' }],
-}
+})
 const formRef = ref<FormInstance>()
+const pickerVisible = ref<Record<string, boolean>>({})
 
 /** 返回上一页 */
 function handleBack() {

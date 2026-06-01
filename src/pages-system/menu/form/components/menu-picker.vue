@@ -1,22 +1,37 @@
 <template>
-  <wd-col-picker
+  <wd-form-item
+    title="上级菜单"
+    title-width="180rpx"
+    :value="selectedLabel"
+    placeholder="请选择菜单"
+    is-link
+    @click="visible = true"
+  />
+  <wd-cascader
     v-model="selectedValue"
-    label="上级菜单"
-    label-width="180rpx"
-    :columns="menuColumns"
+    v-model:visible="visible"
+    :options="menuOptions"
     value-key="id"
-    label-key="name"
-    :column-change="handleColumnChange"
-    :display-format="displayFormat"
-    @confirm="handleConfirm"
+    text-key="name"
+    children-key="children"
+    check-strictly
+    title="请选择菜单"
+    @update:model-value="handleChange"
   />
 </template>
 
 <script lang="ts" setup>
+import type { CascaderOption } from '@wot-ui/ui/components/wd-cascader/types'
 import type { Menu } from '@/api/system/menu'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { getSimpleMenuList } from '@/api/system/menu'
 import { SystemMenuTypeEnum } from '@/utils/constants'
+
+type MenuOption = CascaderOption & {
+  children?: MenuOption[]
+  id: number
+  name: string
+}
 
 const props = defineProps<{
   modelValue?: number
@@ -27,21 +42,31 @@ const emit = defineEmits<{
 }>()
 
 const menuList = ref<Menu[]>([])
-const menuColumns = ref<any[]>([])
-const selectedValue = ref<number[]>([])
+const selectedValue = ref<number | string>(0)
+const visible = ref(false)
+
+const menuOptions = computed(() => [
+  { id: 0, name: '主类目' },
+  ...buildMenuTree(0),
+])
+
+const selectedLabel = computed(() => {
+  if (selectedValue.value === 0 || selectedValue.value === '') {
+    return '主类目'
+  }
+  const path = findMenuPath(Number(selectedValue.value))
+  return path.length > 0
+    ? path.map(item => item.name).join(' / ')
+    : '主类目'
+})
 
 /** 监听外部值变化，回显选中值 */
 watch(
   () => props.modelValue,
   (val) => {
-    if (val !== undefined && val !== 0 && menuList.value.length > 0) {
-      const path = findMenuPath(val)
-      selectedValue.value = path
-      buildColumnsForPath(path)
-    } else {
-      selectedValue.value = [0]
-    }
+    selectedValue.value = val ?? 0
   },
+  { immediate: true },
 )
 
 /** 加载菜单列表 */
@@ -49,113 +74,42 @@ async function loadMenuList() {
   const list = await getSimpleMenuList()
   // 只保留目录和菜单
   menuList.value = list.filter(item => item.type !== SystemMenuTypeEnum.BUTTON)
-  // 构建第一列数据（主类目 + 顶级菜单）
-  const topMenus = menuList.value.filter(item => item.parentId === 0)
-  menuColumns.value = [[
-    { id: 0, name: '主类目' },
-    ...topMenus,
-  ]]
-  // 如果有初始值，回显
-  if (props.modelValue !== undefined && props.modelValue !== 0) {
-    const path = findMenuPath(props.modelValue)
-    selectedValue.value = path
-    buildColumnsForPath(path)
-  } else {
-    selectedValue.value = [0]
-  }
 }
 
 /** 查找菜单路径 */
-function findMenuPath(targetId: number): number[] {
+function findMenuPath(targetId: number): Menu[] {
   if (targetId === 0) {
-    return [0]
+    return []
   }
-  const path: number[] = []
-  const findPath = (parentId: number, id: number): boolean => {
+  const path: Menu[] = []
+  const findPath = (parentId: number): boolean => {
     const items = menuList.value.filter(m => m.parentId === parentId)
     for (const item of items) {
-      if (item.id === id) {
-        path.push(item.id!)
-        return true
-      }
-      if (findPath(item.id!, id)) {
-        path.unshift(item.id!)
+      if (item.id === targetId || findPath(item.id!)) {
+        path.unshift(item)
         return true
       }
     }
     return false
   }
-  findPath(0, targetId)
-  return path.length > 0 ? path : [0]
+  findPath(0)
+  return path
 }
 
-/** 根据路径构建列数据 */
-function buildColumnsForPath(path: number[]) {
-  if (path.length === 0 || (path.length === 1 && path[0] === 0)) {
-    return
-  }
-  // 第一列已经有了，从第二列开始构建
-  const columns = [menuColumns.value[0]]
-  for (let i = 0; i < path.length; i++) {
-    const parentId = path[i]
-    if (parentId === 0) {
-      continue
-    }
-    const children = menuList.value.filter(item => item.parentId === parentId)
-    if (children.length > 0) {
-      columns.push(children)
-    }
-  }
-  menuColumns.value = columns
+function buildMenuTree(parentId: number): MenuOption[] {
+  return menuList.value
+    .filter((item): item is Menu & { id: number } => item.id !== undefined && item.parentId === parentId)
+    .map((item) => {
+      const children = buildMenuTree(item.id)
+      const { children: _children, ...option } = item
+      return children.length > 0 ? { ...option, children } : option
+    })
 }
 
-/** 构建带"选择当前"选项的子列表 */
-function buildChildrenWithCurrent(parentId: number) {
-  const children = menuList.value.filter(item => item.parentId === parentId)
-  // 添加"选择当前"选项，使用父节点 ID 的负数作为标识
-  return [
-    { id: -parentId, name: '✓ 选择当前' },
-    ...children,
-  ]
-}
-
-/** 列变化 */
-function handleColumnChange({ selectedItem, resolve, finish }: any) {
-  // 选择主类目或"选择当前"，结束
-  if (selectedItem.id === 0 || selectedItem.id < 0) {
-    finish()
-    return
-  }
-  const children = menuList.value.filter(item => item.parentId === selectedItem.id)
-  if (children.length > 0) {
-    resolve(buildChildrenWithCurrent(selectedItem.id))
-  } else {
-    finish()
-  }
-}
-
-/** 格式化显示 */
-function displayFormat(selectedItems: any[]) {
-  // 过滤掉"选择当前"选项
-  return selectedItems
-    .filter(item => item.id >= 0)
-    .map(item => item.name)
-    .join(' / ')
-}
-
-/** 确认选择 */
-function handleConfirm({ value }: { value: number[] }) {
-  if (value && value.length > 0) {
-    const lastValue = value[value.length - 1]
-    // 如果选择的是"选择当前"（负数 ID），取其绝对值作为实际选中的菜单 ID
-    if (lastValue < 0) {
-      emit('update:modelValue', Math.abs(lastValue))
-    } else {
-      emit('update:modelValue', lastValue)
-    }
-  } else {
-    emit('update:modelValue', 0)
-  }
+/** 处理选中值变化 */
+function handleChange(value: number | string | Array<number | string>) {
+  const selected = Array.isArray(value) ? value.at(-1) : value
+  emit('update:modelValue', selected === '' || selected === undefined ? 0 : Number(selected))
 }
 
 /** 初始化 */
