@@ -5,7 +5,7 @@
         v-for="menu in menus"
         :key="menu.key"
         :text="menu.name"
-        @itemclick="handleClick(menu)"
+        @click="handleClick(menu)"
       >
         <template #icon>
           <view
@@ -22,7 +22,7 @@
 
 <script lang="ts" setup>
 import type { MenuItem } from '../index'
-import { useToast } from 'wot-design-uni'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { isTabBarPage } from '@/tabbar/config'
 import { parseUrl, setTabParams } from '@/utils/url'
 

@@ -30,7 +30,7 @@
           @click="handleShowVersion"
         >
           <template #icon>
-            <wd-icon name="warning" size="20px" color="#1890ff" class="mr-16rpx" />
+            <wd-icon name="exclamation-circle" size="20px" color="#1890ff" class="mr-16rpx" />
           </template>
         </wd-cell>
         <wd-cell
@@ -64,8 +64,9 @@
 </template>
 
 <script lang="ts" setup>
+import { useDialog } from '@wot-ui/ui/components/wd-dialog'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { navigateBackPlus } from '@/utils'
 
 definePage({
@@ -76,6 +77,7 @@ definePage({
 })
 
 const toast = useToast()
+const dialog = useDialog()
 const version = ref('1.0.0') // 当前版本号
 const storageSize = ref('') // 本地缓存大小
 
@@ -104,23 +106,23 @@ function handleShowVersion() {
 }
 
 /** 清除缓存 */
-function handleClearCache() {
-  uni.showModal({
-    title: '提示',
-    content: '确定要清除本地缓存吗？',
-    success: (res) => {
-      if (!res.confirm) {
-        return
-      }
-      try {
-        uni.clearStorageSync()
-        getStorageSize()
-        toast.success('缓存清除成功')
-      } catch {
-        toast.error('缓存清除失败')
-      }
-    },
-  })
+async function handleClearCache() {
+  try {
+    await dialog.confirm({
+      title: '提示',
+      msg: '确定要清除本地缓存吗？',
+    })
+  } catch {
+    return
+  }
+
+  try {
+    uni.clearStorageSync()
+    getStorageSize()
+    toast.success('缓存清除成功')
+  } catch {
+    toast.error('缓存清除失败')
+  }
 }
 
 /** 跳转到用户协议 */

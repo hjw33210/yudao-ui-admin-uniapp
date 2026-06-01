@@ -16,11 +16,11 @@
       placeholder="请输入你想咨询的问题"
       placeholder-left
       hide-cancel
-      light
+      variant="light"
     />
 
     <!-- FAQ Tabs -->
-    <wd-tabs v-model="activeTab" auto-line-width>
+    <wd-tabs v-model="activeTab" line-theme="text">
       <wd-tab
         v-for="(category, index) in faqList"
         :key="index"
@@ -36,7 +36,7 @@
             >
               <template #title>
                 <view class="flex items-center">
-                  <wd-icon name="edit-outline" size="18px" color="#1890ff" class="mr-16rpx" />
+                  <wd-icon name="edit" size="18px" color="#1890ff" class="mr-16rpx" />
                   <text>{{ item.title }}</text>
                 </view>
               </template>

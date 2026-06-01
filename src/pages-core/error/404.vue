@@ -21,7 +21,7 @@ function handleBack() {
     />
 
     <view class="flex flex-1 flex-col items-center bg-white px-48rpx pt-1/3">
-      <wd-icon name="warning" size="96rpx" color="#faad14" />
+      <wd-icon name="exclamation-circle" size="96rpx" color="#faad14" />
       <view class="mt-24rpx text-34rpx text-[#333] font-semibold">
         404
       </view>
@@ -30,7 +30,7 @@ function handleBack() {
       </view>
 
       <view class="mt-32rpx w-full">
-        <wd-button :block="true" :plain="true" @click="handleBack">
+        <wd-button :block="true" variant="plain" @click="handleBack">
           返回
         </wd-button>
       </view>

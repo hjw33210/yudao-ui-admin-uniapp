@@ -37,14 +37,14 @@
         </wd-cell>
         <wd-cell title="账号安全" is-link @click="handleGoSecurity">
           <template #icon>
-            <wd-icon name="lock-on" size="20px" color="#52c41a" class="mr-16rpx" />
+            <wd-icon name="lock" size="20px" color="#52c41a" class="mr-16rpx" />
           </template>
         </wd-cell>
       </wd-cell-group>
       <wd-cell-group custom-class="menu-group mt-24rpx" border>
         <wd-cell title="常见问题" is-link @click="handleGoFaq">
           <template #icon>
-            <wd-icon name="warning" size="20px" color="#faad14" class="mr-16rpx" />
+            <wd-icon name="exclamation-circle" size="20px" color="#faad14" class="mr-16rpx" />
           </template>
         </wd-cell>
         <wd-cell title="意见反馈" is-link @click="handleGoFeedback">
@@ -59,12 +59,12 @@
         </wd-cell>
         <wd-cell title="应用设置" is-link @click="handleGoSettings">
           <template #icon>
-            <wd-icon name="setting" size="20px" color="#1890ff" class="mr-16rpx" />
+            <wd-icon name="settings" size="20px" color="#1890ff" class="mr-16rpx" />
           </template>
         </wd-cell>
       </wd-cell-group>
       <view class="mt-48rpx">
-        <wd-button block type="error" @click="handleLogout">
+        <wd-button block type="danger" @click="handleLogout">
           退出登录
         </wd-button>
       </view>
@@ -74,9 +74,10 @@
 
 <script lang="ts" setup>
 import type { UserProfileVO } from '@/api/system/user/profile'
+import { useDialog } from '@wot-ui/ui/components/wd-dialog'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { storeToRefs } from 'pinia'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { getUserProfile } from '@/api/system/user/profile'
 import { LOGIN_PAGE } from '@/router/config'
 import { useUserStore } from '@/store'
@@ -91,6 +92,7 @@ definePage({
 const userStore = useUserStore()
 const tokenStore = useTokenStore()
 const toast = useToast()
+const dialog = useDialog()
 const { userInfo } = storeToRefs(userStore)
 const userProfile = ref<UserProfileVO | null>(null) // 用户详细信息
 
@@ -131,21 +133,21 @@ function handleGoSettings() {
 }
 
 /** 退出登录 */
-function handleLogout() {
-  uni.showModal({
-    title: '提示',
-    content: '确定要退出登录吗？',
-    success: async (res) => {
-      if (!res.confirm) {
-        return
-      }
-      await tokenStore.logout()
-      toast.success('退出登录成功')
-      setTimeout(() => {
-        uni.reLaunch({ url: LOGIN_PAGE })
-      }, 500)
-    },
-  })
+async function handleLogout() {
+  try {
+    await dialog.confirm({
+      title: '提示',
+      msg: '确定要退出登录吗？',
+    })
+  } catch {
+    return
+  }
+
+  await tokenStore.logout()
+  toast.success('退出登录成功')
+  setTimeout(() => {
+    uni.reLaunch({ url: LOGIN_PAGE })
+  }, 500)
 }
 </script>
 

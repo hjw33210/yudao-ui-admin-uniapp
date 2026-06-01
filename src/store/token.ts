@@ -6,9 +6,9 @@ import type {
   ILoginForm,
 } from '@/api/login'
 import type { IAuthLoginRes } from '@/api/types/login'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue' // 修复：导入 computed
-import { useToast } from 'wot-design-uni'
 import {
   login as _login,
   logout as _logout,

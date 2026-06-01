@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { TagType } from 'wot-design-uni/components/wd-tag/types'
+import type { TagType } from '@wot-ui/ui/components/wd-tag/types'
 import { computed } from 'vue'
 
 import { getDictObj } from '@/hooks/useDict'

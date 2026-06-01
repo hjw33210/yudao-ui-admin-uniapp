@@ -13,7 +13,6 @@
           placeholder="请输入手机号"
           clearable
           clear-trigger="focus"
-          no-border
           type="number"
           :maxlength="11"
         />
@@ -25,25 +24,23 @@
         :before-send="validateBeforeSend"
       />
       <view class="input-item">
-        <wd-icon name="lock-on" size="20px" color="#1890ff" />
+        <wd-icon name="lock" size="20px" color="#1890ff" />
         <wd-input
           v-model="formData.password"
           placeholder="请输入新密码"
           clearable
           clear-trigger="focus"
           show-password
-          no-border
         />
       </view>
       <view class="input-item">
-        <wd-icon name="lock-on" size="20px" color="#1890ff" />
+        <wd-icon name="lock" size="20px" color="#1890ff" />
         <wd-input
           v-model="formData.confirmPassword"
           placeholder="请确认新密码"
           clearable
           clear-trigger="focus"
           show-password
-          no-border
         />
       </view>
 
@@ -64,8 +61,8 @@
 </template>
 
 <script lang="ts" setup>
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { reactive, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { smsResetPassword } from '@/api/login'
 import { LOGIN_PAGE } from '@/router/config'
 import { isMobile } from '@/utils/validator'

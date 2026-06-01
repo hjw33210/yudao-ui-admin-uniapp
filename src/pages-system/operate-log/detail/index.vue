@@ -40,8 +40,8 @@
 
 <script lang="ts" setup>
 import type { OperateLog } from '@/api/system/operate-log'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { getOperateLog } from '@/api/system/operate-log'
 import { navigateBackPlus } from '@/utils'
 import { DICT_TYPE } from '@/utils/constants'

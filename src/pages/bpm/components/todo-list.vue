@@ -16,7 +16,7 @@
             <view class="bpm-card-title">
               {{ item.processInstance?.name }}
             </view>
-            <wd-tag type="primary" plain>
+            <wd-tag type="primary" variant="plain">
               待审批
             </wd-tag>
           </view>
@@ -48,7 +48,7 @@
 
       <!-- 加载更多 -->
       <view v-if="loadMoreState !== 'loading' && list.length === 0" class="bpm-empty">
-        <wd-status-tip image="content" tip="暂无待办任务" />
+        <wd-empty icon="content" tip="暂无待办任务" />
       </view>
       <wd-loadmore
         v-if="list.length > 0"

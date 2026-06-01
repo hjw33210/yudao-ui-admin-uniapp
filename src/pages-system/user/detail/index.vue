@@ -45,7 +45,7 @@
         </wd-button>
         <wd-button
           v-if="hasAccessByCodes(['system:user:delete'])"
-          class="flex-1" type="error" :loading="deleting" @click="handleDelete"
+          class="flex-1" type="danger" :loading="deleting" @click="handleDelete"
         >
           删除
         </wd-button>
@@ -69,8 +69,9 @@
 
 <script lang="ts" setup>
 import type { User } from '@/api/system/user'
+import { useDialog } from '@wot-ui/ui/components/wd-dialog'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { computed, onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { deleteUser, getUser, updateUserStatus } from '@/api/system/user'
 import { useAccess } from '@/hooks/useAccess'
 import { navigateBackPlus } from '@/utils'
@@ -92,6 +93,7 @@ definePage({
 
 const { hasAccessByCodes } = useAccess()
 const toast = useToast()
+const dialog = useDialog()
 const formData = ref<User>()
 const deleting = ref(false)
 const moreActionVisible = ref(false) // 更多操作菜单
@@ -101,7 +103,10 @@ const moreActions = computed(() => {
   const actions = []
   // 修改状态权限
   if (hasAccessByCodes(['system:user:update'])) {
-    actions.push({ name: formData.value?.status === 1 ? '禁用用户' : '开启用户', value: 'update-status' })
+    actions.push({
+      name: formData.value?.status === CommonStatusEnum.ENABLE ? '禁用用户' : '开启用户',
+      value: 'update-status',
+    })
   }
   // 重置密码权限
   if (hasAccessByCodes(['system:user:update-password'])) {
@@ -141,29 +146,29 @@ function handleEdit() {
 }
 
 /** 删除用户 */
-function handleDelete() {
+async function handleDelete() {
   if (!props.id) {
     return
   }
-  uni.showModal({
-    title: '提示',
-    content: '确定要删除该用户吗？',
-    success: async (res) => {
-      if (!res.confirm) {
-        return
-      }
-      deleting.value = true
-      try {
-        await deleteUser(Number(props.id))
-        toast.success('删除成功')
-        setTimeout(() => {
-          handleBack()
-        }, 500)
-      } finally {
-        deleting.value = false
-      }
-    },
-  })
+  try {
+    await dialog.confirm({
+      title: '提示',
+      msg: '确定要删除该用户吗？',
+    })
+  } catch {
+    return
+  }
+  // 执行删除
+  deleting.value = true
+  try {
+    await deleteUser(Number(props.id))
+    toast.success('删除成功')
+    setTimeout(() => {
+      handleBack()
+    }, 500)
+  } finally {
+    deleting.value = false
+  }
 }
 
 /** 更多操作 */
@@ -178,20 +183,23 @@ function handleMoreAction({ item }: { item: { value: string } }) {
 }
 
 /** 修改用户状态 */
-function handleUpdateStatus() {
-  const isDisable = formData.value.status === CommonStatusEnum.DISABLE
-  uni.showModal({
-    title: '提示',
-    content: isDisable ? '确定要禁用该用户吗？' : '确定要开启该用户吗？',
-    success: async (res) => {
-      if (!res.confirm) {
-        return
-      }
-      await updateUserStatus(Number(props.id), formData.value.status === 1 ? 0 : 1)
-      toast.success(isDisable ? '禁用成功' : '开启成功')
-      await getDetail()
-    },
-  })
+async function handleUpdateStatus() {
+  const willEnable = formData.value.status === CommonStatusEnum.DISABLE
+  try {
+    await dialog.confirm({
+      title: '提示',
+      msg: willEnable ? '确定要开启该用户吗？' : '确定要禁用该用户吗？',
+    })
+  } catch {
+    return
+  }
+
+  await updateUserStatus(
+    Number(props.id),
+    willEnable ? CommonStatusEnum.ENABLE : CommonStatusEnum.DISABLE,
+  )
+  toast.success(willEnable ? '开启成功' : '禁用成功')
+  await getDetail()
 }
 
 /** 初始化 */

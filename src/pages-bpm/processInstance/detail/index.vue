@@ -64,8 +64,8 @@
 <script lang="ts" setup>
 import type { ApprovalNodeInfo, ProcessDefinition, ProcessInstance } from '@/api/bpm/processInstance'
 import type { Task } from '@/api/bpm/task'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { getApprovalDetail } from '@/api/bpm/processInstance'
 import { getTaskListByProcessInstanceId } from '@/api/bpm/task'
 import { navigateBackPlus } from '@/utils'

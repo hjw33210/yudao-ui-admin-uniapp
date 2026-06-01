@@ -24,10 +24,10 @@
               {{ item.requestMethod }} {{ item.requestUrl }}
             </view>
             <view class="flex-shrink-0">
-              <wd-tag v-if="item.resultCode === 0" type="success" plain>
+              <wd-tag v-if="item.resultCode === 0" type="success" variant="plain">
                 成功
               </wd-tag>
-              <wd-tag v-else type="danger" plain>
+              <wd-tag v-else type="danger" variant="plain">
                 失败
               </wd-tag>
             </view>
@@ -56,7 +56,7 @@
 
       <!-- 加载更多 -->
       <view v-if="loadMoreState !== 'loading' && list.length === 0" class="py-100rpx text-center">
-        <wd-status-tip image="content" tip="暂无日志数据" />
+        <wd-empty icon="content" tip="暂无日志数据" />
       </view>
       <wd-loadmore
         v-if="list.length > 0"

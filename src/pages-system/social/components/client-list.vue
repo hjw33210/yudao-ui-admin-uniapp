@@ -39,7 +39,7 @@
 
       <!-- 加载更多 -->
       <view v-if="loadMoreState !== 'loading' && list.length === 0" class="py-100rpx text-center">
-        <wd-status-tip image="content" tip="暂无三方应用数据" />
+        <wd-empty icon="content" tip="暂无三方应用数据" />
       </view>
       <wd-loadmore
         v-if="list.length > 0"

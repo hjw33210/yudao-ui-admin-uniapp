@@ -1,12 +1,11 @@
 <template>
   <view class="input-item">
-    <wd-icon name="lock-on" size="20px" color="#1890ff" />
+    <wd-icon name="lock" size="20px" color="#1890ff" />
     <wd-input
       :model-value="modelValue"
       placeholder="请输入验证码"
       clearable
       clear-trigger="focus"
-      no-border
       type="number"
       :maxlength="6"
       @update:model-value="$emit('update:modelValue', $event)"
@@ -23,8 +22,8 @@
 </template>
 
 <script lang="ts" setup>
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { onUnmounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { sendSmsCode } from '@/api/login'
 import { isMobile } from '@/utils/validator'
 

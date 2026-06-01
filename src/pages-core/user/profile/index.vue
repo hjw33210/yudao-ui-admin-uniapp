@@ -43,8 +43,8 @@
 
 <script lang="ts" setup>
 import type { UserProfileVO } from '@/api/system/user/profile'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { getUserProfile, updateUserProfile } from '@/api/system/user/profile'
 import { getDictLabel } from '@/hooks/useDict'
 import { useUserStore } from '@/store/user'

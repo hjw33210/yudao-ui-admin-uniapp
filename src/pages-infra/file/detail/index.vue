@@ -41,7 +41,7 @@
         </wd-button>
         <wd-button
           v-if="hasAccessByCodes(['infra:file:delete'])"
-          class="flex-1" type="error" :loading="deleting" @click="handleDelete"
+          class="flex-1" type="danger" :loading="deleting" @click="handleDelete"
         >
           删除
         </wd-button>
@@ -52,8 +52,9 @@
 
 <script lang="ts" setup>
 import type { FileVO } from '@/api/infra/file'
+import { useDialog } from '@wot-ui/ui/components/wd-dialog'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { deleteFile, getFile } from '@/api/infra/file'
 import { useAccess } from '@/hooks/useAccess'
 import { navigateBackPlus } from '@/utils'
@@ -73,6 +74,7 @@ definePage({
 
 const { hasAccessByCodes } = useAccess()
 const toast = useToast()
+const dialog = useDialog()
 const formData = ref<FileVO>()
 const deleting = ref(false)
 
@@ -110,29 +112,29 @@ function handleCopyUrl() {
 }
 
 /** 删除 */
-function handleDelete() {
+async function handleDelete() {
   if (!props.id) {
     return
   }
-  uni.showModal({
-    title: '提示',
-    content: '确定要删除该文件吗？',
-    success: async (res) => {
-      if (!res.confirm) {
-        return
-      }
-      deleting.value = true
-      try {
-        await deleteFile(props.id)
-        toast.success('删除成功')
-        setTimeout(() => {
-          handleBack()
-        }, 500)
-      } finally {
-        deleting.value = false
-      }
-    },
-  })
+  try {
+    await dialog.confirm({
+      title: '提示',
+      msg: '确定要删除该文件吗？',
+    })
+  } catch {
+    return
+  }
+  // 执行删除
+  deleting.value = true
+  try {
+    await deleteFile(props.id)
+    toast.success('删除成功')
+    setTimeout(() => {
+      handleBack()
+    }, 500)
+  } finally {
+    deleting.value = false
+  }
 }
 
 /** 初始化 */

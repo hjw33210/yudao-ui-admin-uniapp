@@ -49,7 +49,7 @@
 
       <!-- 加载更多 -->
       <view v-if="loadMoreState !== 'loading' && list.length === 0" class="py-100rpx text-center">
-        <wd-status-tip image="content" tip="暂无字典数据" />
+        <wd-empty icon="content" tip="暂无字典数据" />
       </view>
       <wd-loadmore
         v-if="list.length > 0"
@@ -70,7 +70,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { TagType } from 'wot-design-uni/components/wd-tag/types'
+import type { TagType } from '@wot-ui/ui/components/wd-tag/types'
 import type { DictData } from '@/api/system/dict/data'
 import type { LoadMoreState } from '@/http/types'
 import { ref, watch } from 'vue'

@@ -13,7 +13,6 @@
           placeholder="请输入手机号"
           clearable
           clear-trigger="focus"
-          no-border
           type="number"
           :maxlength="11"
         />
@@ -52,8 +51,8 @@
 </template>
 
 <script lang="ts" setup>
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { reactive, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { FORGET_PASSWORD_PAGE, LOGIN_PAGE } from '@/router/config'
 import { useTokenStore } from '@/store/token'
 import { ensureDecodeURIComponent, redirectAfterLogin } from '@/utils'

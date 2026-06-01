@@ -55,7 +55,7 @@
 
       <!-- 加载更多 -->
       <view v-if="loadMoreState !== 'loading' && list.length === 0" class="py-100rpx text-center">
-        <wd-status-tip image="content" tip="暂无文件配置数据" />
+        <wd-empty icon="content" tip="暂无文件配置数据" />
       </view>
       <wd-loadmore
         v-if="list.length > 0"
@@ -78,8 +78,9 @@
 <script lang="ts" setup>
 import type { FileConfig } from '@/api/infra/file/config'
 import type { LoadMoreState } from '@/http/types'
+import { useDialog } from '@wot-ui/ui/components/wd-dialog'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { getFileConfigPage, testFileConfig, updateFileConfigMaster } from '@/api/infra/file/config'
 import { useAccess } from '@/hooks/useAccess'
 import { DICT_TYPE } from '@/utils/constants'
@@ -88,6 +89,7 @@ import ConfigSearchForm from './config-search-form.vue'
 
 const { hasAccessByCodes } = useAccess()
 const toast = useToast()
+const dialog = useDialog()
 const total = ref(0)
 const list = ref<FileConfig[]>([])
 const loadMoreState = ref<LoadMoreState>('loading')
@@ -154,46 +156,49 @@ async function handleTest(item: FileConfig) {
   toast.loading('测试上传中...')
   const url = await testFileConfig(item.id!)
   toast.close()
-  uni.showModal({
-    title: '测试上传成功',
-    content: '是否要访问该文件？',
-    confirmText: '访问',
-    success: (res) => {
-      if (!res.confirm || !url) {
-        return
-      }
-      // 复制链接到剪贴板
-      uni.setClipboardData({
-        data: url,
-        success: () => {
-          uni.hideToast()
-          toast.success('链接已复制，请在浏览器中打开')
-        },
-      })
+  if (!url) {
+    return
+  }
+
+  try {
+    await dialog.confirm({
+      title: '测试上传成功',
+      msg: '是否复制该文件链接？',
+    })
+  } catch {
+    return
+  }
+
+  // 复制链接到剪贴板
+  uni.setClipboardData({
+    data: url,
+    success: () => {
+      uni.hideToast()
+      toast.success('链接已复制，请在浏览器中打开')
     },
   })
 }
 
 /** 设为主配置 */
-function handleMaster(item: FileConfig) {
-  uni.showModal({
-    title: '提示',
-    content: `是否要将"${item.name}"设为主配置？`,
-    success: async (res) => {
-      if (!res.confirm) {
-        return
-      }
-      try {
-        toast.loading('设置中...')
-        await updateFileConfigMaster(item.id!)
-        toast.success('设置成功')
-        // 刷新列表
-        handleQuery()
-      } catch {
-        toast.close()
-      }
-    },
-  })
+async function handleMaster(item: FileConfig) {
+  try {
+    await dialog.confirm({
+      title: '提示',
+      msg: `是否要将"${item.name}"设为主配置？`,
+    })
+  } catch {
+    return
+  }
+
+  try {
+    toast.loading('设置中...')
+    await updateFileConfigMaster(item.id!)
+    toast.success('设置成功')
+    // 刷新列表
+    handleQuery()
+  } catch {
+    toast.close()
+  }
 }
 
 /** 触底加载更多 */

@@ -28,8 +28,8 @@
 
 <script lang="ts" setup>
 import type { LoginLog } from '@/api/system/login-log'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 
 import { getLoginLog } from '@/api/system/login-log'
 import { navigateBackPlus } from '@/utils'

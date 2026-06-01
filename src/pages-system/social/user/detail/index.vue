@@ -48,8 +48,8 @@
 
 <script lang="ts" setup>
 import type { SocialUser } from '@/api/system/social/user'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { getSocialUser } from '@/api/system/social/user'
 import { navigateBackPlus } from '@/utils'
 import { DICT_TYPE } from '@/utils/constants'

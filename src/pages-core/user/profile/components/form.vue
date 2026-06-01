@@ -21,7 +21,7 @@
       </template>
       <!-- 性别选择 -->
       <template v-else-if="field === 'sex'">
-        <wd-radio-group v-model="formValue" cell>
+        <wd-radio-group v-model="formValue">
           <wd-radio v-for="dict in getIntDictOptions(DICT_TYPE.SYSTEM_USER_SEX)" :key="dict.value" :value="dict.value">
             {{ dict.label }}
           </wd-radio>
@@ -58,8 +58,8 @@
 </template>
 
 <script lang="ts" setup>
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { computed, ref, watch } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { updateUserProfile } from '@/api/system/user/profile'
 import { getIntDictOptions } from '@/hooks/useDict'
 import { DICT_TYPE } from '@/utils/constants'

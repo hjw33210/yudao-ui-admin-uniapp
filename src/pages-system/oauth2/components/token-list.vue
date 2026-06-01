@@ -42,7 +42,7 @@
             v-if="hasAccessByCodes(['system:oauth2-token:delete'])"
             class="flex justify-end -mt-8"
           >
-            <wd-button size="small" type="error" @click="handleDelete(item)">
+            <wd-button size="small" type="danger" @click="handleDelete(item)">
               强退
             </wd-button>
           </view>
@@ -51,7 +51,7 @@
 
       <!-- 加载更多 -->
       <view v-if="loadMoreState !== 'loading' && list.length === 0" class="py-100rpx text-center">
-        <wd-status-tip image="content" tip="暂无令牌数据" />
+        <wd-empty icon="content" tip="暂无令牌数据" />
       </view>
       <wd-loadmore
         v-if="list.length > 0"
@@ -65,8 +65,9 @@
 <script lang="ts" setup>
 import type { OAuth2Token } from '@/api/system/oauth2/token'
 import type { LoadMoreState } from '@/http/types'
+import { useDialog } from '@wot-ui/ui/components/wd-dialog'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { deleteOAuth2Token, getOAuth2TokenPage } from '@/api/system/oauth2/token'
 import { useAccess } from '@/hooks/useAccess'
 import { DICT_TYPE } from '@/utils/constants'
@@ -75,6 +76,7 @@ import TokenSearchForm from './token-search-form.vue'
 
 const { hasAccessByCodes } = useAccess()
 const toast = useToast()
+const dialog = useDialog()
 const total = ref(0)
 const list = ref<OAuth2Token[]>([])
 const loadMoreState = ref<LoadMoreState>('loading')
@@ -123,20 +125,20 @@ function loadMore() {
 }
 
 /** 删除令牌 */
-function handleDelete(item: OAuth2Token) {
-  uni.showModal({
-    title: '提示',
-    content: '确定要删除该令牌吗？',
-    success: async (res) => {
-      if (!res.confirm) {
-        return
-      }
-      await deleteOAuth2Token(item.accessToken)
-      toast.success('删除成功')
-      // 刷新列表
-      handleQuery()
-    },
-  })
+async function handleDelete(item: OAuth2Token) {
+  try {
+    await dialog.confirm({
+      title: '提示',
+      msg: '确定要删除该令牌吗？',
+    })
+  } catch {
+    return
+  }
+  // 执行删除
+  await deleteOAuth2Token(item.accessToken)
+  toast.success('删除成功')
+  // 刷新列表
+  handleQuery()
 }
 
 /** 触底加载更多 */

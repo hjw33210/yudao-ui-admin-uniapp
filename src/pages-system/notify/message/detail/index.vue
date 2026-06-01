@@ -35,8 +35,8 @@
 
 <script lang="ts" setup>
 import type { NotifyMessage } from '@/api/system/notify/message'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { getNotifyMessage } from '@/api/system/notify/message'
 import { navigateBackPlus } from '@/utils'
 import { DICT_TYPE } from '@/utils/constants'

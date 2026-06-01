@@ -1,5 +1,5 @@
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { getEnvBaseUrl } from '@/utils/index'
 
 const VITE_UPLOAD_BASEURL = `${getEnvBaseUrl()}/upload`

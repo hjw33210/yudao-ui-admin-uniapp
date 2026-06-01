@@ -45,7 +45,7 @@
 
       <!-- 空状态 -->
       <view v-if="!loading && list.length === 0" class="py-100rpx text-center">
-        <wd-status-tip image="content" tip="暂无数据源配置数据" />
+        <wd-empty icon="content" tip="暂无数据源配置数据" />
       </view>
     </view>
 
@@ -62,8 +62,8 @@
 
 <script lang="ts" setup>
 import type { DataSourceConfig } from '@/api/infra/data-source-config'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { getDataSourceConfigList } from '@/api/infra/data-source-config'
 import { useAccess } from '@/hooks/useAccess'
 import { navigateBackPlus } from '@/utils'

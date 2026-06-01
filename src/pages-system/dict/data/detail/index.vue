@@ -46,7 +46,7 @@
         </wd-button>
         <wd-button
           v-if="hasAccessByCodes(['system:dict:delete'])"
-          class="flex-1" type="error" :loading="deleting" @click="handleDelete"
+          class="flex-1" type="danger" :loading="deleting" @click="handleDelete"
         >
           删除
         </wd-button>
@@ -56,10 +56,11 @@
 </template>
 
 <script lang="ts" setup>
-import type { TagType } from 'wot-design-uni/components/wd-tag/types'
+import type { TagType } from '@wot-ui/ui/components/wd-tag/types'
 import type { DictData } from '@/api/system/dict/data'
+import { useDialog } from '@wot-ui/ui/components/wd-dialog'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { deleteDictData, getDictData } from '@/api/system/dict/data'
 import { useAccess } from '@/hooks/useAccess'
 import { navigateBackPlus } from '@/utils'
@@ -78,6 +79,7 @@ definePage({
 })
 
 const { hasAccessByCodes } = useAccess()
+const dialog = useDialog()
 const toast = useToast()
 const formData = ref<DictData>()
 const deleting = ref(false)
@@ -125,29 +127,29 @@ function handleEdit() {
 }
 
 /** 删除 */
-function handleDelete() {
+async function handleDelete() {
   if (!props.id) {
     return
   }
-  uni.showModal({
-    title: '提示',
-    content: '确定要删除该字典数据吗？',
-    success: async (res) => {
-      if (!res.confirm) {
-        return
-      }
-      deleting.value = true
-      try {
-        await deleteDictData(props.id)
-        toast.success('删除成功')
-        setTimeout(() => {
-          handleBack()
-        }, 500)
-      } finally {
-        deleting.value = false
-      }
-    },
-  })
+  try {
+    await dialog.confirm({
+      title: '提示',
+      msg: '确定要删除该字典数据吗？',
+    })
+  } catch {
+    return
+  }
+  // 执行删除
+  deleting.value = true
+  try {
+    await deleteDictData(props.id)
+    toast.success('删除成功')
+    setTimeout(() => {
+      handleBack()
+    }, 500)
+  } finally {
+    deleting.value = false
+  }
 }
 
 /** 初始化 */

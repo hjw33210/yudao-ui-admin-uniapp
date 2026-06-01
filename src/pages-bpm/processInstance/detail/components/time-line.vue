@@ -58,7 +58,7 @@
       <view v-if="activity.nodeType === BpmNodeTypeEnum.CHILD_PROCESS_NODE" class="mb-16rpx">
         <wd-button
           type="primary"
-          plain
+          variant="plain"
           size="small"
           :disabled="!activity.processInstanceId"
           @click="handleChildProcess(activity)"
@@ -188,7 +188,7 @@
                 class="absolute right--4rpx top-36rpx h-16rpx w-16rpx flex items-center justify-center border-2 border-white rounded-full"
                 :style="{ backgroundColor: getApprovalNodeColor(BpmTaskStatusEnum.NOT_START) }"
               >
-                <wd-icon name="time" size="12rpx" color="white" />
+                <wd-icon name="clock-circle" size="12rpx" color="white" />
               </view>
             </view>
 
@@ -231,14 +231,14 @@ const emit = defineEmits<{
 // 状态图标映射
 const statusIconMap: Record<string, { color: string, icon: string }> = {
   '-2': { color: '#909398', icon: 'skip-forward' }, // 跳过
-  '-1': { color: '#909398', icon: 'time' }, // 审批未开始
+  '-1': { color: '#909398', icon: 'clock-circle' }, // 审批未开始
   '0': { color: '#f59e0b', icon: 'refresh1' }, // 待审批
   '1': { color: '#f59e0b', icon: 'refresh1' }, // 审批中
   '2': { color: '#00b32a', icon: 'check' }, // 审批通过
   '3': { color: '#f46b6c', icon: 'close' }, // 审批不通过
   '4': { color: '#cccccc', icon: 'delete' }, // 已取消
   '5': { color: '#f46b6c', icon: 'arrow-left' }, // 退回
-  '6': { color: '#448ef7', icon: 'time' }, // 委派中
+  '6': { color: '#448ef7', icon: 'clock-circle' }, // 委派中
   '7': { color: '#00b32a', icon: 'check' }, // 审批通过中
 }
 

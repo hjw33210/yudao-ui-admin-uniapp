@@ -81,7 +81,7 @@
 
       <!-- 空状态 -->
       <view v-if="categoryList.length === 0" class="py-100rpx">
-        <wd-status-tip image="content" tip="暂无可发起的流程" />
+        <wd-empty icon="content" tip="暂无可发起的流程" />
       </view>
     </scroll-view>
   </view>
@@ -91,8 +91,8 @@
 import type { Category } from '@/api/bpm/category'
 import type { ProcessDefinition } from '@/api/bpm/definition'
 import { onLoad } from '@dcloudio/uni-app'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { computed, nextTick, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { getCategorySimpleList } from '@/api/bpm/category'
 import { getProcessDefinitionList } from '@/api/bpm/definition'
 import { getMobileFormCustomPath } from '@/pages-bpm/utils'

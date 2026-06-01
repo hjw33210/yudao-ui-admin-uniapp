@@ -35,10 +35,10 @@
         </view>
         <view class="flex items-start">
           <text class="w-160rpx shrink-0 text-28rpx text-[#999]">是否已读</text>
-          <wd-tag v-if="formData.readStatus" type="success" plain>
+          <wd-tag v-if="formData.readStatus" type="success" variant="plain">
             已读
           </wd-tag>
-          <wd-tag v-else type="warning" plain>
+          <wd-tag v-else type="warning" variant="plain">
             未读
           </wd-tag>
         </view>

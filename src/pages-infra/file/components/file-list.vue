@@ -50,7 +50,7 @@
             </wd-button>
             <wd-button
               v-if="hasAccessByCodes(['infra:file:delete'])"
-              size="small" type="error" @click.stop="handleDelete(item)"
+              size="small" type="danger" @click.stop="handleDelete(item)"
             >
               删除
             </wd-button>
@@ -60,7 +60,7 @@
 
       <!-- 加载更多 -->
       <view v-if="loadMoreState !== 'loading' && list.length === 0" class="py-100rpx text-center">
-        <wd-status-tip image="content" tip="暂无文件数据" />
+        <wd-empty icon="content" tip="暂无文件数据" />
       </view>
       <wd-loadmore
         v-if="list.length > 0"
@@ -81,8 +81,9 @@
 
 <script lang="ts" setup>
 import type { LoadMoreState } from '@/http/types'
+import { useDialog } from '@wot-ui/ui/components/wd-dialog'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { uploadFile } from '@/api/infra/file'
 import { useAccess } from '@/hooks/useAccess'
 import { http } from '@/http/http'
@@ -104,6 +105,7 @@ interface FileInfo {
 
 const { hasAccessByCodes } = useAccess()
 const toast = useToast()
+const dialog = useDialog()
 const total = ref(0)
 const list = ref<FileInfo[]>([])
 const loadMoreState = ref<LoadMoreState>('loading')
@@ -192,25 +194,25 @@ function handleDetail(item: FileInfo) {
 }
 
 /** 删除文件 */
-function handleDelete(item: FileInfo) {
-  uni.showModal({
-    title: '提示',
-    content: `确定要删除文件"${item.name || item.path}"吗？`,
-    success: async (res) => {
-      if (!res.confirm) {
-        return
-      }
-      try {
-        toast.loading('删除中...')
-        await http.delete(`/infra/file/delete?id=${item.id}`)
-        toast.success('删除成功')
-        // 刷新列表
-        handleQuery()
-      } catch {
-        toast.show('删除失败')
-      }
-    },
-  })
+async function handleDelete(item: FileInfo) {
+  try {
+    await dialog.confirm({
+      title: '提示',
+      msg: `确定要删除文件"${item.name || item.path}"吗？`,
+    })
+  } catch {
+    return
+  }
+  // 执行删除
+  try {
+    toast.loading('删除中...')
+    await http.delete(`/infra/file/delete?id=${item.id}`)
+    toast.success('删除成功')
+    // 刷新列表
+    handleQuery()
+  } catch {
+    toast.show('删除失败')
+  }
 }
 
 /** 触底加载更多 */

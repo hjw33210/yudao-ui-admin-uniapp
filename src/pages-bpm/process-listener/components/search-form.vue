@@ -21,7 +21,7 @@
         <view class="yd-search-form-label">
           监听器类型
         </view>
-        <wd-radio-group v-model="formData.type" shape="button">
+        <wd-radio-group v-model="formData.type" type="button">
           <wd-radio value="">
             全部
           </wd-radio>
@@ -35,7 +35,7 @@
         </wd-radio-group>
       </view>
       <view class="yd-search-form-actions">
-        <wd-button class="flex-1" plain @click="handleReset">
+        <wd-button class="flex-1" variant="plain" @click="handleReset">
           重置
         </wd-button>
         <wd-button class="flex-1" type="primary" @click="handleSearch">

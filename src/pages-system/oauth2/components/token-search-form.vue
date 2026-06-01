@@ -21,7 +21,7 @@
         <view class="yd-search-form-label">
           用户类型
         </view>
-        <wd-radio-group v-model="formData.userType" shape="button">
+        <wd-radio-group v-model="formData.userType" type="button">
           <wd-radio :value="-1">
             全部
           </wd-radio>
@@ -45,7 +45,7 @@
         />
       </view>
       <view class="yd-search-form-actions">
-        <wd-button class="flex-1" plain @click="handleReset">
+        <wd-button class="flex-1" variant="plain" @click="handleReset">
           重置
         </wd-button>
         <wd-button class="flex-1" type="primary" @click="handleSearch">

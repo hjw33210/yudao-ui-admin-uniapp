@@ -1,4 +1,4 @@
-import type { ConfigProviderThemeVars } from 'wot-design-uni'
+import type { ConfigProviderThemeVars } from '@wot-ui/ui/components/wd-config-provider/types'
 
 import { defineStore } from 'pinia'
 

@@ -8,7 +8,7 @@
  * 通过环境变量 VITE_UPLOAD_TYPE 配置
  */
 
-import { useToast } from 'wot-design-uni'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import * as FileApi from '@/api/infra/file'
 
 /** 上传类型 */

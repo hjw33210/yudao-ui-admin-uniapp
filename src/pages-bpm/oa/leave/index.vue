@@ -51,11 +51,11 @@
         </view>
         <view class="bpm-actions">
           <view class="bpm-action-btn" @click.stop="handleDetail(item)">
-            <wd-icon name="view" size="32rpx" />
+            <wd-icon name="eye" size="32rpx" />
             <text class="ml-8rpx">详情</text>
           </view>
           <view class="bpm-action-btn" @click.stop="handleProgress(item)">
-            <wd-icon name="queue" size="32rpx" />
+            <wd-icon name="list" size="32rpx" />
             <text class="ml-8rpx">审批进度</text>
           </view>
           <view
@@ -71,7 +71,7 @@
 
       <!-- 加载更多 -->
       <view v-if="loadMoreState !== 'loading' && list.length === 0" class="bpm-empty">
-        <wd-status-tip image="content" tip="暂无请假记录" />
+        <wd-empty icon="content" tip="暂无请假记录" />
       </view>
       <wd-loadmore
         v-if="list.length > 0"
@@ -94,6 +94,7 @@
 import type { Leave } from '@/api/bpm/oa/leave'
 import type { LoadMoreState } from '@/http/types'
 import { onReachBottom } from '@dcloudio/uni-app'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { computed, onMounted, ref } from 'vue'
 import { getLeavePage } from '@/api/bpm/oa/leave'
 import { cancelProcessInstanceByStartUser } from '@/api/bpm/processInstance'
@@ -112,6 +113,7 @@ definePage({
 })
 
 const userStore = useUserStore()
+const toast = useToast()
 const userNickname = computed(() => userStore.userInfo?.nickname || '')
 
 const total = ref(0)
@@ -189,12 +191,12 @@ function handleCancel(item: Leave) {
       }
       const reason = res.content?.trim()
       if (!reason) {
-        uni.showToast({ title: '请输入取消原因', icon: 'none' })
+        toast.show('请输入取消原因')
         return
       }
       await cancelProcessInstanceByStartUser(String(item.processInstanceId), reason)
       // 更新状态
-      uni.showToast({ title: '取消成功', icon: 'success' })
+      toast.success('取消成功')
       item.status = BpmProcessInstanceStatus.CANCEL
       item.endTime = new Date()
     },

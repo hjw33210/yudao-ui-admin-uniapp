@@ -10,7 +10,7 @@
       </view>
       <!-- 更多操作按钮 -->
       <view v-if="moreOperations.length > 0" class="mr-32rpx w-60rpx flex flex-col items-center" @click="handleShowMore">
-        <wd-icon name="ellipsis" size="40rpx" color="#1890ff" />
+        <wd-icon name="more" size="40rpx" color="#1890ff" />
         <text class="mt-4rpx text-22rpx text-[#333]">更多</text>
       </view>
       <!-- 更多操作 ActionSheet -->
@@ -21,7 +21,7 @@
         <wd-button
           v-for="(action, idx) in rightOperations"
           :key="idx"
-          :plain="action.plain"
+          :variant="action.variant"
           :type="action.btnType"
           :round="false"
           class="flex-1"
@@ -36,7 +36,7 @@
   <!--  无待审批的任务 仅显示取消按钮。TODO @jason：看看还需要显示（这个微信交流下） -->
   <view v-if="!runningTask && isShowProcessStartCancel()" class="yd-detail-footer">
     <wd-button
-      plain
+      variant="plain"
       type="primary"
       :round="false"
       block
@@ -48,8 +48,8 @@
 </template>
 
 <script lang="ts" setup>
-import type { Action } from 'wot-design-uni/components/wd-action-sheet/types'
-import type { ButtonType } from 'wot-design-uni/components/wd-button/types'
+import type { Action } from '@wot-ui/ui/components/wd-action-sheet/types'
+import type { ButtonType, ButtonVariant } from '@wot-ui/ui/components/wd-button/types'
 import type { ProcessInstance } from '@/api/bpm/processInstance'
 import type { Task } from '@/api/bpm/task'
 import { useUserStore } from '@/store'
@@ -76,7 +76,7 @@ interface RightOperationType {
   operationType: number
   btnType: ButtonType
   displayName: string
-  plain: boolean
+  variant: ButtonVariant
 }
 const operationIconsMap: Record<number, string> = {
   [BpmTaskOperationButtonTypeEnum.TRANSFER]: 'transfer',
@@ -110,8 +110,8 @@ function init(theProcessInstance: ProcessInstance, task: Task) {
       rightOperations.value.push({
         operationType: BpmTaskOperationButtonTypeEnum.REJECT,
         displayName: getButtonDisplayName(BpmTaskOperationButtonTypeEnum.REJECT),
-        btnType: 'error',
-        plain: true,
+        btnType: 'danger',
+        variant: 'plain',
       })
     }
     if (isHandleTaskStatus() && isShowButton(BpmTaskOperationButtonTypeEnum.APPROVE)) {
@@ -120,7 +120,7 @@ function init(theProcessInstance: ProcessInstance, task: Task) {
         operationType: BpmTaskOperationButtonTypeEnum.APPROVE,
         displayName: getButtonDisplayName(BpmTaskOperationButtonTypeEnum.APPROVE),
         btnType: 'primary',
-        plain: false,
+        variant: 'base',
       })
     }
 
@@ -169,7 +169,7 @@ function init(theProcessInstance: ProcessInstance, task: Task) {
         operationType: BpmTaskOperationButtonTypeEnum.PROCESS_START_CANCEL,
         displayName: getButtonDisplayName(BpmTaskOperationButtonTypeEnum.PROCESS_START_CANCEL),
         btnType: 'primary',
-        plain: true,
+        variant: 'plain',
       })
     } else {
       if (leftOperations.value.length >= 2) {

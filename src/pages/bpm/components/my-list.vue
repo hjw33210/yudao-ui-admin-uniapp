@@ -38,7 +38,7 @@
 
       <!-- 加载更多 -->
       <view v-if="loadMoreState !== 'loading' && list.length === 0" class="bpm-empty">
-        <wd-status-tip image="content" tip="暂无发起的流程" />
+        <wd-empty icon="content" tip="暂无发起的流程" />
       </view>
       <wd-loadmore
         v-if="list.length > 0"
@@ -51,7 +51,7 @@
         class="fixed bottom-200rpx right-32rpx z-10 h-100rpx w-100rpx flex items-center justify-center rounded-full bg-[#1890ff] shadow-lg"
         @click="handleCreate"
       >
-        <wd-icon name="add" size="24px" color="#fff" />
+        <wd-icon name="plus" size="24px" color="#fff" />
       </view>
     </view>
   </view>

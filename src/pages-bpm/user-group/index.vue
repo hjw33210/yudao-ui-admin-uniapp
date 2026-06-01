@@ -36,11 +36,11 @@
                 v-for="userId in (item.userIds || []).slice(0, 3)"
                 :key="userId"
                 type="primary"
-                plain
+                variant="plain"
               >
                 {{ getUserNickname(userId) }}
               </wd-tag>
-              <wd-tag v-if="(item.userIds || []).length > 3" type="info" plain>
+              <wd-tag v-if="(item.userIds || []).length > 3" type="default" variant="plain">
                 +{{ (item.userIds || []).length - 3 }}
               </wd-tag>
             </view>
@@ -54,7 +54,7 @@
 
       <!-- 加载更多 -->
       <view v-if="loadMoreState !== 'loading' && list.length === 0" class="py-100rpx text-center">
-        <wd-status-tip image="content" tip="暂无用户分组数据" />
+        <wd-empty icon="content" tip="暂无用户分组数据" />
       </view>
       <wd-loadmore
         v-if="list.length > 0"
@@ -76,7 +76,7 @@
 
 <script lang="ts" setup>
 import type { UserGroup } from '@/api/bpm/user-group'
-import type { SimpleUser } from '@/api/system/user'
+import type { User } from '@/api/system/user'
 import type { LoadMoreState } from '@/http/types'
 import { onReachBottom } from '@dcloudio/uni-app'
 import { onMounted, ref } from 'vue'
@@ -103,7 +103,7 @@ const queryParams = ref({
   pageNo: 1,
   pageSize: 10,
 })
-const userList = ref<SimpleUser[]>([])
+const userList = ref<User[]>([])
 
 /** 返回上一页 */
 function handleBack() {

@@ -13,39 +13,35 @@
           placeholder="请输入用户名"
           clearable
           clear-trigger="focus"
-          no-border
         />
       </view>
       <view class="input-item">
-        <wd-icon name="person" size="20px" color="#1890ff" />
+        <wd-icon name="user" size="20px" color="#1890ff" />
         <wd-input
           v-model="formData.nickname"
           placeholder="请输入昵称"
           clearable
           clear-trigger="focus"
-          no-border
         />
       </view>
       <view class="input-item">
-        <wd-icon name="lock-on" size="20px" color="#1890ff" />
+        <wd-icon name="lock" size="20px" color="#1890ff" />
         <wd-input
           v-model="formData.password"
           placeholder="请输入密码"
           clearable
           clear-trigger="focus"
           show-password
-          no-border
         />
       </view>
       <view class="input-item">
-        <wd-icon name="lock-on" size="20px" color="#1890ff" />
+        <wd-icon name="lock" size="20px" color="#1890ff" />
         <wd-input
           v-model="formData.confirmPassword"
           placeholder="请确认密码"
           clearable
           clear-trigger="focus"
           show-password
-          no-border
         />
       </view>
       <view v-if="captchaEnabled">
@@ -61,7 +57,7 @@
 
       <!-- 用户协议 -->
       <view class="mb-24rpx flex items-center">
-        <wd-checkbox v-model="agreePolicy" shape="square" />
+        <wd-checkbox v-model="agreePolicy" type="square" />
         <text class="text-24rpx text-[#666]">我已阅读并同意</text>
         <text class="text-24rpx text-[#1890ff]" @click="goToUserAgreement">
           《用户协议》
@@ -92,8 +88,8 @@
 </template>
 
 <script lang="ts" setup>
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { reactive, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { LOGIN_PAGE } from '@/router/config'
 import { useTokenStore } from '@/store/token'
 import { redirectAfterLogin } from '@/utils'

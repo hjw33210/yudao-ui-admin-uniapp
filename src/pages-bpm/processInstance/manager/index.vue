@@ -62,7 +62,7 @@
                 v-for="task in item.tasks"
                 :key="task.id"
                 type="primary"
-                plain
+                variant="plain"
                 @click.stop="handleTaskDetail(item, task)"
               >
                 {{ task.name }}
@@ -73,7 +73,7 @@
             v-if="item.status === BpmProcessInstanceStatus.RUNNING"
             class="flex items-center justify-end border-t border-[#f0f0f0] -mt-8"
           >
-            <wd-button size="small" type="error" plain @click.stop="handleCancel(item)">
+            <wd-button size="small" type="danger" variant="plain" @click.stop="handleCancel(item)">
               取消流程
             </wd-button>
           </view>
@@ -82,7 +82,7 @@
 
       <!-- 加载更多 -->
       <view v-if="loadMoreState !== 'loading' && list.length === 0" class="py-100rpx text-center">
-        <wd-status-tip image="content" tip="暂无流程实例" />
+        <wd-empty icon="content" tip="暂无流程实例" />
       </view>
       <wd-loadmore
         v-if="list.length > 0"
@@ -97,8 +97,8 @@
 import type { ProcessInstance } from '@/api/bpm/processInstance'
 import type { LoadMoreState } from '@/http/types'
 import { onReachBottom } from '@dcloudio/uni-app'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import {
   cancelProcessInstanceByAdmin,
   getProcessInstanceManagerPage,

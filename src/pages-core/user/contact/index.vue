@@ -52,8 +52,8 @@
 </template>
 
 <script lang="ts" setup>
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { navigateBackPlus } from '@/utils'
 import { saveImageToAlbum, staticUrl } from '@/utils/download'
 

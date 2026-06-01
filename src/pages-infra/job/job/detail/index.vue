@@ -36,7 +36,7 @@
         </wd-button>
         <wd-button
           v-if="hasAccessByCodes(['infra:job:delete'])"
-          class="flex-1" type="error" :loading="deleting" @click="handleDelete"
+          class="flex-1" type="danger" :loading="deleting" @click="handleDelete"
         >
           删除
         </wd-button>
@@ -56,8 +56,9 @@
 
 <script lang="ts" setup>
 import type { Job } from '@/api/infra/job'
+import { useDialog } from '@wot-ui/ui/components/wd-dialog'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { computed, onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { deleteJob, getJob, runJob, updateJobStatus } from '@/api/infra/job'
 import { useAccess } from '@/hooks/useAccess'
 import { navigateBackPlus } from '@/utils'
@@ -77,6 +78,7 @@ definePage({
 
 const { hasAccessByCodes } = useAccess()
 const toast = useToast()
+const dialog = useDialog()
 const formData = ref<Job>()
 const deleting = ref(false)
 
@@ -119,26 +121,25 @@ async function getDetail() {
 }
 
 /** 执行一次 */
-function handleRun() {
+async function handleRun() {
   if (!props.id) {
     return
   }
-  uni.showModal({
-    title: '提示',
-    content: '确定要立即执行一次该任务吗？',
-    success: async (res) => {
-      if (!res.confirm) {
-        return
-      }
-      try {
-        toast.loading('执行中...')
-        await runJob(props.id)
-        toast.success('执行成功')
-      } finally {
-        toast.close()
-      }
-    },
-  })
+  try {
+    await dialog.confirm({
+      title: '提示',
+      msg: '确定要立即执行一次该任务吗？',
+    })
+  } catch {
+    return
+  }
+  try {
+    toast.loading('执行中...')
+    await runJob(props.id)
+    toast.success('执行成功')
+  } finally {
+    toast.close()
+  }
 }
 
 /** 编辑 */
@@ -149,29 +150,29 @@ function handleEdit() {
 }
 
 /** 删除 */
-function handleDelete() {
+async function handleDelete() {
   if (!props.id) {
     return
   }
-  uni.showModal({
-    title: '提示',
-    content: '确定要删除该定时任务吗？',
-    success: async (res) => {
-      if (!res.confirm) {
-        return
-      }
-      deleting.value = true
-      try {
-        await deleteJob(props.id)
-        toast.success('删除成功')
-        setTimeout(() => {
-          handleBack()
-        }, 500)
-      } finally {
-        deleting.value = false
-      }
-    },
-  })
+  try {
+    await dialog.confirm({
+      title: '提示',
+      msg: '确定要删除该定时任务吗？',
+    })
+  } catch {
+    return
+  }
+  // 执行删除
+  deleting.value = true
+  try {
+    await deleteJob(props.id)
+    toast.success('删除成功')
+    setTimeout(() => {
+      handleBack()
+    }, 500)
+  } finally {
+    deleting.value = false
+  }
 }
 
 /** 更多操作 */
@@ -186,30 +187,30 @@ function handleMoreAction({ item }: { item: { value: string } }) {
 }
 
 /** 更新任务状态 */
-function handleUpdateStatus() {
+async function handleUpdateStatus() {
   if (!props.id) {
     return
   }
   const isRunning = formData.value?.status === InfraJobStatusEnum.NORMAL
   const statusText = isRunning ? '暂停' : '开启'
-  uni.showModal({
-    title: '提示',
-    content: `确定要${statusText}该任务吗？`,
-    success: async (res) => {
-      if (!res.confirm) {
-        return
-      }
-      try {
-        toast.loading(`正在${statusText}中...`)
-        const newStatus = isRunning ? InfraJobStatusEnum.STOP : InfraJobStatusEnum.NORMAL
-        await updateJobStatus(props.id, newStatus)
-        toast.success(`${statusText}成功`)
-        await getDetail()
-      } finally {
-        toast.close()
-      }
-    },
-  })
+  try {
+    await dialog.confirm({
+      title: '提示',
+      msg: `确定要${statusText}该任务吗？`,
+    })
+  } catch {
+    return
+  }
+
+  try {
+    toast.loading(`正在${statusText}中...`)
+    const newStatus = isRunning ? InfraJobStatusEnum.STOP : InfraJobStatusEnum.NORMAL
+    await updateJobStatus(props.id, newStatus)
+    toast.success(`${statusText}成功`)
+    await getDetail()
+  } finally {
+    toast.close()
+  }
 }
 
 /** 查看调度日志 */

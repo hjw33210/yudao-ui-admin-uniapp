@@ -28,8 +28,8 @@
 
 <script lang="ts" setup>
 import type { Leave } from '@/api/bpm/oa/leave'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { getLeave } from '@/api/bpm/oa/leave'
 import { navigateBackPlus } from '@/utils'
 import { DICT_TYPE } from '@/utils/constants'

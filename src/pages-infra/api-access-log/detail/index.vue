@@ -29,10 +29,10 @@
           </view>
         </wd-cell>
         <wd-cell title="请求时间" :value="getRequestTimeRange()" />
-        <wd-cell title="请求耗时" :value="`${formData.duration} ms`" />
+        <wd-cell title="请求耗时" :value="formData?.duration !== undefined ? `${formData.duration} ms` : '-'" />
         <wd-cell title="操作结果">
           <template v-if="formData?.resultCode === 0">
-            <wd-tag type="success" plain>
+            <wd-tag type="success" variant="plain">
               正常
             </wd-tag>
           </template>
@@ -53,8 +53,8 @@
 
 <script lang="ts" setup>
 import type { ApiAccessLog } from '@/api/infra/api-access-log'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { getApiAccessLog } from '@/api/infra/api-access-log'
 import { getDictLabel } from '@/hooks/useDict'
 import { navigateBackPlus } from '@/utils'

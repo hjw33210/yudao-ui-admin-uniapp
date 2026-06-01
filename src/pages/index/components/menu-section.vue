@@ -5,7 +5,7 @@
       <view class="flex items-center justify-between px-24rpx py-20rpx">
         <text class="text-28rpx text-#333 font-500">常用</text>
         <view class="p-10rpx" @click="handleGotoFavoriteSettings">
-          <wd-icon name="setting" size="32rpx" color="#999" />
+          <wd-icon name="settings" size="32rpx" color="#999" />
         </view>
       </view>
       <MenuGrid v-if="favoriteMenuItems.length > 0" :menus="favoriteMenuItems" />
@@ -14,7 +14,7 @@
         class="mx-24rpx mb-24rpx flex items-center border-1rpx border-#ddd rounded-12rpx border-dashed px-24rpx py-12rpx"
         @click="handleGotoFavoriteSettings"
       >
-        <wd-icon name="add" size="32rpx" color="#999" />
+        <wd-icon name="plus" size="32rpx" color="#999" />
         <text class="pl-10rpx text-28rpx text-#999">添加我常用的</text>
       </view>
     </view>

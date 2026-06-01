@@ -38,7 +38,7 @@
 
       <!-- 加载更多 -->
       <view v-if="loadMoreState !== 'loading' && list.length === 0" class="bpm-empty">
-        <wd-status-tip image="content" tip="暂无已办任务" />
+        <wd-empty icon="content" tip="暂无已办任务" />
       </view>
       <wd-loadmore
         v-if="list.length > 0"

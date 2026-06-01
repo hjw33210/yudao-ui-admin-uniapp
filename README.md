@@ -51,7 +51,7 @@
 |:--------------------------------:|:--------------------------------:|:--------------------------------:|
 | ![](/.image/admin-uniapp/01.png) | ![](/.image/admin-uniapp/02.png) | ![](/.image/admin-uniapp/03.png) |
 
-* 采用 `Vue3` + `TypeScript` + `Vite5` + `UnoCSS` + `wot-design-uni` + `z-paging` 构成，使用最新的前端技术栈，无需依赖 `HBuilderX`，通过命令行方式运行 `H5`、`小程序` 和 `App`。
+* 采用 `Vue3` + `TypeScript` + `Vite5` + `UnoCSS` + `wot-ui` + `z-paging` 构成，使用最新的前端技术栈，无需依赖 `HBuilderX`，通过命令行方式运行 `H5`、`小程序` 和 `App`。
 * 内置了 `约定式路由`、`layout布局`、`请求封装`、`请求拦截`、`登录拦截`、`UnoCSS`、`i18n多语言` 等基础功能，提供了 `代码提示`、`自动格式化`、`统一配置`、`代码片段` 等辅助功能，让你编写 `uniapp` 拥有 `best` 体验。
 
 ## ⚙️ 技术栈
@@ -65,7 +65,7 @@
 | [Pinia](https://pinia.vuejs.org/)                   | Vue 状态管理库         | 2.0.x  |
 | [UnoCSS](https://unocss.dev/)                       | 即时原子化 CSS 引擎      | 66.x   |
 | [unibest](https://github.com/feige996/unibest)      | 最好的 uniapp 框架     | 4.1.0  |
-| [wot-design-uni](https://wot-design-uni.pages.dev/) | 高颜值、轻量化 UI 组件库    | 1.13.x |
+| [wot-ui](https://wot-ui.cn/)                        | 高颜值、轻量化 UI 组件库    | 2.0.x  |
 | [z-paging](https://z-paging.zxlee.cn/)              | 高性能分页组件           | 2.8.x  |
 | [vue-i18n](https://vue-i18n.intlify.dev/)           | 国际化解决方案           | 9.x    |
 

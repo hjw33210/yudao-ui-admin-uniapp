@@ -24,18 +24,18 @@
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="formData?.status" />
         </wd-cell>
         <wd-cell v-if="formData?.type !== SystemMenuTypeEnum.BUTTON" title="显示状态">
-          <wd-tag v-if="formData?.visible" type="success" plain>
+          <wd-tag v-if="formData?.visible" type="success" variant="plain">
             显示
           </wd-tag>
-          <wd-tag v-else type="warning" plain>
+          <wd-tag v-else type="warning" variant="plain">
             隐藏
           </wd-tag>
         </wd-cell>
         <wd-cell v-if="formData?.type === SystemMenuTypeEnum.MENU" title="缓存状态">
-          <wd-tag v-if="formData?.keepAlive" type="success" plain>
+          <wd-tag v-if="formData?.keepAlive" type="success" variant="plain">
             缓存
           </wd-tag>
-          <wd-tag v-else type="default" plain>
+          <wd-tag v-else type="default" variant="plain">
             不缓存
           </wd-tag>
         </wd-cell>
@@ -49,7 +49,7 @@
         <wd-button class="flex-1" type="warning" @click="handleEdit">
           编辑
         </wd-button>
-        <wd-button class="flex-1" type="error" :loading="deleting" @click="handleDelete">
+        <wd-button class="flex-1" type="danger" :loading="deleting" @click="handleDelete">
           删除
         </wd-button>
       </view>
@@ -59,8 +59,9 @@
 
 <script lang="ts" setup>
 import type { Menu } from '@/api/system/menu'
+import { useDialog } from '@wot-ui/ui/components/wd-dialog'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { deleteMenu, getMenu, getSimpleMenuList } from '@/api/system/menu'
 import { navigateBackPlus } from '@/utils'
 import { DICT_TYPE, SystemMenuTypeEnum } from '@/utils/constants'
@@ -78,6 +79,7 @@ definePage({
 })
 
 const toast = useToast()
+const dialog = useDialog()
 const formData = ref<Menu>()
 const deleting = ref(false)
 const parentMenuName = ref('-')
@@ -117,29 +119,29 @@ function handleEdit() {
 }
 
 /** 删除菜单 */
-function handleDelete() {
+async function handleDelete() {
   if (!props.id) {
     return
   }
-  uni.showModal({
-    title: '提示',
-    content: '确定要删除该菜单吗？',
-    success: async (res) => {
-      if (!res.confirm) {
-        return
-      }
-      deleting.value = true
-      try {
-        await deleteMenu(props.id)
-        toast.success('删除成功')
-        setTimeout(() => {
-          handleBack()
-        }, 500)
-      } finally {
-        deleting.value = false
-      }
-    },
-  })
+  try {
+    await dialog.confirm({
+      title: '提示',
+      msg: '确定要删除该菜单吗？',
+    })
+  } catch {
+    return
+  }
+  // 执行删除
+  deleting.value = true
+  try {
+    await deleteMenu(props.id)
+    toast.success('删除成功')
+    setTimeout(() => {
+      handleBack()
+    }, 500)
+  } finally {
+    deleting.value = false
+  }
 }
 
 /** 初始化 */

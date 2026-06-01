@@ -31,8 +31,8 @@
 
 <script lang="ts" setup>
 import type { JobLog } from '@/api/infra/job/log'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { getJobLog } from '@/api/infra/job/log'
 import { navigateBackPlus } from '@/utils'
 import { DICT_TYPE } from '@/utils/constants'

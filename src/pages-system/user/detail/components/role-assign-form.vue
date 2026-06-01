@@ -5,8 +5,8 @@
         <text class="text-32rpx text-[#333] font-semibold">分配角色</text>
         <wd-icon name="close" size="20px" @click="handleClose" />
       </view>
-      <wd-checkbox-group v-model="selectedIds" cell shape="button">
-        <wd-checkbox v-for="item in roleList" :key="item.id" :model-value="item.id">
+      <wd-checkbox-group v-model="selectedIds" type="button">
+        <wd-checkbox v-for="item in roleList" :key="item.id" :name="item.id">
           {{ item.name }}
         </wd-checkbox>
       </wd-checkbox-group>
@@ -21,8 +21,8 @@
 
 <script lang="ts" setup>
 import type { Role } from '@/api/system/role'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { computed, ref, watch } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { getSimpleRoleList } from '@/api/system/role'
 import { assignUserRole, getUserRoleIds } from '@/api/system/user'
 

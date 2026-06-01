@@ -53,7 +53,7 @@
 
       <!-- 空状态 -->
       <view v-if="!loading && currentList.length === 0" class="py-100rpx text-center">
-        <wd-status-tip image="content" tip="暂无部门数据" />
+        <wd-empty icon="content" tip="暂无部门数据" />
       </view>
     </view>
 

@@ -11,7 +11,7 @@
     <wd-cell-group custom-class="cell-group" border>
       <wd-cell title="修改密码" is-link @click="handleChangePassword">
         <template #icon>
-          <wd-icon name="lock-on" size="20px" color="#1890ff" class="mr-16rpx" />
+          <wd-icon name="lock" size="20px" color="#1890ff" class="mr-16rpx" />
         </template>
       </wd-cell>
     </wd-cell-group>
@@ -20,7 +20,7 @@
     <wd-cell-group custom-class="cell-group mt-24rpx" border>
       <wd-cell title="微信小程序" is-link @click="handleBindWechatMiniProgram">
         <template #icon>
-          <wd-icon name="chat" size="20px" color="#07c160" class="mr-16rpx" />
+          <wd-icon name="message" size="20px" color="#07c160" class="mr-16rpx" />
         </template>
         <view class="text-[#999]">
           未绑定
@@ -28,7 +28,7 @@
       </wd-cell>
       <wd-cell title="微信公众号" is-link @click="handleBindWechatOfficialAccount">
         <template #icon>
-          <wd-icon name="chat" size="20px" color="#07c160" class="mr-16rpx" />
+          <wd-icon name="message" size="20px" color="#07c160" class="mr-16rpx" />
         </template>
         <view class="text-[#999]">
           未绑定
@@ -42,8 +42,8 @@
 </template>
 
 <script lang="ts" setup>
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { navigateBackPlus } from '@/utils'
 import PasswordForm from './components/password-form.vue'
 

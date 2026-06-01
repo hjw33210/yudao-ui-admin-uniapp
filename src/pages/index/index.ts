@@ -10,7 +10,7 @@ import { ONLY_PC_PAGE } from '@/router/config'
 export interface MenuItem {
   key: string // 菜单唯一标识
   name: string // 菜单名称
-  icon: string // 菜单图标（支持 wot-design-uni 图标名或图片路径）
+  icon: string // 菜单图标（支持 @wot-ui/ui 图标名或图片路径）
   url?: string // 跳转路径
   iconColor?: string // 图标颜色（可选）
   enabled?: boolean // 是否启用（可选，默认 true）
@@ -41,7 +41,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'role',
         name: '角色管理',
-        icon: 'secured',
+        icon: 'safe',
         url: '/pages-system/role/index',
         iconColor: '#2f54eb',
         permission: 'system:role:query',
@@ -57,7 +57,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'dept',
         name: '部门管理',
-        icon: 'layers',
+        icon: 'organization',
         url: '/pages-system/dept/index',
         iconColor: '#13c2c2',
         permission: 'system:dept:query',
@@ -65,7 +65,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'post',
         name: '岗位管理',
-        icon: 'flag',
+        icon: 'idcard',
         url: '/pages-system/post/index',
         iconColor: '#36cfc9',
         permission: 'system:post:query',
@@ -81,7 +81,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'loginLog',
         name: '登录日志',
-        icon: 'login',
+        icon: 'import',
         url: '/pages-system/login-log/index',
         iconColor: '#9254de',
         permission: 'system:login-log:query',
@@ -97,7 +97,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'sms',
         name: '短信管理',
-        icon: 'chat1',
+        icon: 'message',
         url: '/pages-system/sms/index',
         iconColor: '#faad14',
         permission: 'system:sms-channel:query',
@@ -105,7 +105,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'mail',
         name: '邮件管理',
-        icon: 'mail',
+        icon: 'email',
         url: '/pages-system/mail/index',
         iconColor: '#ffc53d',
         permission: 'system:mail-account:query',
@@ -113,7 +113,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'notify',
         name: '站内信管理',
-        icon: 'read',
+        icon: 'message',
         url: '/pages-system/notify/index',
         iconColor: '#ff7a45',
         permission: 'system:notify-template:query',
@@ -121,7 +121,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'tenant',
         name: '租户管理',
-        icon: 'shop',
+        icon: 'store',
         url: '/pages-system/tenant/index',
         iconColor: '#eb2f96',
         permission: 'system:tenant:query',
@@ -129,7 +129,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'social',
         name: '三方用户',
-        icon: 'share',
+        icon: 'share-alt',
         url: '/pages-system/social/index',
         iconColor: '#f759ab',
         permission: 'system:social-client:query',
@@ -137,7 +137,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'oauth2',
         name: 'OAuth2.0',
-        icon: 'lock-on',
+        icon: 'lock',
         url: '/pages-system/oauth2/index',
         iconColor: '#ff85c0',
         permission: 'system:oauth2-client:query',
@@ -145,7 +145,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'dict',
         name: '字典管理',
-        icon: 'books',
+        icon: 'book',
         url: '/pages-system/dict/index',
         iconColor: '#c41d7f',
         permission: 'system:dict:query',
@@ -166,7 +166,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'accessLog',
         name: '访问日志',
-        icon: 'view-list',
+        icon: 'list',
         url: '/pages-infra/api-access-log/index',
         iconColor: '#1890ff',
         permission: 'infra:api-access-log:query',
@@ -174,7 +174,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'errorLog',
         name: '错误日志',
-        icon: 'error-circle',
+        icon: 'exclamation-circle',
         url: '/pages-infra/api-error-log/index',
         iconColor: '#f5222d',
         permission: 'infra:api-error-log:query',
@@ -182,7 +182,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'config',
         name: '参数配置',
-        icon: 'setting',
+        icon: 'settings',
         url: '/pages-infra/config/index',
         iconColor: '#722ed1',
         permission: 'infra:config:query',
@@ -190,7 +190,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'dataSourceConfig',
         name: '数据源配置',
-        icon: 'server',
+        icon: 'storage',
         url: '/pages-infra/data-source-config/index',
         iconColor: '#9254de',
         permission: 'infra:data-source-config:query',
@@ -213,7 +213,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'job',
         name: '定时任务',
-        icon: 'time',
+        icon: 'clock-circle',
         url: '/pages-infra/job/index',
         iconColor: '#fa8c16',
         permission: 'infra:job:query',
@@ -228,7 +228,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'build',
         name: '表单构建',
-        icon: 'edit-outline',
+        icon: 'edit',
         url: ONLY_PC_PAGE,
         iconColor: '#73d13d',
       },
@@ -255,7 +255,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'bpmMy',
         name: '我的流程',
-        icon: 'user-circle',
+        icon: 'user',
         url: '/pages/bpm/index?tab=my',
         iconColor: '#1890ff',
         permission: 'bpm:process-instance:query',
@@ -263,7 +263,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'bpmTodo',
         name: '待办任务',
-        icon: 'time',
+        icon: 'clock-circle',
         url: '/pages/bpm/index?tab=todo',
         iconColor: '#fa8c16',
         permission: 'bpm:task:query',
@@ -279,7 +279,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'bpmCopy',
         name: '抄送我的',
-        icon: 'mail',
+        icon: 'email',
         url: '/pages/bpm/index?tab=copy',
         iconColor: '#13c2c2',
         permission: 'bpm:process-instance-cc:query',
@@ -287,7 +287,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'oaLeave',
         name: '请假申请',
-        icon: 'calendar',
+        icon: 'calendar-line',
         url: '/pages-bpm/oa/leave/index',
         iconColor: '#52c41a',
         permission: 'bpm:oa-leave:query',
@@ -295,7 +295,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'bpmModel',
         name: '流程模型',
-        icon: 'app',
+        icon: 'apps',
         url: ONLY_PC_PAGE,
         iconColor: '#722ed1',
         permission: 'bpm:process-definition:query',
@@ -303,7 +303,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'bpmForm',
         name: '流程表单',
-        icon: 'edit-1',
+        icon: 'edit',
         url: ONLY_PC_PAGE,
         iconColor: '#9254de',
         permission: 'bpm:form:query',
@@ -311,7 +311,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'bpmCategory',
         name: '流程分类',
-        icon: 'folder-open',
+        icon: 'folder',
         url: '/pages-bpm/category/index',
         iconColor: '#faad14',
         permission: 'bpm:category:query',
@@ -319,7 +319,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'bpmUserGroup',
         name: '用户分组',
-        icon: 'usergroup',
+        icon: 'user-group',
         url: '/pages-bpm/user-group/index',
         iconColor: '#ffc53d',
         permission: 'bpm:user-group:query',
@@ -343,7 +343,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'bpmProcessInstanceManager',
         name: '流程实例',
-        icon: 'queue',
+        icon: 'list',
         url: '/pages-bpm/processInstance/manager/index',
         iconColor: '#36cfc9',
         permission: 'bpm:process-instance:manager-query',
@@ -351,7 +351,7 @@ const menuGroupsData: MenuGroup[] = [
       {
         key: 'bpmTaskManager',
         name: '流程任务',
-        icon: 'bulletpoint',
+        icon: 'unordered-list',
         url: '/pages-bpm/task/manager/index',
         iconColor: '#5cdbd3',
         permission: 'bpm:task:manager-query',

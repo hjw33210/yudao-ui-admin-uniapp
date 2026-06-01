@@ -21,7 +21,7 @@
         <view class="yd-search-form-label">
           发送状态
         </view>
-        <wd-radio-group v-model="formData.sendStatus" shape="button">
+        <wd-radio-group v-model="formData.sendStatus" type="button">
           <wd-radio :value="-1">
             全部
           </wd-radio>
@@ -38,7 +38,7 @@
         <view class="yd-search-form-label">
           接收状态
         </view>
-        <wd-radio-group v-model="formData.receiveStatus" shape="button">
+        <wd-radio-group v-model="formData.receiveStatus" type="button">
           <wd-radio :value="-1">
             全部
           </wd-radio>
@@ -70,7 +70,7 @@
         </view>
         <wd-datetime-picker-view v-if="visibleSendTime[0]" v-model="tempSendTime[0]" type="date" />
         <view v-if="visibleSendTime[0]" class="yd-search-form-date-range-actions">
-          <wd-button size="small" plain @click="visibleSendTime[0] = false">
+          <wd-button size="small" variant="plain" @click="visibleSendTime[0] = false">
             取消
           </wd-button>
           <wd-button size="small" type="primary" @click="handleSendTime0Confirm">
@@ -79,7 +79,7 @@
         </view>
         <wd-datetime-picker-view v-if="visibleSendTime[1]" v-model="tempSendTime[1]" type="date" />
         <view v-if="visibleSendTime[1]" class="yd-search-form-date-range-actions">
-          <wd-button size="small" plain @click="visibleSendTime[1] = false">
+          <wd-button size="small" variant="plain" @click="visibleSendTime[1] = false">
             取消
           </wd-button>
           <wd-button size="small" type="primary" @click="handleSendTime1Confirm">
@@ -88,7 +88,7 @@
         </view>
       </view>
       <view class="yd-search-form-actions">
-        <wd-button class="flex-1" plain @click="handleReset">
+        <wd-button class="flex-1" variant="plain" @click="handleReset">
           重置
         </wd-button>
         <wd-button class="flex-1" type="primary" @click="handleSearch">

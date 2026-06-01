@@ -27,7 +27,7 @@
             <text class="menu-item__name">{{ menu.name }}</text>
           </view>
           <view class="menu-item__right">
-            <wd-button size="small" type="warning" plain custom-class="mr-16rpx" @click="handleRemoveFavorite(menu)">
+            <wd-button size="small" type="warning" variant="plain" custom-class="mr-16rpx" @click="handleRemoveFavorite(menu)">
               从常用移除
             </wd-button>
             <wd-icon name="menu" size="40rpx" color="#ccc" />
@@ -35,8 +35,8 @@
         </view>
       </view>
       <view v-else class="flex flex-col items-center justify-center py-60rpx">
-        <wd-button type="primary" plain @click="scrollToGroups">
-          <wd-icon name="add" size="28rpx" />
+        <wd-button type="primary" variant="plain" @click="scrollToGroups">
+          <wd-icon name="plus" size="28rpx" />
           添加我常用的
         </wd-button>
       </view>
@@ -57,10 +57,10 @@
               <text class="menu-item__name">{{ menu.name }}</text>
             </view>
             <view class="menu-item__right">
-              <wd-button v-if="isInFavorites(menu)" size="small" type="warning" plain @click="handleRemoveFavorite(menu)">
+              <wd-button v-if="isInFavorites(menu)" size="small" type="warning" variant="plain" @click="handleRemoveFavorite(menu)">
                 从常用移除
               </wd-button>
-              <wd-button v-else size="small" type="primary" plain @click="handleAddFavorite(menu)">
+              <wd-button v-else size="small" type="primary" variant="plain" @click="handleAddFavorite(menu)">
                 添加至常用
               </wd-button>
             </view>
@@ -76,7 +76,7 @@
 
 <script lang="ts" setup>
 import type { MenuGroup, MenuItem } from '../index'
-import { useToast } from 'wot-design-uni'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { useUserStore } from '@/store/user'
 import { navigateBackPlus } from '@/utils'
 import { getMenuGroups, getMenuItemByKey } from '../index'

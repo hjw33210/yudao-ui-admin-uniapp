@@ -13,18 +13,16 @@
           placeholder="请输入用户名"
           clearable
           clear-trigger="focus"
-          no-border
         />
       </view>
       <view class="input-item">
-        <wd-icon name="lock-on" size="20px" color="#1890ff" />
+        <wd-icon name="lock" size="20px" color="#1890ff" />
         <wd-input
           v-model="formData.password"
           placeholder="请输入密码"
           clearable
           clear-trigger="focus"
           show-password
-          no-border
         />
       </view>
       <view v-if="captchaEnabled">
@@ -61,10 +59,10 @@
         <!-- TODO @芋艿：图标换下！ -->
         <view class="icons flex justify-center gap-60rpx">
           <view class="icon-item" @click="handleWechatLogin">
-            <wd-icon name="chat" size="24px" color="#07c160" />
+            <wd-icon name="message" size="24px" color="#07c160" />
           </view>
           <view class="icon-item" @click="handleDingTalkLogin">
-            <wd-icon name="computer" size="24px" color="#3370ff" />
+            <wd-icon name="desktop" size="24px" color="#3370ff" />
           </view>
         </view>
       </view>
@@ -80,8 +78,8 @@
 </template>
 
 <script lang="ts" setup>
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { reactive, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import {
   CODE_LOGIN_PAGE,
   FORGET_PASSWORD_PAGE,

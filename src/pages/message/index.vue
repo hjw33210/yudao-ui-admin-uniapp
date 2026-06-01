@@ -57,7 +57,7 @@
 
       <!-- 加载更多 -->
       <view v-if="loadMoreState !== 'loading' && list.length === 0" class="py-100rpx text-center">
-        <wd-status-tip image="content" tip="暂无消息" />
+        <wd-empty icon="content" tip="暂无消息" />
       </view>
       <wd-loadmore
         v-if="list.length > 0"
@@ -76,7 +76,6 @@ import type { NotifyMessage } from '@/api/system/notify/message'
 import type { LoadMoreState } from '@/http/types'
 import { onReachBottom } from '@dcloudio/uni-app'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import {
   getMyNotifyMessagePage,
   updateAllNotifyMessageRead,

@@ -61,8 +61,9 @@
 
 <script lang="ts" setup>
 import type { ApiErrorLog } from '@/api/infra/api-error-log'
+import { useDialog } from '@wot-ui/ui/components/wd-dialog'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { getApiErrorLog, updateApiErrorLogStatus } from '@/api/infra/api-error-log'
 import { getDictLabel } from '@/hooks/useDict'
 import { navigateBackPlus } from '@/utils'
@@ -81,6 +82,7 @@ definePage({
 })
 
 const toast = useToast()
+const dialog = useDialog()
 const formData = ref<ApiErrorLog>() // 详情数据
 const processing = ref(false) // 处理中
 
@@ -125,29 +127,29 @@ function getRequestInfo() {
 }
 
 /** 处理日志 */
-function handleProcess(processStatus: number) {
+async function handleProcess(processStatus: number) {
   if (!props.id) {
     return
   }
   const statusText = processStatus === InfraApiErrorLogProcessStatusEnum.DONE ? '已处理' : '已忽略'
-  uni.showModal({
-    title: '提示',
-    content: `确定标记为${statusText}吗？`,
-    success: async (res) => {
-      if (!res.confirm) {
-        return
-      }
-      processing.value = true
-      try {
-        await updateApiErrorLogStatus(props.id, processStatus)
-        toast.success('操作成功')
-        // 刷新详情
-        await getDetail()
-      } finally {
-        processing.value = false
-      }
-    },
-  })
+  try {
+    await dialog.confirm({
+      title: '提示',
+      msg: `确定标记为${statusText}吗？`,
+    })
+  } catch {
+    return
+  }
+
+  processing.value = true
+  try {
+    await updateApiErrorLogStatus(props.id, processStatus)
+    toast.success('操作成功')
+    // 刷新详情
+    await getDetail()
+  } finally {
+    processing.value = false
+  }
 }
 
 /** 初始化 */

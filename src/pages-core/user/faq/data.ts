@@ -42,7 +42,7 @@ export const faqList: FaqCategory[] = [
     ],
   },
   {
-    icon: 'warning',
+    icon: 'exclamation-circle',
     title: '其他问题',
     childList: [
       {

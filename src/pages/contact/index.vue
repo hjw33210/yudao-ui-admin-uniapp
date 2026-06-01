@@ -69,7 +69,7 @@
 
       <!-- 空状态 -->
       <view v-if="!loading && currentDeptList.length === 0 && currentUserList.length === 0" class="py-100rpx text-center">
-        <wd-status-tip image="content" tip="暂无数据" />
+        <wd-empty icon="content" tip="暂无数据" />
       </view>
     </view>
   </view>
@@ -78,8 +78,8 @@
 <script lang="ts" setup>
 import type { Dept } from '@/api/system/dept'
 import type { User } from '@/api/system/user'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { computed, onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { getSimpleDeptList } from '@/api/system/dept'
 import { getSimpleUserList, getUser } from '@/api/system/user'
 import { findChildren, handleTree } from '@/utils/tree'

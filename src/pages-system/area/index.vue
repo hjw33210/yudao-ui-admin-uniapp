@@ -23,7 +23,7 @@
       </view>
       <!-- 空状态 -->
       <view v-else class="py-100rpx text-center">
-        <wd-status-tip image="content" tip="暂无地区数据" />
+        <wd-empty icon="content" tip="暂无地区数据" />
       </view>
     </view>
 

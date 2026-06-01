@@ -14,12 +14,12 @@
         <wd-cell title="组名" :value="formData?.name" />
         <wd-cell title="描述" :value="formData?.description || '-'" />
         <wd-cell title="成员">
-          <view class="flex flex-wrap gap-8rpx justify-end">
+          <view class="flex flex-wrap justify-end gap-8rpx">
             <wd-tag
               v-for="userId in (formData?.userIds || [])"
               :key="userId"
               type="primary"
-              plain
+              variant="plain"
             >
               {{ getUserNickname(userId) }}
             </wd-tag>
@@ -44,7 +44,7 @@
         </wd-button>
         <wd-button
           v-if="hasAccessByCodes(['bpm:user-group:delete'])"
-          class="flex-1" type="error" :loading="deleting" @click="handleDelete"
+          class="flex-1" type="danger" :loading="deleting" @click="handleDelete"
         >
           删除
         </wd-button>
@@ -55,9 +55,10 @@
 
 <script lang="ts" setup>
 import type { UserGroup } from '@/api/bpm/user-group'
-import type { SimpleUser } from '@/api/system/user'
+import type { User } from '@/api/system/user'
+import { useDialog } from '@wot-ui/ui/components/wd-dialog'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
 import { deleteUserGroup, getUserGroup } from '@/api/bpm/user-group'
 import { getSimpleUserList } from '@/api/system/user'
 import { useAccess } from '@/hooks/useAccess'
@@ -78,9 +79,10 @@ definePage({
 
 const { hasAccessByCodes } = useAccess()
 const toast = useToast()
+const dialog = useDialog()
 const formData = ref<UserGroup>()
 const deleting = ref(false)
-const userList = ref<SimpleUser[]>([])
+const userList = ref<User[]>([])
 
 /** 返回上一页 */
 function handleBack() {
@@ -119,29 +121,29 @@ function handleEdit() {
 }
 
 /** 删除用户分组 */
-function handleDelete() {
+async function handleDelete() {
   if (!props.id) {
     return
   }
-  uni.showModal({
-    title: '提示',
-    content: '确定要删除该用户分组吗？',
-    success: async (res) => {
-      if (!res.confirm) {
-        return
-      }
-      deleting.value = true
-      try {
-        await deleteUserGroup(props.id)
-        toast.success('删除成功')
-        setTimeout(() => {
-          handleBack()
-        }, 500)
-      } finally {
-        deleting.value = false
-      }
-    },
-  })
+  try {
+    await dialog.confirm({
+      title: '提示',
+      msg: '确定要删除该用户分组吗？',
+    })
+  } catch {
+    return
+  }
+  // 执行删除
+  deleting.value = true
+  try {
+    await deleteUserGroup(props.id)
+    toast.success('删除成功')
+    setTimeout(() => {
+      handleBack()
+    }, 500)
+  } finally {
+    deleting.value = false
+  }
 }
 
 /** 初始化 */
