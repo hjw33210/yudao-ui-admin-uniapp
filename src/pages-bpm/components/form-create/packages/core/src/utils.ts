@@ -1,0 +1,106 @@
+import type { FormCreateOptionItem, FormCreateRule, FormCreateValue, NormalizedFormCreateRule } from '../../../types/typing'
+import { hasOwn, isEmptyValue } from '../../utils/src'
+
+const FIELDLESS_TYPES = new Set(['html', 'divider', 'alert'])
+const LAYOUT_TYPES = new Set(['row', 'col', 'grid', 'tabs', 'tabPane', 'collapse', 'collapseItem'])
+
+export function normalizeRules(rules: FormCreateRule[] = []): NormalizedFormCreateRule[] {
+  const result: NormalizedFormCreateRule[] = []
+  const walk = (rule: FormCreateRule, indexPath: string) => {
+    if (!rule || FIELDLESS_TYPES.has(rule.type)) {
+      return
+    }
+    if ((LAYOUT_TYPES.has(rule.type) || !rule.field) && Array.isArray(rule.children) && rule.children.length > 0) {
+      rule.children.forEach((child, index) => walk(child, `${indexPath}_${index}`))
+      return
+    }
+    result.push({
+      ...rule,
+      props: { ...(rule.props || {}) },
+      options: normalizeOptions(rule.options || rule.props?.options),
+      __fcId: `${rule.field || rule.type || 'field'}_${indexPath}`,
+      __originType: rule.type,
+    })
+  }
+  rules.forEach((rule, index) => walk(rule, String(index)))
+  return result
+}
+
+export function normalizeOptions(options?: FormCreateOptionItem[]) {
+  if (!Array.isArray(options)) {
+    return []
+  }
+  return options.map(item => ({
+    ...item,
+    label: item.label ?? item.text ?? String(item.value ?? ''),
+    text: item.text ?? item.label ?? String(item.value ?? ''),
+  }))
+}
+
+export function getDefaultValueByType(type: string): FormCreateValue {
+  switch (type) {
+    case 'checkbox':
+    case 'upload':
+    case 'uploadFile':
+    case 'uploadImage':
+    case 'uploadImages':
+    case 'FileUpload':
+    case 'ImagesUpload':
+      return []
+    case 'ImageUpload':
+      return ''
+    case 'switch':
+      return false
+    case 'inputNumber':
+    case 'InputNumber':
+    case 'number':
+      return undefined
+    case 'rate':
+    case 'slider':
+      return 0
+    default:
+      return ''
+  }
+}
+
+export function createInitialFormData(
+  rules: NormalizedFormCreateRule[],
+  values: Record<string, any> = {},
+) {
+  const data: Record<string, any> = {}
+  rules.forEach((rule) => {
+    if (!rule.field) {
+      return
+    }
+    if (hasOwn(values, rule.field)) {
+      data[rule.field] = values[rule.field]
+    } else if (rule.value !== undefined) {
+      data[rule.field] = rule.value
+    } else {
+      data[rule.field] = getDefaultValue(rule)
+    }
+  })
+  return data
+}
+
+function getDefaultValue(rule: NormalizedFormCreateRule): FormCreateValue {
+  const isMultiple = rule.type === 'treeSelectMultiple' || rule.props?.multiple || rule.props?.mode === 'multiple'
+  if ((rule.type === 'select' || rule.type.endsWith('Select') || rule.type === 'treeSelectMultiple') && isMultiple) {
+    return []
+  }
+  return getDefaultValueByType(rule.type)
+}
+
+export function getAllowedFieldSet(rules: FormCreateRule[]) {
+  return new Set(rules.map(rule => rule.field).filter(Boolean) as string[])
+}
+
+export function isRuleHidden(rule: FormCreateRule, state?: { hidden?: boolean }) {
+  return state?.hidden === true || rule.hidden === true || rule.display === false
+}
+
+export function isRuleDisabled(globalDisabled: boolean, state?: { disabled?: boolean }) {
+  return globalDisabled || state?.disabled === true
+}
+
+export { isEmptyValue }

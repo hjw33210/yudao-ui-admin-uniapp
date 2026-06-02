@@ -1,0 +1,22 @@
+.fc-wot {
+  background: #fff;
+}
+
+.fc-wot__text {
+  color: #333;
+  font-size: 28rpx;
+  line-height: 1.6;
+  word-break: break-all;
+}
+
+.fc-wot__empty {
+  color: #999;
+  font-size: 26rpx;
+  padding: 32rpx 24rpx;
+  text-align: center;
+}
+
+.fc-wot__fallback {
+  color: #999;
+  font-size: 24rpx;
+}
