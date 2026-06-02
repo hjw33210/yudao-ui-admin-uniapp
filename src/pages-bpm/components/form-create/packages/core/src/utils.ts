@@ -2,28 +2,52 @@ import type { FormCreateOptionItem, FormCreateRule, FormCreateValue, NormalizedF
 import { hasOwn, isEmptyValue } from '../../utils/src'
 
 const FIELDLESS_TYPES = new Set(['html', 'divider', 'alert'])
-const LAYOUT_TYPES = new Set(['row', 'col', 'grid', 'tabs', 'tabPane', 'collapse', 'collapseItem'])
 
 export function normalizeRules(rules: FormCreateRule[] = []): NormalizedFormCreateRule[] {
   const result: NormalizedFormCreateRule[] = []
-  const walk = (rule: FormCreateRule, indexPath: string) => {
+  const walk = (rule: FormCreateRule | undefined, indexPath: string) => {
     if (!rule || FIELDLESS_TYPES.has(rule.type)) {
       return
     }
-    if ((LAYOUT_TYPES.has(rule.type) || !rule.field) && Array.isArray(rule.children) && rule.children.length > 0) {
-      rule.children.forEach((child, index) => walk(child, `${indexPath}_${index}`))
+    const children = getRuleChildren(rule)
+    if (!rule.field && children.length > 0) {
+      walkChildren(children, indexPath)
       return
     }
     result.push({
       ...rule,
       props: { ...(rule.props || {}) },
       options: normalizeOptions(rule.options || rule.props?.options),
-      __fcId: `${rule.field || rule.type || 'field'}_${indexPath}`,
-      __originType: rule.type,
+      __fcId: rule.__fcId || `${rule.field || rule.type || 'field'}_${indexPath}`,
+      __originType: rule.__originType || rule.type,
     })
+  }
+  const walkChildren = (children: FormCreateRule[], indexPath: string) => {
+    children.forEach((child, index) => walk(child, `${indexPath}_${index}`))
   }
   rules.forEach((rule, index) => walk(rule, String(index)))
   return result
+}
+
+function getRuleChildren(rule: FormCreateRule): FormCreateRule[] {
+  return normalizeChildRules(rule.children || rule.props?.children || rule.props?.rows || rule.props?.columns)
+}
+
+function normalizeChildRules(children: unknown): FormCreateRule[] {
+  if (!children) {
+    return []
+  }
+  if (Array.isArray(children)) {
+    return children.flatMap(item => normalizeChildRules(item))
+  }
+  if (typeof children !== 'object') {
+    return []
+  }
+  const child = children as FormCreateRule
+  if (child.type || child.field) {
+    return [child]
+  }
+  return normalizeChildRules(child.children || child.props?.children || child.props?.rows || child.props?.columns)
 }
 
 export function normalizeOptions(options?: FormCreateOptionItem[]) {

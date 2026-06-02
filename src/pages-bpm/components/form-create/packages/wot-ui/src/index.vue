@@ -12,8 +12,18 @@
     >
       <wd-cell-group :border="formOption.form?.border !== false">
         <template v-for="rule in visibleRules" :key="rule.__fcId">
+          <view v-if="isLayoutTitleType(rule)" class="fc-wot__layout-title">
+            {{ rule.title }}
+          </view>
+
+          <view
+            v-else-if="isLayoutGapType(rule)"
+            class="fc-wot__layout-gap"
+            :style="{ height: getLayoutGapHeight(rule) }"
+          />
+
           <wd-form-item
-            v-if="isInputType(rule)"
+            v-else-if="isInputType(rule)"
             :title="rule.title"
             :title-width="titleWidth"
             :prop="rule.field"
@@ -209,7 +219,7 @@
           />
 
           <FcGroup
-            v-else-if="rule.type === 'group' || rule.type === 'subForm'"
+            v-else-if="isUnsupportedFormContainerType(rule)"
             :rule="rule"
             :title-width="titleWidth"
           />
@@ -220,7 +230,9 @@
             :title-width="titleWidth"
             :prop="rule.field"
           >
-            <view class="fc-wot__text">{{ formatDisplayValue(getValue(rule)) }}</view>
+            <view class="fc-wot__text">
+              {{ formatDisplayValue(getValue(rule)) }}
+            </view>
           </wd-form-item>
 
           <wd-form-item
@@ -266,14 +278,17 @@ import {
   isDictSelectType,
   isInputNumberType,
   isInputType,
+  isLayoutGapType,
+  isLayoutTitleType,
   isSelectType,
   isTextareaType,
   isTimePickerType,
   isTreeSelectType,
+  isUnsupportedFormContainerType,
   isUploadType,
   isUserSelectType,
 } from './core/utils'
-import { parseRule } from './parsers'
+import { parseRules } from './parsers'
 
 const props = withDefaults(defineProps<{
   api?: FormCreateApi
@@ -295,8 +310,8 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
   'update:api': [api: FormCreateApi]
   'update:modelValue': [data: Record<string, any>]
-  change: [data: Record<string, any>, field?: string, value?: any]
-  mounted: [api: FormCreateApi]
+  'change': [data: Record<string, any>, field?: string, value?: any]
+  'mounted': [api: FormCreateApi]
 }>()
 
 const formRef = ref<FormInstance>()
@@ -305,7 +320,7 @@ const fieldStates = reactive<Record<string, FormCreateFieldState>>({})
 
 const formOption = computed(() => getConfig(props.option))
 const titleWidth = computed(() => getTitleWidth(formOption.value))
-const parsedRules = computed(() => props.rule.map(parseRule))
+const parsedRules = computed(() => parseRules(props.rule))
 const rules = computed(() => normalizeRules(parsedRules.value))
 const visibleRules = computed(() => rules.value.filter(rule => !isRuleHidden(rule, fieldStates[rule.field || ''])))
 const formSchema = computed(() => createFormSchema(() => rules.value, fieldStates))
@@ -362,6 +377,17 @@ function formatDisplayValue(value: any) {
     return '-'
   }
   return String(value)
+}
+
+function getLayoutGapHeight(rule: NormalizedFormCreateRule) {
+  const height = rule.props?.height
+  if (typeof height === 'number') {
+    return `${height}rpx`
+  }
+  if (typeof height === 'string' && height.trim()) {
+    return height
+  }
+  return '24rpx'
 }
 
 const api = createApi({

@@ -22,3 +22,5 @@ export function getMobileFormCustomPath(pcPath: string | undefined): string | un
   }
   return PC_TO_MOBILE_PATH_MAP[pcPath]
 }
+
+export * from './form-create'

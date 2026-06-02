@@ -1,4 +1,5 @@
 import type { FormCreateOption, NormalizedFormCreateRule } from '../../../../types/typing'
+import { INTERNAL_LAYOUT_GAP_TYPE, INTERNAL_LAYOUT_TITLE_TYPE } from '../parsers/utils'
 import alias from './alias'
 
 const INPUT_TYPES = new Set(['input', 'Input', 'field'])
@@ -9,6 +10,7 @@ const TIME_TYPES = new Set(['timePicker', 'TimePicker'])
 const UPLOAD_TYPES = new Set(['upload', 'uploader', 'uploadFile', 'uploadImage', 'uploadImages', 'FileUpload', 'ImageUpload', 'ImagesUpload'])
 const SELECT_TYPES = new Set(['select'])
 const TREE_SELECT_TYPES = new Set(['treeSelect', 'TreeSelect', 'treeSelectMultiple'])
+const UNSUPPORTED_FORM_CONTAINER_TYPES = new Set(['group', 'subForm', 'fcSubForm', 'array', 'tableForm', 'subTable', 'fcTableForm'])
 
 export function getWotType(rule: NormalizedFormCreateRule) {
   return alias[rule.type as keyof typeof alias] || rule.type
@@ -36,6 +38,18 @@ export function isTimePickerType(rule: NormalizedFormCreateRule) {
 
 export function isUploadType(rule: NormalizedFormCreateRule) {
   return UPLOAD_TYPES.has(rule.type)
+}
+
+export function isUnsupportedFormContainerType(rule: NormalizedFormCreateRule) {
+  return UNSUPPORTED_FORM_CONTAINER_TYPES.has(rule.type) || ['子表单', '分组', '表格表单'].includes(rule.title || '')
+}
+
+export function isLayoutTitleType(rule: NormalizedFormCreateRule) {
+  return rule.type === INTERNAL_LAYOUT_TITLE_TYPE
+}
+
+export function isLayoutGapType(rule: NormalizedFormCreateRule) {
+  return rule.type === INTERNAL_LAYOUT_GAP_TYPE
 }
 
 export function isSelectType(rule: NormalizedFormCreateRule) {
