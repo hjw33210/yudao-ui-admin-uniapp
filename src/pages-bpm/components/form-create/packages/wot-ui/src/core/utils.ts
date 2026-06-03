@@ -1,6 +1,8 @@
 import type { FormCreateOption, NormalizedFormCreateRule } from '../../../../types/typing'
-import { INTERNAL_LAYOUT_GAP_TYPE, INTERNAL_LAYOUT_TITLE_TYPE } from '../parsers/utils'
 import alias from './alias'
+
+export const INTERNAL_LAYOUT_TITLE_TYPE = '__fcLayoutTitle'
+export const INTERNAL_LAYOUT_GAP_TYPE = '__fcLayoutGap'
 
 const INPUT_TYPES = new Set(['input', 'Input', 'field'])
 const TEXTAREA_TYPES = new Set(['textarea'])
@@ -41,7 +43,7 @@ export function isUploadType(rule: NormalizedFormCreateRule) {
 }
 
 export function isUnsupportedFormContainerType(rule: NormalizedFormCreateRule) {
-  return UNSUPPORTED_FORM_CONTAINER_TYPES.has(rule.type) || ['子表单', '分组', '表格表单'].includes(rule.title || '')
+  return UNSUPPORTED_FORM_CONTAINER_TYPES.has(rule.type)
 }
 
 export function isLayoutTitleType(rule: NormalizedFormCreateRule) {

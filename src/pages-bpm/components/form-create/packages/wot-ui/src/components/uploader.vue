@@ -86,7 +86,7 @@ function handleFileChange(event: { fileList?: UploadFileItem[] }) {
 
 function emitValue(nextFileList: UploadFileItem[]) {
   const valueList = nextFileList
-    .filter(item => item.status === 'success' || item.status === 'pending')
+    .filter(item => item.status === 'success')
     .map((item: any) => getUploadedUrl(item))
     .filter(Boolean)
   const value = isSingle() ? (valueList[0] || '') : valueList
@@ -103,7 +103,14 @@ function getUploadedUrl(item: UploadFileItem) {
   if (typeof response === 'string') {
     return response
   }
-  return response?.data?.url || response?.data || response?.url || item.url
+  const data = response?.data
+  if (typeof data === 'string') {
+    return data
+  }
+  if (data && typeof data === 'object') {
+    return data.url || data.fileUrl || data.path
+  }
+  return response?.url || item.url
 }
 
 function parseResponse(response?: string | Record<string, any>) {

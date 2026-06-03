@@ -382,7 +382,7 @@ function formatDisplayValue(value: any) {
 function getLayoutGapHeight(rule: NormalizedFormCreateRule) {
   const height = rule.props?.height
   if (typeof height === 'number') {
-    return `${height}rpx`
+    return `${height}px`
   }
   if (typeof height === 'string' && height.trim()) {
     return height

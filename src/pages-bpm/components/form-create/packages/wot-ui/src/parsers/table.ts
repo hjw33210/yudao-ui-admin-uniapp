@@ -2,23 +2,24 @@ import type { FormCreateRule } from '../../../../types/typing'
 import type { ParseRule } from './utils'
 import { parseRuleChildren } from './utils'
 
-const ROW_TYPES = new Set([
-  'row',
-  'col',
-  'grid',
-  'elRow',
-  'elCol',
-  'ElRow',
-  'ElCol',
-  'fcRow',
-  'fcCol',
-  'fcGrid',
+const TABLE_TYPES = new Set([
+  'table',
+  'tbody',
+  'thead',
+  'tr',
+  'td',
+  'th',
+  'elTable',
+  'elTableColumn',
+  'ElTable',
+  'ElTableColumn',
+  'fcTable',
 ])
 
 export default {
-  name: 'row',
+  name: 'table',
   match(rule: FormCreateRule) {
-    return ROW_TYPES.has(rule.type)
+    return TABLE_TYPES.has(rule.type)
   },
   render(rule: FormCreateRule, indexPath: string, parseRule: ParseRule) {
     return parseRuleChildren(rule, indexPath, parseRule)
