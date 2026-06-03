@@ -46,6 +46,7 @@ const emit = defineEmits<{
 }>()
 
 const loading = ref(false)
+const loadError = ref('')
 const options = ref<any[]>([])
 const pickerValue = ref<any>([])
 const visible = ref(false)
@@ -70,8 +71,14 @@ watch(
   { deep: true, immediate: true },
 )
 
-function open() {
+async function open() {
   if (props.disabled) {
+    return
+  }
+  if (loadError.value && !loading.value) {
+    await loadOptions()
+  }
+  if (loadError.value && options.value.length === 0) {
     return
   }
   pickerValue.value = normalizeSelectValue(props.modelValue, isMultiple.value)
@@ -88,11 +95,24 @@ function handleConfirm({ value }: { value: any }) {
 
 async function loadOptions() {
   loading.value = true
+  loadError.value = ''
   try {
     options.value = await loadUserOptions()
+  } catch (error) {
+    console.error('加载用户选项失败:', error)
+    options.value = []
+    loadError.value = '用户选项加载失败，请稍后重试'
+    showLoadError(loadError.value)
   } finally {
     loading.value = false
   }
+}
+
+function showLoadError(message: string) {
+  uni.showToast({
+    icon: 'none',
+    title: message,
+  })
 }
 </script>
 

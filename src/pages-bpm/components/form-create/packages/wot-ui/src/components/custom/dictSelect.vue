@@ -16,6 +16,7 @@
     :columns="options"
     :type="isMultiple ? 'checkbox' : 'radio'"
     :show-confirm="isMultiple"
+    :loading="loading"
     :filter-placeholder="rule.props?.filterPlaceholder || '搜索选项'"
     custom-content-class="fc-custom-select__content"
     filterable
@@ -28,6 +29,7 @@
 <script lang="ts" setup>
 import type { NormalizedFormCreateRule } from '../../../../../types/typing'
 import { computed, ref, watch } from 'vue'
+import { useDictStore } from '@/store/dict'
 import { loadDictOptions } from './api'
 import { formatSelectedSummary, isMultipleSelect, normalizeSelectValue } from './utils'
 import { getPlaceholder } from '../../core/utils'
@@ -44,6 +46,10 @@ const emit = defineEmits<{
   change: [value: any]
 }>()
 
+const dictStore = useDictStore()
+
+const loading = ref(false)
+const loadError = ref('')
 const options = ref<any[]>([])
 const pickerValue = ref<any>([])
 const visible = ref(false)
@@ -73,15 +79,19 @@ watch(
 
 watch(
   () => [props.rule.props, valueType.value],
-  () => {
-    options.value = loadDictOptions(props.rule.props?.dictType || '', valueType.value)
-  },
+  () => loadOptions(),
   { deep: true, immediate: true },
 )
 
-function open() {
+async function open() {
   if (props.disabled) {
     return
+  }
+  if (options.value.length === 0 && !loading.value) {
+    await loadOptions()
+  }
+  if (loadError.value && !loading.value) {
+    showLoadError(loadError.value)
   }
   pickerValue.value = normalizeSelectValue(props.modelValue, isMultiple.value)
   visible.value = true
@@ -93,6 +103,39 @@ function handleConfirm({ value }: { value: any }) {
     : value === '' ? undefined : value
   emit('update:modelValue', nextValue)
   emit('change', nextValue)
+}
+
+async function loadOptions() {
+  const dictType = props.rule.props?.dictType || ''
+  if (!dictType) {
+    options.value = []
+    loadError.value = ''
+    return
+  }
+
+  loading.value = true
+  loadError.value = ''
+  try {
+    await dictStore.loadDictCacheWithRetry()
+    options.value = loadDictOptions(dictType, valueType.value)
+    if (options.value.length === 0) {
+      loadError.value = '字典选项为空，请稍后重试'
+    }
+  } catch (error) {
+    console.error('加载字典选项失败:', error)
+    options.value = []
+    loadError.value = '字典选项加载失败，请稍后重试'
+    showLoadError(loadError.value)
+  } finally {
+    loading.value = false
+  }
+}
+
+function showLoadError(message: string) {
+  uni.showToast({
+    icon: 'none',
+    title: message,
+  })
 }
 </script>
 

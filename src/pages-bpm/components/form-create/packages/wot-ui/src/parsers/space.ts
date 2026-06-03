@@ -1,6 +1,7 @@
 import type { FormCreateRule } from '../../../../types/typing'
 import type { ParseRule } from './utils'
-import { createLayoutGapRule, getRuleChildren, parseRuleChildren } from './utils'
+import { getRuleChildren } from '../../../utils/src'
+import { createLayoutGapRule, parseRuleChildren } from './utils'
 
 const SPACE_TYPES = new Set(['space', 'Space', 'elSpace', 'ElSpace', 'gap', 'Gap', 'div'])
 

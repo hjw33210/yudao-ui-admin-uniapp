@@ -22,6 +22,42 @@
             :style="{ height: getLayoutGapHeight(rule) }"
           />
 
+          <FcAlert
+            v-else-if="isAlertType(rule)"
+            :rule="rule"
+          />
+
+          <FcTitle
+            v-else-if="isTitleType(rule)"
+            :rule="rule"
+          />
+
+          <FcHtml
+            v-else-if="isHtmlType(rule)"
+            :rule="rule"
+          />
+
+          <FcDivider
+            v-else-if="isDividerType(rule)"
+            :rule="rule"
+          />
+
+          <FcTag
+            v-else-if="isTagType(rule)"
+            :rule="rule"
+          />
+
+          <FcImage
+            v-else-if="isImageType(rule)"
+            :rule="rule"
+          />
+
+          <FcButton
+            v-else-if="isButtonType(rule)"
+            :rule="rule"
+            :disabled="isDisabled(rule)"
+          />
+
           <wd-form-item
             v-else-if="isInputType(rule)"
             :title="rule.title"
@@ -103,6 +139,15 @@
 
           <FcApiSelect
             v-else-if="isApiSelectType(rule)"
+            :model-value="getValue(rule)"
+            :rule="rule"
+            :title-width="titleWidth"
+            :disabled="isDisabled(rule)"
+            @update:model-value="handleUpdate(rule, $event)"
+          />
+
+          <FcAreaSelect
+            v-else-if="isAreaSelectType(rule)"
             :model-value="getValue(rule)"
             :rule="rule"
             :title-width="titleWidth"
@@ -224,6 +269,12 @@
             :title-width="titleWidth"
           />
 
+          <FcUnsupported
+            v-else-if="isUnsupportedInteractionType(rule)"
+            :rule="rule"
+            :title-width="titleWidth"
+          />
+
           <wd-form-item
             v-else-if="rule.type === 'span'"
             :title="rule.title"
@@ -265,26 +316,35 @@ import type { FormCreateApi, FormCreateFieldState, FormCreateOption, FormCreateR
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { createApi, createFormSchema, createInitialFormData, isRuleDisabled, isRuleHidden, normalizeRules } from '../../core/src'
 import { deepMerge } from '../../utils/src'
-import { FcApiSelect, FcCheckbox, FcDatePicker, FcDeptSelect, FcDictSelect, FcGroup, FcRadio, FcSelect, FcTimePicker, FcTreeSelect, FcUploader, FcUserSelect } from './components'
+import { FcAlert, FcApiSelect, FcAreaSelect, FcButton, FcCheckbox, FcDatePicker, FcDeptSelect, FcDictSelect, FcDivider, FcGroup, FcHtml, FcImage, FcRadio, FcSelect, FcTag, FcTimePicker, FcTitle, FcTreeSelect, FcUnsupported, FcUploader, FcUserSelect } from './components'
 import getConfig from './core/config'
 import {
   getInputType,
   getPlaceholder,
   getRuleProps,
   getTitleWidth,
+  isAlertType,
   isApiSelectType,
+  isAreaSelectType,
+  isButtonType,
   isDatePickerType,
   isDeptSelectType,
+  isDividerType,
   isDictSelectType,
+  isHtmlType,
+  isImageType,
   isInputNumberType,
   isInputType,
   isLayoutGapType,
   isLayoutTitleType,
   isSelectType,
+  isTagType,
   isTextareaType,
   isTimePickerType,
+  isTitleType,
   isTreeSelectType,
   isUnsupportedFormContainerType,
+  isUnsupportedInteractionType,
   isUploadType,
   isUserSelectType,
 } from './core/utils'

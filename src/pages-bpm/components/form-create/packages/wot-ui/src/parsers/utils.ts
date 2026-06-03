@@ -2,8 +2,6 @@ import type { FormCreateRule } from '../../../../types/typing'
 import { getRuleChildren } from '../../../utils/src'
 import { INTERNAL_LAYOUT_GAP_TYPE, INTERNAL_LAYOUT_TITLE_TYPE } from '../core/utils'
 
-export { getRuleChildren }
-
 export type ParseRule = (rule: FormCreateRule, indexPath: string) => FormCreateRule[]
 
 export function parseRuleChildren(rule: FormCreateRule, indexPath: string, parseRule: ParseRule) {

@@ -1,12 +1,10 @@
 import type { FormCreateOptionItem, FormCreateRule, FormCreateValue, NormalizedFormCreateRule } from '../../../types/typing'
 import { getRuleChildren, hasOwn, isEmptyValue } from '../../utils/src'
 
-const FIELDLESS_TYPES = new Set(['html', 'divider', 'alert'])
-
 export function normalizeRules(rules: FormCreateRule[] = []): NormalizedFormCreateRule[] {
   const result: NormalizedFormCreateRule[] = []
   const walk = (rule: FormCreateRule | undefined, indexPath: string) => {
-    if (!rule || FIELDLESS_TYPES.has(rule.type)) {
+    if (!rule) {
       return
     }
     const children = getRuleChildren(rule)
@@ -49,8 +47,11 @@ export function getDefaultValueByType(type: string): FormCreateValue {
     case 'uploadImages':
     case 'FileUpload':
     case 'ImagesUpload':
+    case 'UploadImgs':
       return []
     case 'ImageUpload':
+    case 'UploadImg':
+    case 'UploadFile':
       return ''
     case 'switch':
       return false

@@ -37,7 +37,7 @@ const emit = defineEmits<{
 const limit = computed(() => props.rule.props?.maxNumber || props.rule.props?.maxCount || props.rule.props?.limit || (isSingle() ? 1 : undefined))
 const multiple = computed(() => !!props.rule.props?.multiple || (limit.value ? limit.value > 1 : false))
 const accept = computed(() => {
-  if (['ImageUpload', 'uploadImage', 'uploadImages'].includes(props.rule.type)) {
+  if (['ImageUpload', 'ImagesUpload', 'UploadImg', 'UploadImgs', 'uploadImage', 'uploadImages'].includes(props.rule.type)) {
     return 'image'
   }
   return props.rule.props?.acceptType || props.rule.props?.fileType || 'all'
@@ -95,7 +95,10 @@ function emitValue(nextFileList: UploadFileItem[]) {
 }
 
 function isSingle() {
-  return ['ImageUpload', 'uploadImage'].includes(props.rule.type) || props.rule.props?.maxNumber === 1 || props.rule.props?.maxCount === 1
+  if (props.rule.props?.multiple || props.rule.props?.maxNumber > 1 || props.rule.props?.maxCount > 1 || props.rule.props?.limit > 1) {
+    return false
+  }
+  return ['ImageUpload', 'UploadImg', 'UploadFile', 'uploadImage'].includes(props.rule.type) || props.rule.props?.maxNumber === 1 || props.rule.props?.maxCount === 1
 }
 
 function getUploadedUrl(item: UploadFileItem) {
