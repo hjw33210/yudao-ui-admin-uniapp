@@ -1,5 +1,6 @@
 import type { FormCreateApi, FormCreateApiContext } from '../../../types/typing'
 import { FORM_FIELD_PERMISSION } from '../../../types/typing'
+import { fetchProviderData, getProviderData, translate } from './provider'
 
 export function createApi(ctx: FormCreateApiContext): FormCreateApi {
   const setFieldState = (field: string | undefined, key: 'disabled' | 'hidden', value: boolean) => {
@@ -37,6 +38,20 @@ export function createApi(ctx: FormCreateApiContext): FormCreateApi {
     getValue(field) {
       return ctx.formData.value[field]
     },
+    fetch(option) {
+      return fetchProviderData(option, {
+        api,
+        formData: ctx.formData.value,
+        option: ctx.option?.value,
+      })
+    },
+    getData(id, defaultValue) {
+      return getProviderData(id, {
+        api,
+        formData: ctx.formData.value,
+        option: ctx.option?.value,
+      }, defaultValue)
+    },
     setValue(values) {
       ctx.formData.value = {
         ...ctx.formData.value,
@@ -53,6 +68,13 @@ export function createApi(ctx: FormCreateApiContext): FormCreateApi {
     },
     hidden(status, field) {
       setFieldState(field, 'hidden', status)
+    },
+    t(id, params) {
+      return translate(id, params, {
+        api,
+        formData: ctx.formData.value,
+        option: ctx.option?.value,
+      })
     },
     setFieldPermission(field, permission) {
       if (permission === FORM_FIELD_PERMISSION.READ) {

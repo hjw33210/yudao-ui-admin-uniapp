@@ -320,6 +320,7 @@
             v-else-if="isSubFormType(rule)"
             :model-value="getValue(rule)"
             :rule="rule"
+            :option="formOption"
             :title-width="titleWidth"
             :disabled="isDisabled(rule)"
             @update:model-value="handleUpdate(rule, $event)"
@@ -369,9 +370,10 @@ import type {
   FormCreateRule,
   NormalizedFormCreateRule,
 } from '../../../types/typing'
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import {
   applyControlRules,
+  applyRuleProviders,
   createApi,
   createFormSchema,
   createInitialFormData,
@@ -379,7 +381,9 @@ import {
   isRuleDisabled,
   isRuleHidden,
   normalizeRules,
+  resolveRuleFetchEffects,
 } from '../../core/src'
+import type { FormCreateProviderContext, FormCreateProviderState } from '../../core/src/provider'
 import { deepMerge, hasOwn } from '../../utils/src'
 import {
   FcAlert,
@@ -475,61 +479,29 @@ const formRef = ref<FormInstance>()
 const formData = ref<Record<string, any>>({})
 const initialFormValues = ref<Record<string, any>>({})
 const fieldStates = reactive<Record<string, FormCreateFieldState>>({})
+const providerStates = reactive<Record<string, FormCreateProviderState>>({})
+let api: FormCreateApi
 
 const formOption = computed(() => getConfig(props.option))
 const titleWidth = computed(() => getTitleWidth(formOption.value))
 const parsedRules = computed(() => parseRules(props.rule))
 const baseRules = computed(() => normalizeRules(parsedRules.value))
 const controlResult = computed(() => applyControlRules(baseRules.value, formData.value))
-const rules = computed(() => controlResult.value.rules)
+const providerContext: FormCreateProviderContext = {
+  get api() {
+    return api
+  },
+  get formData() {
+    return formData.value
+  },
+  get option() {
+    return formOption.value
+  },
+  states: providerStates,
+}
+const rules = computed(() => applyRuleProviders(controlResult.value.rules, providerContext))
 const visibleRules = computed(() => rules.value.filter(rule => !isRuleHidden(rule, fieldStates[rule.field || ''])))
-const formSchema = computed(() => createFormSchema(() => rules.value, fieldStates, parseRules))
-
-watch(
-  rules,
-  (nextRules) => {
-    nextRules.forEach((rule) => {
-      if (rule.field && !fieldStates[rule.field]) {
-        fieldStates[rule.field] = {}
-      }
-      if (rule.field && !hasOwn(formData.value, rule.field)) {
-        formData.value[rule.field] = hasOwn(initialFormValues.value, rule.field)
-          ? initialFormValues.value[rule.field]
-          : rule.value !== undefined ? rule.value : getDefaultValue(rule)
-      }
-    })
-  },
-  { immediate: true },
-)
-
-watch(
-  () => controlResult.value.fieldStates,
-  (nextStates) => {
-    const fields = new Set([
-      ...Object.keys(fieldStates),
-      ...Object.keys(nextStates),
-    ])
-    fields.forEach((field) => {
-      if (!fieldStates[field]) {
-        fieldStates[field] = {}
-      }
-      fieldStates[field].controlHidden = nextStates[field]?.controlHidden
-      fieldStates[field].controlDisabled = nextStates[field]?.controlDisabled
-      fieldStates[field].controlRequired = nextStates[field]?.controlRequired
-    })
-  },
-  { deep: true, immediate: true },
-)
-
-watch(
-  () => [props.modelValue, props.option?.formData, props.rule],
-  () => {
-    const initialValues = deepMerge<Record<string, any>>(formOption.value.formData || {}, props.modelValue || {})
-    initialFormValues.value = initialValues
-    formData.value = createInitialFormData(baseRules.value, initialValues)
-  },
-  { deep: true, immediate: true },
-)
+const formSchema = computed(() => createFormSchema(() => rules.value, fieldStates, parseRules, providerContext))
 
 function getValue(rule: NormalizedFormCreateRule) {
   return rule.field ? formData.value[rule.field] : undefined
@@ -580,12 +552,102 @@ function getLayoutGapHeight(rule: NormalizedFormCreateRule) {
   return '24rpx'
 }
 
-const api = createApi({
+api = createApi({
   emitChange: () => emitChange(),
   fieldStates,
   formData,
   formRef,
+  option: formOption,
   rules,
+})
+
+let providerFetchVersion = 0
+let providerFetchTimer: ReturnType<typeof setTimeout> | undefined
+
+watch(
+  () => [props.modelValue, props.option?.formData, props.rule],
+  () => {
+    const initialValues = deepMerge<Record<string, any>>(formOption.value.formData || {}, props.modelValue || {})
+    initialFormValues.value = initialValues
+    formData.value = createInitialFormData(baseRules.value, initialValues)
+  },
+  { deep: true, immediate: true },
+)
+
+watch(
+  rules,
+  (nextRules) => {
+    nextRules.forEach((rule) => {
+      if (rule.field && !fieldStates[rule.field]) {
+        fieldStates[rule.field] = {}
+      }
+      if (rule.field && !hasOwn(formData.value, rule.field)) {
+        formData.value[rule.field] = hasOwn(initialFormValues.value, rule.field)
+          ? initialFormValues.value[rule.field]
+          : rule.value !== undefined ? rule.value : getDefaultValue(rule)
+      }
+    })
+  },
+  { immediate: true },
+)
+
+watch(
+  () => controlResult.value.fieldStates,
+  (nextStates) => {
+    const fields = new Set([
+      ...Object.keys(fieldStates),
+      ...Object.keys(nextStates),
+    ])
+    fields.forEach((field) => {
+      if (!fieldStates[field]) {
+        fieldStates[field] = {}
+      }
+      fieldStates[field].controlHidden = nextStates[field]?.controlHidden
+      fieldStates[field].controlDisabled = nextStates[field]?.controlDisabled
+      fieldStates[field].controlRequired = nextStates[field]?.controlRequired
+    })
+  },
+  { deep: true, immediate: true },
+)
+
+watch(
+  () => [controlResult.value.rules, formData.value, formOption.value.globalData],
+  () => {
+    scheduleProviderFetchEffects()
+  },
+  { deep: true, immediate: true },
+)
+
+function scheduleProviderFetchEffects() {
+  if (providerFetchTimer) {
+    clearTimeout(providerFetchTimer)
+  }
+  providerFetchTimer = setTimeout(() => {
+    providerFetchTimer = undefined
+    void refreshProviderFetchEffects()
+  }, 300)
+}
+
+async function refreshProviderFetchEffects() {
+  const version = ++providerFetchVersion
+  const results = await resolveRuleFetchEffects(controlResult.value.rules, providerContext)
+  if (version !== providerFetchVersion) {
+    return
+  }
+  results.forEach((result) => {
+    if (!providerStates[result.fieldId]) {
+      providerStates[result.fieldId] = {}
+    }
+    providerStates[result.fieldId].fetchLoaded = true
+    providerStates[result.fieldId].fetchPatch = result.patch
+  })
+}
+
+onBeforeUnmount(() => {
+  if (providerFetchTimer) {
+    clearTimeout(providerFetchTimer)
+    providerFetchTimer = undefined
+  }
 })
 
 onMounted(() => {

@@ -265,6 +265,7 @@
               v-else-if="isSubFormType(childRule)"
               :model-value="getItemValue(itemIndex, childRule.field)"
               :rule="getRenderRule(childRule, itemIndex)"
+              :option="option"
               :title-width="childTitleWidth"
               :disabled="isChildDisabled(childRule, itemIndex)"
               @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
@@ -297,9 +298,10 @@
 </template>
 
 <script lang="ts" setup>
-import type { FormCreateRule, NormalizedFormCreateRule } from '../../../../types/typing'
+import type { FormCreateOption, FormCreateRule, NormalizedFormCreateRule } from '../../../../types/typing'
+import type { FormCreateProviderContext } from '../../../core/src/provider'
 import { computed, ref, watch } from 'vue'
-import { applyControlRules, getDefaultValue, isRuleDisabled, isRuleHidden, normalizeSubFormRules } from '../../../core/src'
+import { applyControlRules, applyRuleProviders, getDefaultValue, isRuleDisabled, isRuleHidden, normalizeSubFormRules } from '../../../core/src'
 import {
   INTERNAL_LAYOUT_TITLE_TYPE,
   getInputType,
@@ -360,6 +362,7 @@ defineOptions({
 const props = defineProps<{
   disabled?: boolean
   modelValue?: any
+  option?: FormCreateOption
   rule: NormalizedFormCreateRule
   titleWidth?: string | number
 }>()
@@ -446,8 +449,16 @@ function fillDefaultRow(row: Record<string, any>, rules: NormalizedFormCreateRul
 
 function getItemRules(itemIndex: number) {
   const result = getItemControlResult(itemIndex)
-  const rules = result?.rules || baseChildRules.value
+  const providerContext = getItemProviderContext(itemIndex)
+  const rules = applyRuleProviders(result?.rules || baseChildRules.value, providerContext)
   return rules.filter(rule => !isRuleHidden(rule, getItemFieldState(itemIndex, rule)))
+}
+
+function getItemProviderContext(itemIndex: number): FormCreateProviderContext {
+  return {
+    formData: rows.value[itemIndex] || {},
+    option: props.option,
+  }
 }
 
 function getItemFieldState(itemIndex: number, rule: NormalizedFormCreateRule) {

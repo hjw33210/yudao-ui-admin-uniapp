@@ -25,7 +25,39 @@ export interface FormCreateValidateRule {
   message?: string
   pattern?: RegExp | string
   trigger?: string | string[]
-  validator?: (value: unknown) => boolean | string | void | Promise<boolean | string | void>
+  validator?: (value: unknown, rule?: FormCreateRule, api?: FormCreateApi) => boolean | string | void | Promise<boolean | string | void>
+  [key: string]: any
+}
+
+export interface FormCreateFetchOption {
+  action?: string | ((rule?: FormCreateRule, api?: FormCreateApi) => any)
+  data?: Record<string, any>
+  headers?: Record<string, any>
+  header?: Record<string, any>
+  key?: string
+  method?: string
+  onError?: (error: unknown, rule?: FormCreateRule, api?: FormCreateApi) => void
+  parse?: string | ((body: any, rule?: FormCreateRule, api?: FormCreateApi) => any)
+  query?: Record<string, any>
+  to?: string
+  [key: string]: any
+}
+
+export interface FormCreateLoadDataEffectOption {
+  attr?: string
+  copy?: boolean
+  default?: any
+  handler?: (get: (id: string, defaultValue?: any) => any, rule?: FormCreateRule, api?: FormCreateApi) => any
+  template?: string
+  to?: string
+  [key: string]: any
+}
+
+export type FormCreateComponentValidateEffect = boolean | string | {
+  message?: string
+  method?: string | ((value: unknown, rule?: FormCreateRule, api?: FormCreateApi) => any)
+  trigger?: string | string[]
+  validator?: (value: unknown, rule?: FormCreateRule, api?: FormCreateApi) => any
   [key: string]: any
 }
 
@@ -57,16 +89,35 @@ export interface FormCreateRule {
   name?: string
   className?: string
   control?: FormCreateControl | FormCreateControl[]
-  effect?: Record<string, any>
+  effect?: {
+    componentValidate?: FormCreateComponentValidateEffect
+    disabled?: boolean
+    display?: boolean
+    fetch?: string | FormCreateFetchOption | ((rule?: FormCreateRule, api?: FormCreateApi) => FormCreateFetchOption | string | undefined)
+    hidden?: boolean
+    loadData?: FormCreateLoadDataEffectOption | FormCreateLoadDataEffectOption[]
+    required?: boolean | string | FormCreateValidateRule
+    show?: boolean
+    t?: Record<string, string | {
+      attr: string
+      params?: Record<string, any>
+      to?: string
+    }>
+    [key: string]: any
+  }
   [key: string]: any
 }
 
 export interface FormCreateOption {
+  fetch?: (option: FormCreateFetchOption, context?: { api?: FormCreateApi, rule?: FormCreateRule }) => Promise<any>
   form?: Record<string, any>
   row?: Record<string, any>
   submitBtn?: boolean | Record<string, any>
   resetBtn?: boolean | Record<string, any>
   formData?: Record<string, any>
+  globalData?: Record<string, any>
+  messages?: Record<string, string>
+  t?: (id: string, params?: Record<string, any>) => string | undefined
   [key: string]: any
 }
 
@@ -96,16 +147,20 @@ export interface FormCreateApi {
   formData: () => Record<string, any>
   getFormData: () => Record<string, any>
   getValue: (field: string) => any
+  fetch: (option: FormCreateFetchOption) => Promise<any>
+  getData: (id: string, defaultValue?: any) => any
   setValue: (values: Record<string, any>) => void
   coverValue: (values: Record<string, any>) => void
   disabled: (status: boolean, field?: string) => void
   hidden: (status: boolean, field?: string) => void
+  t: (id: string, params?: Record<string, any>) => string | undefined
   setFieldPermission: (field: string, permission: FormFieldPermission | string) => void
 }
 
 export interface FormCreateApiContext {
   formRef: Ref<FormInstance | undefined>
   formData: Ref<Record<string, any>>
+  option?: Readonly<Ref<FormCreateOption>>
   rules: Readonly<Ref<NormalizedFormCreateRule[]>>
   fieldStates: Record<string, FormCreateFieldState>
   emitChange: () => void

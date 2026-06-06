@@ -1,5 +1,6 @@
 import type { FormSchema, FormSchemaIssue } from '@wot-ui/ui/components/wd-form/types'
 import type { FormCreateFieldState, FormCreateRule, NormalizedFormCreateRule } from '../../../types/typing'
+import type { FormCreateProviderContext } from './provider'
 import type { ParseSubFormRules } from './subForm'
 import { applyControlRules } from './control'
 import { getValidateRules } from './provider'
@@ -10,6 +11,7 @@ export function createFormSchema(
   rules: () => NormalizedFormCreateRule[],
   fieldStates: Record<string, FormCreateFieldState>,
   parseSubFormRules?: ParseSubFormRules,
+  providerContext?: FormCreateProviderContext,
 ): FormSchema {
   return {
     async validate(model) {
@@ -20,10 +22,10 @@ export function createFormSchema(
         }
         const value = model[rule.field]
         if (isSubFormRule(rule)) {
-          await validateSubFormRule(rule, value, issues, rule.field, fieldStates[rule.field], parseSubFormRules)
+          await validateSubFormRule(rule, value, issues, rule.field, fieldStates[rule.field], parseSubFormRules, providerContext)
           continue
         }
-        for (const validateRule of getValidateRules(rule, fieldStates[rule.field])) {
+        for (const validateRule of getValidateRules(rule, fieldStates[rule.field], providerContext)) {
           if (validateRule.required && isEmptyValue(value)) {
             issues.push(createIssue(rule.field, validateRule.message || `${rule.title || '该字段'}不能为空`))
             break
@@ -39,7 +41,7 @@ export function createFormSchema(
             }
           }
           if (validateRule.validator) {
-            const result = await validateRule.validator(value)
+            const result = await validateRule.validator(value, rule, providerContext?.api)
             if (result === false || typeof result === 'string') {
               issues.push(createIssue(rule.field, typeof result === 'string' ? result : validateRule.message || `${rule.title || '该字段'}校验失败`))
               break
@@ -53,10 +55,10 @@ export function createFormSchema(
       const prop = normalizePath(path)
       const rule = rules().find(item => item.field === prop)
       if (rule) {
-        return getValidateRules(rule, fieldStates[rule.field]).some(item => item.required)
+        return getValidateRules(rule, fieldStates[rule.field], providerContext).some(item => item.required)
       }
       const childRule = findSubFormChildRule(rules(), prop, parseSubFormRules)
-      return !!(childRule && getValidateRules(childRule).some(item => item.required))
+      return !!(childRule && getValidateRules(childRule, undefined, providerContext).some(item => item.required))
     },
   }
 }
@@ -68,8 +70,9 @@ async function validateSubFormRule(
   fieldPath: string = rule.field || '',
   state?: FormCreateFieldState,
   parseSubFormRules?: ParseSubFormRules,
+  providerContext?: FormCreateProviderContext,
 ) {
-  for (const validateRule of getValidateRules(rule, state)) {
+  for (const validateRule of getValidateRules(rule, state, providerContext)) {
     if (validateRule.required && (!Array.isArray(value) || value.length === 0)) {
       issues.push(createIssue(fieldPath, validateRule.message || `${rule.title || '子表单'}不能为空`))
       return
@@ -92,10 +95,16 @@ async function validateSubFormRule(
       const childValue = row?.[childRule.field]
       const childPath = getSubFormPath(fieldPath, rowIndex, childRule.field)
       if (isSubFormRule(childRule)) {
-        await validateSubFormRule(childRule, childValue, issues, childPath, childState, parseSubFormRules)
+        await validateSubFormRule(childRule, childValue, issues, childPath, childState, parseSubFormRules, {
+          ...providerContext,
+          formData: row || {},
+        })
         continue
       }
-      for (const validateRule of getValidateRules(childRule, childState)) {
+      for (const validateRule of getValidateRules(childRule, childState, {
+        ...providerContext,
+        formData: row || {},
+      })) {
         if (validateRule.required && isEmptyValue(childValue)) {
           issues.push(createIssue(childPath, validateRule.message || `${childRule.title || '该字段'}不能为空`))
           break
@@ -111,7 +120,7 @@ async function validateSubFormRule(
           }
         }
         if (validateRule.validator) {
-          const result = await validateRule.validator(childValue)
+          const result = await validateRule.validator(childValue, childRule, providerContext?.api)
           if (result === false || typeof result === 'string') {
             issues.push(createIssue(childPath, typeof result === 'string' ? result : validateRule.message || `${childRule.title || '该字段'}校验失败`))
             break
