@@ -179,21 +179,23 @@ watch(type, () => {
 onMounted(() => {
   // 禁止拖拽
   init()
+  if (!proxy?.$el) {
+    return
+  }
   proxy.$el.onselectstart = function () {
     return false
   }
 })
+function getPointerX(e) {
+  const touch = e?.touches?.[0] || e?.changedTouches?.[0]
+  if (touch) {
+    return touch.pageX
+  }
+  return e?.clientX || 0
+}
 // 鼠标按下
 function start(e) {
-  e = e || window.event
-  let x = 0
-  if (!e.touches) {
-    // 兼容PC端
-    x = e.clientX
-  } else {
-    // 兼容移动端
-    x = e.touches[0].pageX
-  }
+  const x = getPointerX(e)
   barArea.value.boundingClientRect((rect) => {
     rectData.value = rect
     startLeft.value = Math.floor(x - rect.left)
@@ -204,22 +206,14 @@ function start(e) {
     moveBlockBackgroundColor.value = '#337ab7'
     leftBarBorderColor.value = '#337AB7'
     iconColor.value = '#fff'
-    e.stopPropagation()
+    e?.stopPropagation?.()
     status.value = true
   }
 }
 // 鼠标移动
 function move(e) {
-  e = e || window.event
   if (status.value && isEnd.value === false) {
-    let x = 0
-    if (!e.touches) {
-      // 兼容PC端
-      x = e.clientX
-    } else {
-      // 兼容移动端
-      x = e.touches[0].pageX
-    }
+    const x = getPointerX(e)
     if (rectData.value) {
       const bar_area_left = Math.ceil(rectData.value.left)
       const barArea_offsetWidth = Math.ceil(rectData.value.width)

@@ -9,7 +9,7 @@
 
     <!-- 审批表单 -->
     <view class="p-24rpx">
-      <!-- TODO @AI：是不是要注释下？ -->
+      <!-- 节点表单 -->
       <view v-if="isApprove && approveForm.rule.length > 0" class="mb-24rpx overflow-hidden rounded-16rpx bg-white">
         <FormCreate
           v-model="approveForm.value"
@@ -20,7 +20,7 @@
         />
       </view>
 
-      <!-- TODO @AI：是不是要注释下？ -->
+      <!-- 审批操作表单 -->
       <wd-form ref="formRef" :model="formData" :schema="formSchema">
         <wd-cell-group border>
           <!-- 下一个节点的审批人 -->
@@ -133,25 +133,24 @@ definePage({
     navigationStyle: 'custom',
   },
 })
-// TODO @AI：注释风格统一；
 const taskId = computed(() => props.taskId || '')
 const processInstanceId = computed(() => props.processInstanceId)
 const isApprove = computed(() => props.pass !== 'false') // true: 同意, false: 拒绝
 const toast = useToast()
-const formLoading = ref(false)
+const formLoading = ref(false) // 审批提交状态
 const taskInfo = ref<Task | null>(null) // 任务信息
 
 const nextAssigneesActivityNode = ref<ApprovalNodeInfo[]>([]) // 下一个节点审批人列表
 const approveUserSelectTasks = ref<ApprovalNodeInfo[]>([]) // 需要选择审批人的节点列表
 const approveUserSelectAssignees = ref<Record<string, number[]>>({}) // 审批人选择的审批人数据
-const normalFormVariables = ref<Record<string, any>>({})
-const approveFormApi = ref<FormCreateApi>()
+const normalFormVariables = ref<Record<string, any>>({}) // 详情页流程表单暂存的可写变量
+const approveFormApi = ref<FormCreateApi>() // 节点表单 API
 const approveForm = ref<FormCreatePreview>({
   option: {},
   rule: [],
   value: {},
-})
-let nextAssigneeTimer: ReturnType<typeof setTimeout> | undefined
+}) // 节点表单配置和数据
+let nextAssigneeTimer: ReturnType<typeof setTimeout> | undefined // 下一节点审批人刷新防抖定时器
 
 const showSignatureModal = ref(false) // 签名相关
 
@@ -187,6 +186,7 @@ async function loadTaskInfo() {
     )
     approveForm.value.option = {
       ...approveForm.value.option,
+      // 审批页使用页面底部按钮提交，隐藏 form-create 内置按钮
       submitBtn: false,
       resetBtn: false,
     }
@@ -224,10 +224,12 @@ function selectNextAssigneesConfirm(activityId: string, userList: any[]) {
   approveUserSelectAssignees.value[activityId] = userList.map(user => user.id)
 }
 
+/** 同步节点表单数据 */
 function handleApproveFormChange(data: Record<string, any>) {
   approveForm.value.value = data
 }
 
+/** 获取详情页暂存的流程表单变量 */
 function getCachedNormalFormVariables() {
   if (!props.variablesCacheKey) {
     return {}
@@ -235,12 +237,14 @@ function getCachedNormalFormVariables() {
   return uni.getStorageSync(props.variablesCacheKey) || {}
 }
 
+/** 清理详情页暂存的流程表单变量 */
 function clearCachedNormalFormVariables() {
   if (props.variablesCacheKey) {
     uni.removeStorageSync(props.variablesCacheKey)
   }
 }
 
+/** 合并流程表单变量和节点表单变量 */
 function getApprovalVariables() {
   return {
     ...normalFormVariables.value,
@@ -248,6 +252,7 @@ function getApprovalVariables() {
   }
 }
 
+/** 清理下一节点审批人刷新定时器 */
 function clearNextAssigneeTimer() {
   if (nextAssigneeTimer) {
     clearTimeout(nextAssigneeTimer)
@@ -265,8 +270,7 @@ async function handleSignatureConfirm(result: { tempFilePath: string, base64: st
   toast.loading('上传中...')
   try {
     // 上传签名图片
-    const url = await uploadSignatureFile(result.tempFilePath)
-    formData.signPicUrl = url
+    formData.signPicUrl = await uploadSignatureFile(result.tempFilePath)
     showSignatureModal.value = false
     toast.success('签名成功')
   } catch (err) {
@@ -382,6 +386,7 @@ async function handleSubmit() {
   }
 }
 
+/** 审批表单变化后防抖刷新下一节点审批人 */
 watch(
   () => approveForm.value.value,
   () => {
@@ -397,11 +402,12 @@ watch(
   { deep: true },
 )
 
+/** 页面卸载时清理定时器 */
 onBeforeUnmount(() => {
   clearNextAssigneeTimer()
 })
 
-/** 页面加载时 */
+/** 初始化审批页数据 */
 onMounted(async () => {
   /** 初始化校验 */
   if (!props.taskId || !props.processInstanceId) {

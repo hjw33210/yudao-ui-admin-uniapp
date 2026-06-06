@@ -1,11 +1,13 @@
 <template>
   <view class="yd-page-container pb-[120rpx]">
+    <!-- 顶部导航栏 -->
     <wd-navbar
       :title="processName"
       left-arrow placeholder safe-area-inset-top fixed
       @click-left="handleBack"
     />
 
+    <!-- 表单加载状态 -->
     <view v-if="loading" class="py-100rpx text-center">
       <wd-loading size="40rpx" />
       <view class="mt-24rpx text-26rpx text-[#999]">
@@ -14,6 +16,7 @@
     </view>
 
     <template v-else>
+      <!-- 流程表单 -->
       <view class="mx-24rpx mt-24rpx overflow-hidden rounded-16rpx bg-white">
         <FormCreate
           v-model="detailForm.value"
@@ -25,6 +28,7 @@
         />
       </view>
 
+      <!-- 流程预览 -->
       <view class="mx-24rpx mt-24rpx rounded-16rpx bg-white">
         <view class="p-24rpx">
           <view class="mb-16rpx flex items-center justify-between">
@@ -39,6 +43,7 @@
             @select-user-confirm="selectUserConfirm"
           />
 
+          <!-- 无流程预览数据 -->
           <view v-else-if="!processTimeLineLoading" class="py-40rpx text-center">
             <text class="text-24rpx text-[#999]">暂无流程预览数据</text>
           </view>
@@ -46,6 +51,7 @@
       </view>
     </template>
 
+    <!-- 底部提交按钮 -->
     <view v-if="!loading" class="yd-detail-footer">
       <view class="yd-detail-footer-actions">
         <wd-button type="primary" class="flex-1" :loading="submitting" @click="handleSubmit">
@@ -57,10 +63,6 @@
 </template>
 
 <script lang="ts" setup>
-// TODO @AI：注释风格，是不是参考 /Users/yunai/Java/yudao-ui-admin-uniapp-next-v4/src/pages-system/user 做一些优化；
-// TODO @AI：方法内的注释；
-// TODO @AI：变量注释；
-// TODO @AI：html 相关的里面的注释；
 import type { ApprovalNodeInfo } from '@/api/bpm/processInstance'
 import type { FormCreateApi } from '@/pages-bpm/components/form-create/packages/wot-ui/types'
 import type { FormCreatePreview } from '@/pages-bpm/utils'
@@ -84,36 +86,36 @@ definePage({
 
 const toast = useToast()
 
-const loading = ref(true)
-const submitting = ref(false)
-const processTimeLineLoading = ref(false)
-const initialized = ref(false)
-const processName = ref('流程表单')
-const processDefinitionId = ref('')
-const processInstanceId = ref('')
-const fApi = ref<FormCreateApi>()
+const loading = ref(true) // 页面加载状态
+const submitting = ref(false) // 表单提交状态
+const processTimeLineLoading = ref(false) // 流程预览加载状态
+const initialized = ref(false) // 表单初始化完成后才响应字段变更
+const processName = ref('流程表单') // 流程名称
+const processDefinitionId = ref('') // 流程定义编号
+const processInstanceId = ref('') // 重新发起时的流程实例编号
+const fApi = ref<FormCreateApi>() // 流程表单 API
 const detailForm = ref<FormCreatePreview>({
   option: {},
   rule: [],
   value: {},
-})
-const activityNodes = ref<ApprovalNodeInfo[]>([])
-const startUserSelectTasks = ref<ApprovalNodeInfo[]>([])
-const startUserSelectAssignees = ref<Record<string, number[]>>({})
-const tempStartUserSelectAssignees = ref<Record<string, number[]>>({})
-let previewTimer: ReturnType<typeof setTimeout> | undefined
+}) // 流程表单配置和数据
+const activityNodes = ref<ApprovalNodeInfo[]>([]) // 流程预览节点
+const startUserSelectTasks = ref<ApprovalNodeInfo[]>([]) // 发起人需要选择审批人的节点
+const startUserSelectAssignees = ref<Record<string, number[]>>({}) // 发起人选择的审批人
+const tempStartUserSelectAssignees = ref<Record<string, number[]>>({}) // 刷新预览前临时保留的审批人
+let previewTimer: ReturnType<typeof setTimeout> | undefined // 流程预览刷新防抖定时器
 
-// TODO @AI：这里写个注释？
+/** 返回流程发起页 */
 function handleBack() {
   navigateBackPlus('/pages-bpm/processInstance/create/index')
 }
 
-// TODO @AI：这里写个注释？
+/** 同步流程表单数据 */
 function handleFormChange(data: Record<string, any>) {
   detailForm.value.value = data
 }
 
-// TODO @AI：这里写个注释？
+/** 加载流程预览和发起人自选审批节点 */
 async function getProcessApprovalDetail() {
   if (!processDefinitionId.value) {
     return
@@ -121,6 +123,7 @@ async function getProcessApprovalDetail() {
 
   processTimeLineLoading.value = true
   try {
+    // 根据当前表单变量查询流程预览，后端会同步返回节点审批人和字段权限
     const data = await getApprovalDetail({
       processDefinitionId: processDefinitionId.value,
       activityId: BpmNodeIdEnum.START_USER_NODE_ID,
@@ -132,10 +135,12 @@ async function getProcessApprovalDetail() {
     }
 
     activityNodes.value = data.activityNodes || []
+    // 只保留“发起人自选审批人”的节点，提交前必须校验这些节点已选择审批人
     startUserSelectTasks.value = (data.activityNodes || []).filter(
       node => BpmCandidateStrategyEnum.START_USER_SELECT === node.candidateStrategy,
     )
 
+    // 刷新流程预览后恢复已选择的发起人自选审批人
     if (startUserSelectTasks.value.length > 0) {
       for (const node of startUserSelectTasks.value) {
         const tempAssignees = tempStartUserSelectAssignees.value[node.id]
@@ -143,6 +148,7 @@ async function getProcessApprovalDetail() {
       }
     }
 
+    // 后端会根据表单变量返回字段权限，移动端同步给 form-create
     if (data.formFieldsPermission) {
       await nextTick()
       Object.entries(data.formFieldsPermission).forEach(([field, permission]) => {
@@ -154,12 +160,12 @@ async function getProcessApprovalDetail() {
   }
 }
 
-// TODO @AI：这里写个注释？
+/** 确认发起人自选审批人 */
 function selectUserConfirm(activityId: string, userList: any[]) {
   startUserSelectAssignees.value[activityId] = userList?.map(item => item.id) || []
 }
 
-// TODO @AI：这里写个注释？
+/** 提交流程表单 */
 async function handleSubmit() {
   if (!fApi.value || submitting.value) {
     return
@@ -169,6 +175,7 @@ async function handleSubmit() {
     return
   }
 
+  // 校验所有发起人自选审批节点都已选择审批人
   if (startUserSelectTasks.value.length > 0) {
     for (const userTask of startUserSelectTasks.value) {
       const assignees = startUserSelectAssignees.value[userTask.id]
@@ -181,6 +188,7 @@ async function handleSubmit() {
 
   submitting.value = true
   try {
+    // 只提交流程表单字段，避免把审批人等辅助变量混入表单变量
     await createProcessInstance({
       processDefinitionId: processDefinitionId.value,
       variables: filterFormVariablesByFields(detailForm.value.rule, fApi.value.formData()),
@@ -195,7 +203,7 @@ async function handleSubmit() {
   }
 }
 
-// TODO @AI：这里写个注释？
+/** 表单变化后防抖刷新流程预览 */
 watch(
   () => detailForm.value.value,
   () => {
@@ -206,6 +214,7 @@ watch(
       clearTimeout(previewTimer)
     }
     previewTimer = setTimeout(() => {
+      // 刷新预览前先暂存已选审批人，避免后端节点重算后丢失用户选择
       tempStartUserSelectAssignees.value = { ...startUserSelectAssignees.value }
       startUserSelectAssignees.value = {}
       getProcessApprovalDetail()
@@ -214,7 +223,7 @@ watch(
   { deep: true },
 )
 
-// TODO @AI：这里写个注释？
+/** 初始化流程表单 */
 onLoad(async (options) => {
   const id = options?.processDefinitionId
   const instanceId = options?.processInstanceId
@@ -227,6 +236,7 @@ onLoad(async (options) => {
   processDefinitionId.value = id
   processInstanceId.value = instanceId || ''
   try {
+    // 先加载流程定义，拿到表单配置、表单字段和页面标题
     const definition = await getProcessDefinition(id)
     processName.value = definition.name || '流程表单'
     if (!definition.formFields?.length) {
@@ -240,25 +250,22 @@ onLoad(async (options) => {
     setConfAndFields2(detailForm, definition.formConf, definition.formFields, formVariables)
     detailForm.value.option = {
       ...detailForm.value.option,
+      // 发起页使用页面底部按钮提交，隐藏 form-create 内置按钮
       submitBtn: false,
       resetBtn: false,
     }
 
+    // 等 form-create 渲染完成后再查询流程预览和字段权限
     await nextTick()
     await getProcessApprovalDetail()
+    // 初始化完成后，表单字段变化才会触发流程预览防抖刷新
     initialized.value = true
-  } catch (error: any) {
-    const code = error?.code ?? error?.data?.code ?? error?.statusCode
-    if (code !== 401) {
-      console.error('加载流程表单失败:', error)
-      toast.show('加载流程表单失败，请稍后重试')
-    }
   } finally {
     loading.value = false
   }
 })
 
-// TODO @AI：这里写个注释？
+/** 获取重新发起时可回填的流程表单变量 */
 async function getRestartFormVariables(formFields?: string[]) {
   const processInstance = await getProcessInstance(processInstanceId.value)
   if (!processInstance) {

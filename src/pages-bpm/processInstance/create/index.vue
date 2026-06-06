@@ -1,5 +1,4 @@
 <template>
-  <!-- TODO vben 对应的地址：/Users/yunai/Java/yudao-ui-admin-vben-v5/apps/web-antd/src/views/bpm/processInstance/create/index.vue -->
   <view class="yd-page-container">
     <!-- 顶部导航栏 -->
     <wd-navbar
@@ -162,7 +161,7 @@ function handleBack() {
   navigateBackPlus('/pages/bpm/index')
 }
 
-/** 搜索 */
+/** 更新流程定义搜索结果位置 */
 async function handleSearch() {
   // 搜索后重新计算分类位置
   await nextTick()
@@ -252,11 +251,12 @@ async function loadDefinitionList() {
   definitionList.value = await getProcessDefinitionList({ suspensionState: 1 })
 }
 
-/** 初始化 */
+/** 初始化可发起流程列表 */
 onLoad(async (options) => {
-  // TODO @AI：这里写下注释
+  // 分类和流程定义互不依赖，并行加载减少首屏等待时间
   await Promise.all([loadCategoryList(), loadDefinitionList()])
-  // TODO @AI：这里写下注释
+
+  // 从详情页重新发起时，直接定位原流程定义并进入表单页
   if (options?.processInstanceId) {
     await restartProcessInstance(options.processInstanceId)
     return
@@ -272,8 +272,7 @@ onLoad(async (options) => {
   }, 100)
 })
 
-// TODO @AI：这里写个注释？
-// TODO @AI：是不是应该放到 onLoad 前面？
+/** 重新发起流程 */
 async function restartProcessInstance(processInstanceId: string) {
   const processInstance = await getProcessInstance(processInstanceId)
   if (!processInstance) {
@@ -288,6 +287,7 @@ async function restartProcessInstance(processInstanceId: string) {
     toast.show('重新发起流程失败，原因：流程定义不存在')
     return
   }
+  // 复用普通发起入口，带上流程实例编号让表单页回填历史变量
   handleSelect(processDefinition, processInstanceId)
 }
 </script>

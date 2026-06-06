@@ -46,7 +46,6 @@ import LeaveDetail from '@/pages-bpm/oa/leave/detail/index.vue'
 import { setConfAndFields2 } from '@/pages-bpm/utils'
 import { BpmModelFormType } from '@/utils/constants'
 
-// TODO @AI：注释风格
 const props = defineProps<{
   /** 流程定义 */
   processDefinition?: ProcessDefinition
@@ -64,6 +63,7 @@ const normalForm = ref<FormCreatePreview>({
   value: {},
 })
 
+/** 初始化流程表单配置和数据 */
 watch(
   () => [
     props.processDefinition?.formConf,
@@ -93,12 +93,14 @@ watch(
   { deep: true, immediate: true },
 )
 
+/** 表单 API 或字段权限变化后重新应用权限 */
 watch(
   () => [normalFormApi.value, props.formFieldsPermission, normalForm.value.rule],
   () => applyFieldPermission(),
   { deep: true, immediate: true },
 )
 
+/** 应用流程表单字段权限 */
 async function applyFieldPermission() {
   await nextTick()
   const api = normalFormApi.value
@@ -107,6 +109,7 @@ async function applyFieldPermission() {
   }
 
   writableFields.value = []
+  // 默认展示全部字段并禁用编辑，再按后端字段权限逐项放开或隐藏
   api.hidden(false)
   api.disabled(true)
 
@@ -118,6 +121,7 @@ async function applyFieldPermission() {
   })
 }
 
+/** 校验当前流程表单 */
 async function validate() {
   if (!normalFormApi.value) {
     return { valid: true, errors: [] }
@@ -125,6 +129,7 @@ async function validate() {
   return normalFormApi.value.validate()
 }
 
+/** 获取当前节点允许编辑的流程变量 */
 function getWritableVariables() {
   const formData = normalFormApi.value?.formData() || normalForm.value.value || {}
   return writableFields.value.reduce<Record<string, any>>((variables, field) => {
