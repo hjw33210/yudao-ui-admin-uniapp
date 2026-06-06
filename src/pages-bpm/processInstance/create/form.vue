@@ -76,6 +76,7 @@ import ProcessInstanceTimeline from '@/pages-bpm/processInstance/detail/componen
 import { filterFormVariablesByFields, setConfAndFields2 } from '@/pages-bpm/utils'
 import { navigateBackPlus } from '@/utils'
 import { BpmCandidateStrategyEnum, BpmNodeIdEnum } from '@/utils/constants'
+import { setTabParams } from '@/utils/url'
 
 definePage({
   style: {
@@ -196,7 +197,8 @@ async function handleSubmit() {
     })
     toast.success('发起流程成功')
     setTimeout(() => {
-      navigateBackPlus('/pages/bpm/index')
+      setTabParams({ tab: 'my' })
+      uni.switchTab({ url: '/pages/bpm/index' })
     }, 1000)
   } finally {
     submitting.value = false
