@@ -35,6 +35,7 @@
       label-key="label"
       type="checkbox"
       value-key="value"
+      @cancel="emit('cancel')"
       @confirm="handleMultipleConfirm"
     />
   </view>
@@ -64,7 +65,11 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:modelValue': [value: any]
+  'cancel': []
   'change': [value: any]
+  'close': []
+  'confirm': [value: any]
+  'open': []
 }>()
 
 const visible = ref(false)
@@ -96,6 +101,14 @@ watch(
   { deep: true, immediate: true },
 )
 
+watch(visible, (value) => {
+  if (value) {
+    emit('open')
+  } else {
+    emit('close')
+  }
+})
+
 function open() {
   if (props.disabled) {
     return
@@ -109,12 +122,14 @@ function handleCascaderConfirm({ value }: { value: any }) {
   const nextValue = selected === '' || selected === undefined ? undefined : selected
   emit('update:modelValue', nextValue)
   emit('change', nextValue)
+  emit('confirm', nextValue)
 }
 
 function handleMultipleConfirm({ value }: { value: any }) {
   const nextValue = Array.isArray(value) ? value : []
   emit('update:modelValue', nextValue)
   emit('change', nextValue)
+  emit('confirm', nextValue)
 }
 
 function getTreeData() {

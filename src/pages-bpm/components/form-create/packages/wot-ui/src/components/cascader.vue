@@ -28,7 +28,7 @@
 <script lang="ts" setup>
 import type { CascaderOption } from '@wot-ui/ui/components/wd-cascader/types'
 import type { NormalizedFormCreateRule } from '../../../../types/typing'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { getPlaceholder } from '../core/utils'
 
 type CascaderValue = string | number
@@ -43,10 +43,14 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [value: any]
   'change': [value: any]
+  'cancel': []
+  'close': []
   'confirm': [value: any]
+  'open': []
 }>()
 
 const visible = ref(false)
+const closingByConfirm = ref(false)
 
 const placeholder = computed(() => getPlaceholder(props.rule, '请选择'))
 const fieldNames = computed(() => getFieldNames())
@@ -56,6 +60,18 @@ const checkStrictly = computed(() => props.rule.props?.checkStrictly ?? props.ru
 const componentProps = computed(() => getComponentProps())
 const displayValue = computed(() => formatDisplayValue(props.modelValue))
 
+watch(visible, (value) => {
+  if (value) {
+    emit('open')
+  } else {
+    emit('close')
+    if (!closingByConfirm.value) {
+      emit('cancel')
+    }
+    closingByConfirm.value = false
+  }
+})
+
 function open() {
   if (props.disabled) {
     return
@@ -64,6 +80,7 @@ function open() {
 }
 
 function handleConfirm({ value, selectedOptions }: { value: any, selectedOptions?: CascaderOption[] }) {
+  closingByConfirm.value = true
   const values = getSelectedValues(value, selectedOptions)
   const leafValue = values.length ? values[values.length - 1] : value
   const nextValue = shouldEmitPath()

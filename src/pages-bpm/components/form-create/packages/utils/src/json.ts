@@ -1,8 +1,7 @@
 const FUNCTION_PREFIX = '[[FORM-CREATE-PREFIX-'
 const FUNCTION_SUFFIX = '-FORM-CREATE-SUFFIX]]'
 
-// Function deserialization is only for trusted form-create schema from the form designer/backend.
-// Do not use parseJson/parseFn on untrusted user-controlled JSON.
+// Align with form-create function deserialization for trusted schema from the form designer/backend.
 type JsonFunction = ((...args: any[]) => any) & {
   __inject?: boolean
   __json?: string

@@ -21,6 +21,7 @@
       label-key="label"
       type="checkbox"
       value-key="value"
+      @cancel="emit('cancel')"
       @confirm="handleConfirm"
     />
   </view>
@@ -52,7 +53,11 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:modelValue': [value: TransferValue[]]
+  'cancel': []
   'change': [value: TransferValue[]]
+  'close': []
+  'confirm': [value: TransferValue[]]
+  'open': []
 }>()
 
 const pickerValue = ref<TransferValue[]>([])
@@ -78,6 +83,14 @@ watch(
   { deep: true, immediate: true },
 )
 
+watch(visible, (value) => {
+  if (value) {
+    emit('open')
+  } else {
+    emit('close')
+  }
+})
+
 function open() {
   if (props.disabled) {
     return
@@ -90,6 +103,7 @@ function handleConfirm({ value }: { value: any }) {
   const nextValue = Array.isArray(value) ? value : []
   emit('update:modelValue', nextValue)
   emit('change', nextValue)
+  emit('confirm', nextValue)
 }
 
 function normalizeOptions(list: unknown): TransferOption[] {

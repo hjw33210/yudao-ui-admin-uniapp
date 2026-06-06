@@ -14,6 +14,7 @@
       :model-value="pickerValue"
       :type="pickerType"
       :title="placeholder"
+      @cancel="emit('cancel')"
       @confirm="handleConfirm"
     />
   </view>
@@ -22,7 +23,7 @@
 <script lang="ts" setup>
 import type { NormalizedFormCreateRule } from '../../../../types/typing'
 import dayjs from 'dayjs'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { getPlaceholder } from '../core/utils'
 
 const props = defineProps<{
@@ -34,8 +35,11 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:modelValue': [value: any]
+  'cancel': []
   'change': [value: any]
+  'close': []
   'confirm': [value: any]
+  'open': []
 }>()
 
 const visible = ref(false)
@@ -49,6 +53,14 @@ const displayValue = computed(() => {
     return ''
   }
   return dayjs(value).format(getDefaultFormat())
+})
+
+watch(visible, (value) => {
+  if (value) {
+    emit('open')
+  } else {
+    emit('close')
+  }
 })
 
 function open() {

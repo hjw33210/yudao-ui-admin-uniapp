@@ -14,6 +14,7 @@
       :model-value="pickerValue"
       type="time"
       :title="placeholder"
+      @cancel="emit('cancel')"
       @confirm="handleConfirm"
     />
   </view>
@@ -21,7 +22,7 @@
 
 <script lang="ts" setup>
 import type { NormalizedFormCreateRule } from '../../../../types/typing'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { getPlaceholder } from '../core/utils'
 
 const props = defineProps<{
@@ -33,14 +34,25 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:modelValue': [value: any]
+  'cancel': []
   'change': [value: any]
+  'close': []
   'confirm': [value: any]
+  'open': []
 }>()
 
 const visible = ref(false)
 const placeholder = computed(() => getPlaceholder(props.rule, '请选择'))
 const pickerValue = computed(() => normalizeTimeValue(props.modelValue) || props.rule.props?.defaultValue || '09:00')
 const displayValue = computed(() => normalizeTimeValue(props.modelValue))
+
+watch(visible, (value) => {
+  if (value) {
+    emit('open')
+  } else {
+    emit('close')
+  }
+})
 
 function open() {
   if (!props.disabled) {

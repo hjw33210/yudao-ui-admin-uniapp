@@ -88,6 +88,7 @@ export interface FormCreateRule {
   emit?: Array<string | { emitPrefix?: string, inject?: boolean, name: string, prefix?: string }>
   emitPrefix?: string
   info?: string
+  ignore?: boolean | 'hidden'
   name?: string
   className?: string
   control?: FormCreateControl | FormCreateControl[]
@@ -126,6 +127,7 @@ export interface FormCreateRule {
 export interface FormCreateOption {
   fetch?: (option: FormCreateFetchOption, context?: { api?: FormCreateApi, rule?: FormCreateRule }) => Promise<any>
   form?: Record<string, any>
+  ignoreHiddenFields?: boolean
   row?: Record<string, any>
   submitBtn?: boolean | Record<string, any>
   resetBtn?: boolean | Record<string, any>
@@ -167,7 +169,6 @@ export interface FormCreateApi {
   validate: () => Promise<{ valid: boolean, errors: { prop: string, message: string }[] }>
   validateField: (field: string, callback?: (result: { valid: boolean, errors: { prop: string, message: string }[] }) => void) => Promise<{ valid: boolean, errors: { prop: string, message: string }[] }>
   validateFields: (fields: string | string[], callback?: (result: { valid: boolean, errors: { prop: string, message: string }[] }) => void) => Promise<{ valid: boolean, errors: { prop: string, message: string }[] }>
-  /** Wot UI Form 只暴露整表 reset，fields 参数仅为兼容 form-create 调用签名。 */
   clearValidateState: (fields?: string | string[]) => void
   onSubmit: (fn: FormCreateOption['onSubmit']) => void
   submit: (callback?: FormCreateOption['onSubmit']) => Promise<{ valid: boolean, errors: { prop: string, message: string }[], data: Record<string, any> }>
@@ -217,10 +218,12 @@ export interface FormCreateApiContext {
   option?: Readonly<Ref<FormCreateOption>>
   rules: Readonly<Ref<NormalizedFormCreateRule[]>>
   rulePatches?: Record<string, Partial<NormalizedFormCreateRule>>
+  parseSubFormRules?: (rules: FormCreateRule[]) => FormCreateRule[]
   fieldStates: Record<string, FormCreateFieldState>
   emitChange: () => void
   emitReset?: () => void
   emitSubmit?: (data: Record<string, any>) => void
   emitValidateFail?: (errors: { prop: string, message: string }[]) => void
+  clearValidateState?: (fields: string | string[]) => void
   refresh?: () => void
 }

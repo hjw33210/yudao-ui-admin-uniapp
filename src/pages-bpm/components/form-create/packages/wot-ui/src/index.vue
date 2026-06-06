@@ -49,7 +49,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { FormInstance } from '@wot-ui/ui/components/wd-form/types'
+import type { FormInstance, FormSchemaIssue } from '@wot-ui/ui/components/wd-form/types'
 import type {
   FormCreateApi,
   FormCreateFieldState,
@@ -69,6 +69,7 @@ import {
   isRuleDisabled,
   isRuleHidden,
   normalizeRules,
+  normalizeSubFormRules,
   resolveRuleFetchEffects,
 } from '../../core/src'
 import { deepMerge, hasOwn } from '../../utils/src'
@@ -119,6 +120,7 @@ const providerStates = reactive<Record<string, FormCreateProviderState>>({})
 const apiRulePatches = reactive<Record<string, Partial<NormalizedFormCreateRule>>>({})
 const changeStatus = ref(false)
 const hidden = ref(false)
+const clearingValidateFields = ref<Set<string>>()
 let api: FormCreateApi
 // 用于识别本组件 emit('update:modelValue') 后父组件同步回绑的值，避免把用户输入写成 resetFields 的初始基准。
 let syncingModelValue = false
@@ -145,7 +147,18 @@ const providerContext: FormCreateProviderContext = {
 }
 const rules = computed(() => applyRuleProviders(providerSourceRules.value, providerContext))
 const visibleRules = computed(() => rules.value.filter(rule => !isRuleHidden(rule, fieldStates[rule.field || ''])))
-const formSchema = computed(() => createFormSchema(() => rules.value, fieldStates, parseRules, providerContext))
+const baseFormSchema = computed(() => createFormSchema(() => rules.value, fieldStates, parseRules, providerContext))
+const formSchema = computed(() => ({
+  ...baseFormSchema.value,
+  async validate(model: Record<string, any>) {
+    const fields = clearingValidateFields.value
+    const issues = await Promise.resolve(baseFormSchema.value.validate(model))
+    if (!fields?.size) {
+      return issues
+    }
+    return issues.filter(issue => !isClearingValidateIssue(issue, fields))
+  },
+}))
 const MAX_RULE_UPDATE_DEPTH = 5
 
 interface RuleUpdateTask {
@@ -265,10 +278,22 @@ function runRuleUpdates(sourceRule: NormalizedFormCreateRule, value: any) {
       ...changedFields.map(item => item.field),
     ]))
     if (task.depth >= MAX_RULE_UPDATE_DEPTH) {
+      warnRuleUpdateDepth(task)
       continue
     }
     runLinkedRuleUpdates(task, sourceFields, visited, queue)
   }
+}
+
+function warnRuleUpdateDepth(task: RuleUpdateTask) {
+  console.warn(
+    `[form-create] rule.update/link reached max depth ${MAX_RULE_UPDATE_DEPTH}, linked updates stopped.`,
+    {
+      field: task.sourceRule.field,
+      linkField: task.linkField,
+      originField: task.origin.field,
+    },
+  )
 }
 
 function runLinkedRuleUpdates(
@@ -362,6 +387,82 @@ function isDisabled(rule: NormalizedFormCreateRule) {
   return isRuleDisabled(globalDisabled.value || !!rule.props?.disabled, fieldStates[rule.field || ''], rule)
 }
 
+function clearValidateState(fields: string | string[]) {
+  const targets = getClearValidateTargets(fields)
+  if (targets.length === 0 || !formRef.value) {
+    return
+  }
+  // wd-form 会在 validate() 调用期间同步进入 schema.validate()。这里只在本次调用入口暴露过滤集合，
+  // schema.validate() 自己先捕获集合再 await，避免并发的真实 validate 被清提示逻辑误过滤；
+  // 如果后续 Wot UI 改成异步进入 schema.validate()，这里会安全降级为不清理指定字段提示。
+  clearingValidateFields.value = new Set(targets)
+  const promise = formRef.value.validate(targets)
+  clearingValidateFields.value = undefined
+  void promise
+}
+
+function getClearValidateTargets(fields: string | string[]) {
+  const requested = normalizeValidateFields(fields)
+  if (requested.length === 0) {
+    return []
+  }
+  const paths = new Set([
+    ...requested,
+    ...collectRuleFieldPaths(rules.value, formData.value),
+  ])
+  const targets: string[] = []
+  paths.forEach((path) => {
+    if (requested.some(field => isValidatePathMatch(path, field))) {
+      targets.push(path)
+    }
+  })
+  return targets
+}
+
+function collectRuleFieldPaths(nextRules: NormalizedFormCreateRule[], data: Record<string, any>, prefix = ''): string[] {
+  const paths: string[] = []
+  nextRules.forEach((rule) => {
+    if (!rule.field) {
+      return
+    }
+    const path = prefix ? `${prefix}.${rule.field}` : rule.field
+    paths.push(path)
+    if (!isSubFormType(rule)) {
+      return
+    }
+    const rows = data?.[rule.field]
+    if (!Array.isArray(rows)) {
+      return
+    }
+    const children = normalizeSubFormRules(rule, parseRules)
+    rows.forEach((row, index) => {
+      paths.push(...collectRuleFieldPaths(children, row || {}, `${path}.${index}`))
+    })
+  })
+  return paths
+}
+
+function normalizeValidateFields(fields: string | string[]) {
+  return (Array.isArray(fields) ? fields : [fields])
+    .map(field => String(field).trim())
+    .filter(Boolean)
+}
+
+function isClearingValidateIssue(issue: FormSchemaIssue, fields: Set<string>) {
+  const path = issue.path.map(item => String(item)).join('.')
+  let matched = false
+  fields.forEach((field) => {
+    if (isValidatePathMatch(path, field)) {
+      matched = true
+    }
+  })
+  return matched
+}
+
+function isValidatePathMatch(path: string, field: string) {
+  return path === field || path.startsWith(`${field}.`) || field.startsWith(`${path}.`)
+}
+
 function applyApiRulePatches(nextRules: NormalizedFormCreateRule[]) {
   return nextRules.map((rule) => {
     const patch = apiRulePatches[rule.__fcId]
@@ -382,6 +483,8 @@ api = createApi({
   hidden,
   initialFormData: initialFormValues,
   option: formOption,
+  parseSubFormRules: parseRules,
+  clearValidateState,
   refresh: () => scheduleProviderFetchEffects(),
   rulePatches: apiRulePatches,
   rules,

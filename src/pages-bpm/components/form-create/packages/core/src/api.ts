@@ -1,7 +1,14 @@
-import type { FormCreateApi, FormCreateApiContext } from '../../../types/typing'
+import type {
+  FormCreateApi,
+  FormCreateApiContext,
+  FormCreateFieldState,
+  NormalizedFormCreateRule,
+} from '../../../types/typing'
 import { FORM_FIELD_PERMISSION } from '../../../types/typing'
 import { deepMerge, hasOwn, toJson as stringifyJson } from '../../utils/src'
+import { applyControlRules } from './control'
 import { fetchProviderData, getProviderData, translate } from './provider'
+import { isSubFormRule, normalizeSubFormRules } from './subForm'
 import { getDefaultValue, isRuleDisabled, isRuleHidden } from './utils'
 
 export function createApi(ctx: FormCreateApiContext): FormCreateApi {
@@ -14,6 +21,51 @@ export function createApi(ctx: FormCreateApiContext): FormCreateApi {
 
   const findRule = (field: string) =>
     ctx.rules.value.find(rule => rule.field === field || rule.name === field || rule.__fcId === field)
+
+  const isIgnoredRule = (rule: NormalizedFormCreateRule, state?: FormCreateFieldState) => {
+    if (rule.ignore === true) {
+      return true
+    }
+    if ((rule.ignore === 'hidden' || ctx.option?.value.ignoreHiddenFields) && isRuleHidden(rule, state)) {
+      return true
+    }
+    return false
+  }
+
+  const filterSubFormValue = (rule: NormalizedFormCreateRule, value: any): any => {
+    if (!Array.isArray(value)) {
+      return value
+    }
+    const childRules = normalizeSubFormRules(rule, ctx.parseSubFormRules)
+    return value.map(row => filterSubFormRow(childRules, row || {}))
+  }
+
+  const filterSubFormRow = (childRules: NormalizedFormCreateRule[], row: Record<string, any>) => {
+    const result: Record<string, any> = {}
+    const controlResult = applyControlRules(childRules, row)
+    controlResult.rules.forEach((rule) => {
+      if (!rule.field || isIgnoredRule(rule, controlResult.fieldStates[rule.field]) || !hasOwn(row, rule.field)) {
+        return
+      }
+      result[rule.field] = isSubFormRule(rule)
+        ? filterSubFormValue(rule, row[rule.field])
+        : row[rule.field]
+    })
+    return result
+  }
+
+  const getSubmitData = () => {
+    const data: Record<string, any> = {}
+    ctx.rules.value.forEach((rule) => {
+      if (!rule.field || isIgnoredRule(rule, ctx.fieldStates[rule.field]) || !hasOwn(ctx.formData.value, rule.field)) {
+        return
+      }
+      data[rule.field] = isSubFormRule(rule)
+        ? filterSubFormValue(rule, ctx.formData.value[rule.field])
+        : ctx.formData.value[rule.field]
+    })
+    return data
+  }
 
   const setFieldState = (field: string | undefined, key: 'disabled' | 'hidden' | 'required', value: boolean) => {
     if (field) {
@@ -76,7 +128,11 @@ export function createApi(ctx: FormCreateApiContext): FormCreateApi {
       callback?.(result)
       return result
     },
-    clearValidateState() {
+    clearValidateState(fields) {
+      if (fields !== undefined && ctx.clearValidateState) {
+        ctx.clearValidateState(fields)
+        return
+      }
       ctx.formRef.value?.reset()
     },
     onSubmit(fn) {
@@ -130,7 +186,7 @@ export function createApi(ctx: FormCreateApiContext): FormCreateApi {
       ctx.refresh?.()
     },
     formData() {
-      return { ...ctx.formData.value }
+      return getSubmitData()
     },
     getFormData() {
       return api.formData()

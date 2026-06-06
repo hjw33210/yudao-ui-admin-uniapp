@@ -23,6 +23,7 @@
       filterable
       label-key="label"
       value-key="value"
+      @cancel="emit('cancel')"
       @confirm="handleConfirm"
     />
   </view>
@@ -45,7 +46,11 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:modelValue': [value: any]
+  'cancel': []
   'change': [value: any]
+  'close': []
+  'confirm': [value: any]
+  'open': []
 }>()
 
 const dictStore = useDictStore()
@@ -85,6 +90,14 @@ watch(
   { deep: true, immediate: true },
 )
 
+watch(visible, (value) => {
+  if (value) {
+    emit('open')
+  } else {
+    emit('close')
+  }
+})
+
 async function open() {
   if (props.disabled) {
     return
@@ -108,6 +121,7 @@ function handleConfirm({ value }: { value: any }) {
     : value === '' ? undefined : value
   emit('update:modelValue', nextValue)
   emit('change', nextValue)
+  emit('confirm', nextValue)
 }
 
 async function loadOptions() {

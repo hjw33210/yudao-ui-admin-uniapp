@@ -27,7 +27,7 @@
 <script lang="ts" setup>
 import type { NormalizedFormCreateRule } from '../../../../../types/typing'
 import type { Area } from '@/api/system/area'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { getAreaTree } from '@/api/system/area'
 import { getPlaceholder } from '../../core/utils'
 
@@ -41,11 +41,16 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [value: any]
   'change': [value: any]
+  'cancel': []
+  'close': []
+  'confirm': [value: any]
+  'open': []
 }>()
 
 const areaList = ref<Area[]>([])
 const loading = ref(false)
 const visible = ref(false)
+const closingByConfirm = ref(false)
 
 const placeholder = computed(() => getPlaceholder(props.rule, '请选择'))
 const checkStrictly = computed(() => props.rule.props?.checkStrictly !== false)
@@ -61,6 +66,18 @@ const displayValue = computed(() => {
 
 onMounted(() => {
   void loadAreaList()
+})
+
+watch(visible, (value) => {
+  if (value) {
+    emit('open')
+  } else {
+    emit('close')
+    if (!closingByConfirm.value) {
+      emit('cancel')
+    }
+    closingByConfirm.value = false
+  }
 })
 
 async function open() {
@@ -88,9 +105,11 @@ async function open() {
 }
 
 function handleConfirm({ value }: { value: any }) {
+  closingByConfirm.value = true
   const nextValue = value === '' ? undefined : value
   emit('update:modelValue', nextValue)
   emit('change', nextValue)
+  emit('confirm', nextValue)
 }
 
 async function loadAreaList() {

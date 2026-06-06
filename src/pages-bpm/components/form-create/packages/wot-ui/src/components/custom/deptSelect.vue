@@ -37,7 +37,7 @@
             清空
           </wd-button>
           <text class="fc-dept-select__title">{{ rule.title || '选择部门' }}</text>
-          <wd-icon name="close" size="20px" color="#666" @click="multiVisible = false" />
+          <wd-icon name="close" size="20px" color="#666" @click="cancelMultiPicker" />
         </view>
 
         <wd-search
@@ -133,7 +133,11 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:modelValue': [value: any]
+  'cancel': []
   'change': [value: any]
+  'close': []
+  'confirm': [value: any]
+  'open': []
 }>()
 
 const activeDept = ref<DeptOption | null>(null)
@@ -195,6 +199,22 @@ watch(
   { deep: true, immediate: true },
 )
 
+watch(cascaderVisible, (value) => {
+  if (value) {
+    emit('open')
+  } else {
+    emit('close')
+  }
+})
+
+watch(multiVisible, (value) => {
+  if (value) {
+    emit('open')
+  } else {
+    emit('close')
+  }
+})
+
 async function open() {
   if (props.disabled) {
     return
@@ -224,12 +244,19 @@ function handleSingleChange(value: string | number | Array<string | number>) {
   const nextValue = selected === '' || selected === undefined ? undefined : selected
   emit('update:modelValue', nextValue)
   emit('change', nextValue)
+  emit('confirm', nextValue)
 }
 
 function handleMultiConfirm() {
   const nextValue = [...multiValue.value]
   emit('update:modelValue', nextValue)
   emit('change', nextValue)
+  emit('confirm', nextValue)
+  multiVisible.value = false
+}
+
+function cancelMultiPicker() {
+  emit('cancel')
   multiVisible.value = false
 }
 

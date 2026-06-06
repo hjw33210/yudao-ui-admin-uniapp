@@ -414,10 +414,23 @@ function runItemRuleUpdates(
       ...changedFields.map(item => item.field),
     ]))
     if (task.depth >= MAX_RULE_UPDATE_DEPTH) {
+      warnItemRuleUpdateDepth(itemIndex, task)
       continue
     }
     runLinkedItemRuleUpdates(itemIndex, task, sourceFields, visited, queue, nextRows)
   }
+}
+
+function warnItemRuleUpdateDepth(itemIndex: number, task: ItemRuleUpdateTask) {
+  console.warn(
+    `[form-create] child rule.update/link reached max depth ${MAX_RULE_UPDATE_DEPTH}, linked updates stopped.`,
+    {
+      field: task.sourceRule.field,
+      itemIndex,
+      linkField: task.linkField,
+      originField: task.origin.field,
+    },
+  )
 }
 
 function runLinkedItemRuleUpdates(

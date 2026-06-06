@@ -93,25 +93,25 @@
       />
     </wd-form-item>
 
-    <FcUserSelect v-else-if="isUserSelectType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @update:model-value="emitUpdate" />
+    <FcUserSelect v-else-if="isUserSelectType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @cancel="emitRuleEvent('cancel')" @close="emitRuleEvent('close')" @confirm="emitRuleEvent('confirm', $event)" @open="emitRuleEvent('open')" @update:model-value="emitUpdate" />
 
-    <FcDeptSelect v-else-if="isDeptSelectType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @update:model-value="emitUpdate" />
+    <FcDeptSelect v-else-if="isDeptSelectType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @cancel="emitRuleEvent('cancel')" @close="emitRuleEvent('close')" @confirm="emitRuleEvent('confirm', $event)" @open="emitRuleEvent('open')" @update:model-value="emitUpdate" />
 
-    <FcDictSelect v-else-if="isDictSelectType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @update:model-value="emitUpdate" />
+    <FcDictSelect v-else-if="isDictSelectType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @cancel="emitRuleEvent('cancel')" @close="emitRuleEvent('close')" @confirm="emitRuleEvent('confirm', $event)" @open="emitRuleEvent('open')" @update:model-value="emitUpdate" />
 
-    <FcApiSelect v-else-if="isApiSelectType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @update:model-value="emitUpdate" />
+    <FcApiSelect v-else-if="isApiSelectType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @cancel="emitRuleEvent('cancel')" @close="emitRuleEvent('close')" @confirm="emitRuleEvent('confirm', $event)" @open="emitRuleEvent('open')" @update:model-value="emitUpdate" />
 
-    <FcAreaSelect v-else-if="isAreaSelectType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @update:model-value="emitUpdate" />
+    <FcAreaSelect v-else-if="isAreaSelectType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @cancel="emitRuleEvent('cancel')" @close="emitRuleEvent('close')" @confirm="emitRuleEvent('confirm', $event)" @open="emitRuleEvent('open')" @update:model-value="emitUpdate" />
 
-    <FcCascader v-else-if="isCascaderType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @confirm="emitRuleEvent('confirm', $event)" @update:model-value="emitUpdate" />
+    <FcCascader v-else-if="isCascaderType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @cancel="emitRuleEvent('cancel')" @close="emitRuleEvent('close')" @confirm="emitRuleEvent('confirm', $event)" @open="emitRuleEvent('open')" @update:model-value="emitUpdate" />
 
-    <FcCalendar v-else-if="isCalendarType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @confirm="emitRuleEvent('confirm', $event)" @update:model-value="emitUpdate" />
+    <FcCalendar v-else-if="isCalendarType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @cancel="emitRuleEvent('cancel')" @close="emitRuleEvent('close')" @confirm="emitRuleEvent('confirm', $event)" @open="emitRuleEvent('open')" @update:model-value="emitUpdate" />
 
-    <FcTreeSelect v-else-if="isTreeSelectType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @update:model-value="emitUpdate" />
+    <FcTreeSelect v-else-if="isTreeSelectType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @cancel="emitRuleEvent('cancel')" @close="emitRuleEvent('close')" @confirm="emitRuleEvent('confirm', $event)" @open="emitRuleEvent('open')" @update:model-value="emitUpdate" />
 
-    <FcTransfer v-else-if="isTransferType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @update:model-value="emitUpdate" />
+    <FcTransfer v-else-if="isTransferType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @cancel="emitRuleEvent('cancel')" @close="emitRuleEvent('close')" @confirm="emitRuleEvent('confirm', $event)" @open="emitRuleEvent('open')" @update:model-value="emitUpdate" />
 
-    <FcSelect v-else-if="isSelectType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @confirm="emitRuleEvent('confirm', $event)" @update:model-value="emitUpdate" />
+    <FcSelect v-else-if="isSelectType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @cancel="emitRuleEvent('cancel')" @close="emitRuleEvent('close')" @confirm="emitRuleEvent('confirm', $event)" @open="emitRuleEvent('open')" @update:model-value="emitUpdate" />
 
     <FcColorPicker v-else-if="isColorPickerType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @update:model-value="emitUpdate" />
 
@@ -128,9 +128,9 @@
       />
     </wd-form-item>
 
-    <FcDatePicker v-else-if="isDatePickerType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @confirm="emitRuleEvent('confirm', $event)" @update:model-value="emitUpdate" />
+    <FcDatePicker v-else-if="isDatePickerType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @cancel="emitRuleEvent('cancel')" @close="emitRuleEvent('close')" @confirm="emitRuleEvent('confirm', $event)" @open="emitRuleEvent('open')" @update:model-value="emitUpdate" />
 
-    <FcTimePicker v-else-if="isTimePickerType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @confirm="emitRuleEvent('confirm', $event)" @update:model-value="emitUpdate" />
+    <FcTimePicker v-else-if="isTimePickerType(rule)" :model-value="modelValue" :rule="rule" :title-width="titleWidth" :disabled="disabled" style="" @cancel="emitRuleEvent('cancel')" @close="emitRuleEvent('close')" @confirm="emitRuleEvent('confirm', $event)" @open="emitRuleEvent('open')" @update:model-value="emitUpdate" />
 
     <wd-form-item v-else-if="rule.type === 'rate'" :title="rule.title" :title-width="titleWidth" :prop="rule.field" center>
       <wd-rate

@@ -18,6 +18,7 @@
       :min-date="minDate"
       :max-date="maxDate"
       v-bind="componentProps"
+      @cancel="emit('cancel')"
       @confirm="handleConfirm"
     />
   </view>
@@ -27,7 +28,7 @@
 import type { CalendarType } from '@wot-ui/ui/components/wd-calendar-view/types'
 import type { NormalizedFormCreateRule } from '../../../../types/typing'
 import dayjs from 'dayjs'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { getPlaceholder } from '../core/utils'
 
 const props = defineProps<{
@@ -39,8 +40,11 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:modelValue': [value: any]
+  'cancel': []
   'change': [value: any]
+  'close': []
   'confirm': [value: any]
+  'open': []
 }>()
 
 const visible = ref(false)
@@ -53,6 +57,14 @@ const minDate = computed(() => normalizeTimestamp(props.rule.props?.minDate || p
 const maxDate = computed(() => normalizeTimestamp(props.rule.props?.maxDate || props.rule.props?.max, valueFormat.value))
 const componentProps = computed(() => getComponentProps())
 const displayValue = computed(() => formatDisplayValue(props.modelValue))
+
+watch(visible, (value) => {
+  if (value) {
+    emit('open')
+  } else {
+    emit('close')
+  }
+})
 
 function open() {
   if (props.disabled) {
