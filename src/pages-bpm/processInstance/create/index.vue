@@ -95,23 +95,10 @@ import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { computed, nextTick, ref } from 'vue'
 import { getCategorySimpleList } from '@/api/bpm/category'
 import { getProcessDefinitionList } from '@/api/bpm/definition'
+import { getProcessInstance } from '@/api/bpm/processInstance'
 import { getMobileFormCustomPath } from '@/pages-bpm/utils'
 import { navigateBackPlus } from '@/utils'
 import { BpmModelFormType } from '@/utils/constants'
-
-// TODO @芋艿：【重新发起流程】支持通过 processInstanceId 参数重新发起已有流程
-// 对应 vben 第 44-60 行：从路由获取 processInstanceId，查询流程实例后自动选中对应流程定义并填充表单数据
-
-// TODO @芋艿：【流程表单填写】选择流程后跳转到表单填写页面
-// 对应 vben form.vue 全部：包含以下子功能：
-// - 表单渲染 (form-create)：vben form.vue 第 145-152 行
-// - 审批流程预览时间线：vben form.vue 第 153-162 行
-// - 流程图预览 (BPMN/简易)：vben form.vue 第 163-178 行
-// - 发起人自选审批人：vben form.vue 第 30-32, 85-95 行
-// - 表单字段权限控制 (读/写/隐藏)：vben form.vue 第 119-131 行
-// - 业务表单跳转 (formCustomCreatePath)：vben form.vue 第 79-85 行
-// - 表单值变化重新预测审批节点：vben form.vue 第 87-102 行
-// - 提交流程实例：vben form.vue 第 56-76 行
 
 definePage({
   style: {
@@ -236,11 +223,11 @@ function updateCategoryPositions() {
 }
 
 /** 选择流程定义 */
-function handleSelect(item: ProcessDefinition) {
-  // 情况一：流程表单，提示仅允许 PC 端发起
+function handleSelect(item: ProcessDefinition, processInstanceId?: string) {
+  // 情况一：流程表单，跳转到移动端流程表单填写页
   if (item.formType === BpmModelFormType.NORMAL) {
-    // TODO @jason：业务表单：/Users/yunai/Java/yudao-ui-admin-vben-v5/apps/web-antd/src/views/bpm/processInstance/create/modules/form.vue
-    toast.show('流程表单仅支持 PC 端发起')
+    const restartQuery = processInstanceId ? `&processInstanceId=${processInstanceId}` : ''
+    uni.navigateTo({ url: `/pages-bpm/processInstance/create/form?processDefinitionId=${item.id}${restartQuery}` })
     return
   }
 
@@ -266,8 +253,14 @@ async function loadDefinitionList() {
 }
 
 /** 初始化 */
-onLoad(async () => {
+onLoad(async (options) => {
+  // TODO @AI：这里写下注释
   await Promise.all([loadCategoryList(), loadDefinitionList()])
+  // TODO @AI：这里写下注释
+  if (options?.processInstanceId) {
+    await restartProcessInstance(options.processInstanceId)
+    return
+  }
   // 默认选中第一个分类
   if (categoryList.value.length > 0) {
     activeCategory.value = categoryList.value[0].code
@@ -278,6 +271,25 @@ onLoad(async () => {
     updateCategoryPositions()
   }, 100)
 })
+
+// TODO @AI：这里写个注释？
+// TODO @AI：是不是应该放到 onLoad 前面？
+async function restartProcessInstance(processInstanceId: string) {
+  const processInstance = await getProcessInstance(processInstanceId)
+  if (!processInstance) {
+    toast.show('重新发起流程失败，原因：流程实例不存在')
+    return
+  }
+  const processDefinition = definitionList.value.find(item =>
+    item.id === processInstance.processDefinition?.id
+    || item.key === processInstance.processDefinition?.key,
+  )
+  if (!processDefinition) {
+    toast.show('重新发起流程失败，原因：流程定义不存在')
+    return
+  }
+  handleSelect(processDefinition, processInstanceId)
+}
 </script>
 
 <style lang="scss" scoped>

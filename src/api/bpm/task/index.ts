@@ -32,6 +32,10 @@ export interface Task {
   processInstance: ProcessInstance
   reasonRequire?: boolean // 是否填写审批意见
   signEnable?: boolean // 是否需要签名
+  formId?: number // 节点表单 ID
+  formConf?: string // 节点表单配置
+  formFields?: string[] // 节点表单字段
+  formVariables?: Record<string, any> // 节点表单变量
   buttonsSetting?: Record<number, OperationButtonSetting> // 按钮设置
   children?: Task[] // 由加签生成，包含多层子任务
 }
@@ -50,6 +54,7 @@ export function getTaskDonePage(params: PageParam) {
 export function approveTask(data: {
   id: string
   reason: string
+  variables?: Record<string, any> // 审批通过时修改的流程变量
   signPicUrl?: string // 签名图片 URL
   nextAssignees?: Record<string, number[]> // 下一个节点审批人
 }) {
@@ -99,4 +104,9 @@ export function signCreateTask(data: { id: string, type: string, userIds: number
 /** 减签任务 */
 export function signDeleteTask(data: { id: string, reason: string }) {
   return http.delete<boolean>('/bpm/task/delete-sign', data)
+}
+
+/** 抄送任务 */
+export function copyTask(data: { id: string, copyUserIds: number[], reason: string }) {
+  return http.put<boolean>('/bpm/task/copy', data)
 }

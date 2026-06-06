@@ -9,6 +9,18 @@
 
     <!-- 审批表单 -->
     <view class="p-24rpx">
+      <!-- TODO @AI：是不是要注释下？ -->
+      <view v-if="isApprove && approveForm.rule.length > 0" class="mb-24rpx overflow-hidden rounded-16rpx bg-white">
+        <FormCreate
+          v-model="approveForm.value"
+          v-model:api="approveFormApi"
+          :option="approveForm.option"
+          :rule="approveForm.rule"
+          @change="handleApproveFormChange"
+        />
+      </view>
+
+      <!-- TODO @AI：是不是要注释下？ -->
       <wd-form ref="formRef" :model="formData" :schema="formSchema">
         <wd-cell-group border>
           <!-- 下一个节点的审批人 -->
@@ -24,7 +36,6 @@
               @select-user-confirm="selectNextAssigneesConfirm"
             />
           </view>
-
           <!-- 签名 -->
           <view v-if="isApprove && taskInfo?.signEnable" class="border-b border-[#eee] p-24rpx">
             <view class="mb-16rpx flex items-center">
@@ -44,7 +55,6 @@
               />
             </view>
           </view>
-
           <!-- 审批意见 -->
           <wd-form-item prop="reason" title="审批意见：" title-width="180rpx">
             <wd-textarea
@@ -97,11 +107,15 @@
 import type { FormInstance } from '@wot-ui/ui/components/wd-form/types'
 import type { ApprovalNodeInfo } from '@/api/bpm/processInstance'
 import type { Task } from '@/api/bpm/task'
+import type { FormCreateApi } from '@/pages-bpm/components/form-create/packages/wot-ui/types'
+import type { FormCreatePreview } from '@/pages-bpm/utils'
 import { useToast } from '@wot-ui/ui/components/wd-toast'
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { getApprovalDetail, getNextApproveNodes } from '@/api/bpm/processInstance'
 import { approveTask, rejectTask } from '@/api/bpm/task'
+import FormCreate from '@/pages-bpm/components/form-create/packages/wot-ui/src/index.vue'
 import ProcessInstanceTimeline from '@/pages-bpm/processInstance/detail/components/time-line.vue'
+import { setConfAndFields2 } from '@/pages-bpm/utils'
 import { getEnvBaseUrl, navigateBackPlus } from '@/utils'
 import { BpmCandidateStrategyEnum } from '@/utils/constants'
 import { createFormSchema } from '@/utils/wot'
@@ -110,6 +124,7 @@ const props = defineProps<{
   processInstanceId?: string
   taskId?: string
   pass?: string
+  variablesCacheKey?: string
 }>()
 
 definePage({
@@ -118,6 +133,7 @@ definePage({
     navigationStyle: 'custom',
   },
 })
+// TODO @AI：注释风格统一；
 const taskId = computed(() => props.taskId || '')
 const processInstanceId = computed(() => props.processInstanceId)
 const isApprove = computed(() => props.pass !== 'false') // true: 同意, false: 拒绝
@@ -128,9 +144,16 @@ const taskInfo = ref<Task | null>(null) // 任务信息
 const nextAssigneesActivityNode = ref<ApprovalNodeInfo[]>([]) // 下一个节点审批人列表
 const approveUserSelectTasks = ref<ApprovalNodeInfo[]>([]) // 需要选择审批人的节点列表
 const approveUserSelectAssignees = ref<Record<string, number[]>>({}) // 审批人选择的审批人数据
+const normalFormVariables = ref<Record<string, any>>({})
+const approveFormApi = ref<FormCreateApi>()
+const approveForm = ref<FormCreatePreview>({
+  option: {},
+  rule: [],
+  value: {},
+})
+let nextAssigneeTimer: ReturnType<typeof setTimeout> | undefined
 
-// 签名相关
-const showSignatureModal = ref(false)
+const showSignatureModal = ref(false) // 签名相关
 
 const formData = reactive({
   reason: '',
@@ -139,7 +162,6 @@ const formData = reactive({
 const formSchema = createFormSchema({
   reason: [{ required: () => !!taskInfo.value?.reasonRequire, message: '审批意见不能为空' }],
 })
-
 const formRef = ref<FormInstance>()
 
 /** 返回上一页 */
@@ -154,6 +176,23 @@ async function loadTaskInfo() {
     taskId: taskId.value,
   })
   taskInfo.value = data?.todoTask || null
+  normalFormVariables.value = getCachedNormalFormVariables()
+
+  if (isApprove.value && taskInfo.value?.formConf && taskInfo.value?.formFields?.length) {
+    setConfAndFields2(
+      approveForm,
+      taskInfo.value.formConf,
+      taskInfo.value.formFields,
+      taskInfo.value.formVariables || {},
+    )
+    approveForm.value.option = {
+      ...approveForm.value.option,
+      submitBtn: false,
+      resetBtn: false,
+    }
+  } else {
+    approveForm.value = { option: {}, rule: [], value: {} }
+  }
 }
 
 /** 加载下一个节点审批人 */
@@ -164,8 +203,12 @@ async function loadNextApproveNodes() {
   const params = {
     processInstanceId: processInstanceId.value,
     taskId: taskId.value,
+    processVariablesStr: JSON.stringify(getApprovalVariables()),
   }
   const data = await getNextApproveNodes(params)
+  nextAssigneesActivityNode.value = []
+  approveUserSelectTasks.value = []
+  approveUserSelectAssignees.value = {}
   if (data && data.length > 0) {
     nextAssigneesActivityNode.value = data
     // 获取审批人自选的任务
@@ -179,6 +222,37 @@ async function loadNextApproveNodes() {
 /** 选择下一个节点审批人确认 */
 function selectNextAssigneesConfirm(activityId: string, userList: any[]) {
   approveUserSelectAssignees.value[activityId] = userList.map(user => user.id)
+}
+
+function handleApproveFormChange(data: Record<string, any>) {
+  approveForm.value.value = data
+}
+
+function getCachedNormalFormVariables() {
+  if (!props.variablesCacheKey) {
+    return {}
+  }
+  return uni.getStorageSync(props.variablesCacheKey) || {}
+}
+
+function clearCachedNormalFormVariables() {
+  if (props.variablesCacheKey) {
+    uni.removeStorageSync(props.variablesCacheKey)
+  }
+}
+
+function getApprovalVariables() {
+  return {
+    ...normalFormVariables.value,
+    ...(approveFormApi.value?.formData() || approveForm.value.value || {}),
+  }
+}
+
+function clearNextAssigneeTimer() {
+  if (nextAssigneeTimer) {
+    clearTimeout(nextAssigneeTimer)
+    nextAssigneeTimer = undefined
+  }
 }
 
 /** 打开签名弹窗 */
@@ -258,6 +332,12 @@ async function handleSubmit() {
     toast.show('请先进行签名')
     return
   }
+  if (isApprove.value && approveForm.value.rule.length > 0) {
+    const { valid } = await (approveFormApi.value?.validate() || Promise.resolve({ valid: true, errors: [] }))
+    if (!valid) {
+      return
+    }
+  }
 
   // 验证审批人选择
   if (isApprove.value && approveUserSelectTasks.value.length > 0) {
@@ -272,11 +352,13 @@ async function handleSubmit() {
   formLoading.value = true
   try {
     if (isApprove.value) {
+      const variables = getApprovalVariables()
       // 审批通过
       await approveTask({
         id: taskId.value as string,
         reason: formData.reason,
         signPicUrl: formData.signPicUrl || undefined,
+        variables: Object.keys(variables).length > 0 ? variables : undefined,
         nextAssignees: Object.keys(approveUserSelectAssignees.value).length > 0
           ? approveUserSelectAssignees.value
           : undefined,
@@ -288,6 +370,7 @@ async function handleSubmit() {
         reason: formData.reason,
       })
     }
+    clearCachedNormalFormVariables()
     toast.success('审批成功')
     setTimeout(() => {
       uni.redirectTo({
@@ -298,6 +381,25 @@ async function handleSubmit() {
     formLoading.value = false
   }
 }
+
+watch(
+  () => approveForm.value.value,
+  () => {
+    if (!isApprove.value || approveForm.value.rule.length === 0) {
+      return
+    }
+    clearNextAssigneeTimer()
+    nextAssigneeTimer = setTimeout(() => {
+      nextAssigneeTimer = undefined
+      loadNextApproveNodes()
+    }, 300)
+  },
+  { deep: true },
+)
+
+onBeforeUnmount(() => {
+  clearNextAssigneeTimer()
+})
 
 /** 页面加载时 */
 onMounted(async () => {

@@ -60,6 +60,11 @@ import {
   OPERATION_BUTTON_NAME,
 } from '@/utils/constants'
 
+const props = defineProps<{
+  validateNormalForm?: () => Promise<boolean>
+  getNormalFormVariables?: () => Record<string, any>
+}>()
+
 const showMoreActions = ref(false)
 
 type MoreOperationType = Action & {
@@ -90,7 +95,7 @@ const operationIconsMap: Record<number, string> = {
 
 const userStore = useUserStore()
 const leftOperations = ref<LeftOperationType[]>([]) //  左侧操作按钮 【最多两个】{转办, 委派, 退回, 加签， 抄送等}
-const rightOperationTypes = [] // 右侧操作按钮【最多两个】{通过，拒绝, 取消}
+const rightOperationTypes = ref<number[]>([]) // 右侧操作按钮【最多两个】{通过，拒绝, 取消}
 const rightOperations = ref<RightOperationType[]>([])
 const moreOperations = ref<MoreOperationType[]>([]) // 更多操作
 const runningTask = ref<Task>()
@@ -99,6 +104,7 @@ const reasonRequire = ref<boolean>(false)
 
 /** 初始化 */
 function init(theProcessInstance: ProcessInstance, task: Task) {
+  resetOperations()
   processInstance.value = theProcessInstance
   runningTask.value = task
   if (task) {
@@ -106,7 +112,7 @@ function init(theProcessInstance: ProcessInstance, task: Task) {
     // TODO @jason：这里的判断，是否可以简化哈？就是默认计算出按钮，然后根据数量，去渲染具体的按钮。
     // 右侧按钮
     if (isHandleTaskStatus() && isShowButton(BpmTaskOperationButtonTypeEnum.REJECT)) {
-      rightOperationTypes.push(BpmTaskOperationButtonTypeEnum.REJECT)
+      rightOperationTypes.value.push(BpmTaskOperationButtonTypeEnum.REJECT)
       rightOperations.value.push({
         operationType: BpmTaskOperationButtonTypeEnum.REJECT,
         displayName: getButtonDisplayName(BpmTaskOperationButtonTypeEnum.REJECT),
@@ -115,7 +121,7 @@ function init(theProcessInstance: ProcessInstance, task: Task) {
       })
     }
     if (isHandleTaskStatus() && isShowButton(BpmTaskOperationButtonTypeEnum.APPROVE)) {
-      rightOperationTypes.push(BpmTaskOperationButtonTypeEnum.APPROVE)
+      rightOperationTypes.value.push(BpmTaskOperationButtonTypeEnum.APPROVE)
       rightOperations.value.push({
         operationType: BpmTaskOperationButtonTypeEnum.APPROVE,
         displayName: getButtonDisplayName(BpmTaskOperationButtonTypeEnum.APPROVE),
@@ -128,7 +134,7 @@ function init(theProcessInstance: ProcessInstance, task: Task) {
     Object.keys(task.buttonsSetting || {}).forEach((key) => {
       const operationType = Number(key)
       if (task.buttonsSetting[key].enable && isHandleTaskStatus()
-        && !rightOperationTypes.includes(operationType)) {
+        && !rightOperationTypes.value.includes(operationType)) {
         if (leftOperations.value.length >= 2) {
           moreOperations.value.push({
             name: getButtonDisplayName(operationType),
@@ -163,8 +169,8 @@ function init(theProcessInstance: ProcessInstance, task: Task) {
 
   // 是否显示流程取消
   if (isShowProcessStartCancel()) {
-    if (rightOperationTypes.length < 2) {
-      rightOperationTypes.push(BpmTaskOperationButtonTypeEnum.PROCESS_START_CANCEL)
+    if (rightOperationTypes.value.length < 2) {
+      rightOperationTypes.value.push(BpmTaskOperationButtonTypeEnum.PROCESS_START_CANCEL)
       rightOperations.value.push({
         operationType: BpmTaskOperationButtonTypeEnum.PROCESS_START_CANCEL,
         displayName: getButtonDisplayName(BpmTaskOperationButtonTypeEnum.PROCESS_START_CANCEL),
@@ -188,12 +194,27 @@ function init(theProcessInstance: ProcessInstance, task: Task) {
   }
 }
 
+function resetOperations() {
+  showMoreActions.value = false
+  leftOperations.value = []
+  rightOperationTypes.value = []
+  rightOperations.value = []
+  moreOperations.value = []
+  reasonRequire.value = false
+}
+
 /** 跳转到相应的操作页面 */
-function handleOperation(operationType: number) {
+async function handleOperation(operationType: number) {
   switch (operationType) {
-    case BpmTaskOperationButtonTypeEnum.APPROVE:
-      uni.navigateTo({ url: `/pages-bpm/processInstance/detail/audit/index?processInstanceId=${processInstance.value.id}&taskId=${runningTask.value?.id}&pass=true` })
+    case BpmTaskOperationButtonTypeEnum.APPROVE: {
+      const variablesCacheKey = await saveNormalFormVariables()
+      if (variablesCacheKey === undefined) {
+        return
+      }
+      const variablesQuery = variablesCacheKey ? `&variablesCacheKey=${encodeURIComponent(variablesCacheKey)}` : ''
+      uni.navigateTo({ url: `/pages-bpm/processInstance/detail/audit/index?processInstanceId=${processInstance.value.id}&taskId=${runningTask.value?.id}&pass=true${variablesQuery}` })
       break
+    }
     case BpmTaskOperationButtonTypeEnum.REJECT:
       uni.navigateTo({ url: `/pages-bpm/processInstance/detail/audit/index?processInstanceId=${processInstance.value.id}&taskId=${runningTask.value?.id}&pass=false` })
       break
@@ -217,6 +238,11 @@ function handleOperation(operationType: number) {
         url: `/pages-bpm/processInstance/detail/return/index?processInstanceId=${runningTask.value.processInstanceId}&taskId=${runningTask.value.id}`,
       })
       break
+    case BpmTaskOperationButtonTypeEnum.COPY:
+      uni.navigateTo({
+        url: `/pages-bpm/processInstance/detail/copy/index?processInstanceId=${runningTask.value.processInstanceId}&taskId=${runningTask.value.id}`,
+      })
+      break
     case BpmTaskOperationButtonTypeEnum.DELETE_SIGN:
       uni.navigateTo({
         url: `/pages-bpm/processInstance/detail/delete-sign/index?processInstanceId=${runningTask.value.processInstanceId}&taskId=${runningTask.value.id}&children=${encodeURIComponent(JSON.stringify(runningTask.value.children || []))}`,
@@ -228,6 +254,32 @@ function handleOperation(operationType: number) {
       })
       break
   }
+}
+
+/** 暂存流程表单中当前节点可编辑的变量，审批提交页会读取并提交 */
+async function saveNormalFormVariables() {
+  const valid = await props.validateNormalForm?.()
+  if (valid === false) {
+    uni.showToast({
+      title: '表单校验不通过，请先完善表单',
+      icon: 'none',
+    })
+    return undefined
+  }
+
+  const variables = props.getNormalFormVariables?.() || {}
+  const cacheKey = getNormalFormVariablesCacheKey()
+  if (Object.keys(variables).length === 0) {
+    uni.removeStorageSync(cacheKey)
+    return ''
+  }
+
+  uni.setStorageSync(cacheKey, variables)
+  return cacheKey
+}
+
+function getNormalFormVariablesCacheKey() {
+  return `bpm-normal-form-variables:${processInstance.value?.id || ''}:${runningTask.value?.id || ''}`
 }
 
 /** 显示更多操作 */

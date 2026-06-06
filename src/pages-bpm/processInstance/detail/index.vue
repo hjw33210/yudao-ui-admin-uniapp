@@ -40,8 +40,44 @@
       </view>
     </view>
 
+    <!-- 区域：PC 专属能力提示 -->
+    <view class="mx-24rpx mt-24rpx rounded-16rpx bg-white">
+      <view class="p-24rpx">
+        <view class="mb-20rpx flex items-center justify-between">
+          <text class="text-28rpx text-[#333] font-bold">流程辅助</text>
+          <wd-button
+            icon="printer"
+            size="small"
+            type="primary"
+            variant="plain"
+            :round="false"
+            @click="handlePrintTip"
+          >
+            打印
+          </wd-button>
+        </view>
+        <view class="flex items-start rounded-12rpx bg-[#f7f8fa] p-20rpx">
+          <view class="h-64rpx w-64rpx flex items-center justify-center rounded-full bg-[#e6f4ff]">
+            <wd-icon name="desktop" size="36rpx" color="#1890ff" />
+          </view>
+          <view class="ml-18rpx flex-1">
+            <view class="mb-8rpx flex items-center">
+              <text class="text-26rpx text-[#333] font-medium">流程图预览</text>
+              <text class="ml-12rpx rounded-6rpx bg-[#fff7e6] px-10rpx py-2rpx text-20rpx text-[#fa8c16]">PC</text>
+            </view>
+            <text class="text-24rpx text-[#999] leading-36rpx">仅 PC 支持预览，请前往 PC 端查看 BPMN 或简易流程图。</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
     <!-- 区域：审批详情（表单） -->
-    <FormDetail :process-definition="processDefinition" :process-instance="processInstance" />
+    <FormDetail
+      ref="formDetailRef"
+      :process-definition="processDefinition"
+      :process-instance="processInstance"
+      :form-fields-permission="formFieldsPermission"
+    />
 
     <!-- 区域：审批进度 -->
     <view class="mx-24rpx mt-24rpx rounded-16rpx bg-white">
@@ -57,7 +93,11 @@
     <!-- TODO 待开发：区域：流程评论 -->
 
     <!-- 区域：底部操作栏 -->
-    <ProcessInstanceOperationButton ref="operationButtonRef" />
+    <ProcessInstanceOperationButton
+      ref="operationButtonRef"
+      :validate-normal-form="validateNormalForm"
+      :get-normal-form-variables="getNormalFormVariables"
+    />
   </view>
 </template>
 
@@ -90,11 +130,13 @@ definePage({
 const toast = useToast()
 const processInstance = ref<ProcessInstance>()
 const processDefinition = ref<ProcessDefinition>()
+const formFieldsPermission = ref<Record<string, string>>({})
 const tasks = ref<Task[]>([])
 
 const activityNodes = ref<ApprovalNodeInfo[]>([]) // 审批节点信息
 
 const operationButtonRef = ref() // 操作按钮组件 ref
+const formDetailRef = ref<InstanceType<typeof FormDetail>>() // 流程表单 ref
 
 /** 返回上一页 */
 function handleBack() {
@@ -103,14 +145,20 @@ function handleBack() {
 
 /** 获取状态图标 */
 function getStatusIcon(status?: number): string {
-  // 状态映射： 1-审批中, 2-审批通过, 3-审批不通过, 4-已取消. -1 未开始不会出现
+  // 状态映射： 1-审批中, 2-审批通过, 3-审批不通过, 4-已取消, 7-审批通过中. -1 未开始不会出现
   const iconMap: Record<number, string> = {
     [BpmProcessInstanceStatus.RUNNING]: '/static/my-icons/bpm/bpm-running.svg', // 待审批
     [BpmProcessInstanceStatus.APPROVE]: '/static/my-icons/bpm/bpm-approve.svg', // 审批通过
     [BpmProcessInstanceStatus.REJECT]: '/static/my-icons/bpm/bpm-reject.svg', // 审批不通过
     [BpmProcessInstanceStatus.CANCEL]: '/static/my-icons/bpm/bpm-cancel.svg', // 已取消
+    [BpmProcessInstanceStatus.APPROVING]: '/static/my-icons/bpm/bpm-running.svg', // 审批通过中
   }
-  return iconMap[status ?? 1]
+  return iconMap[status ?? BpmProcessInstanceStatus.RUNNING] || iconMap[BpmProcessInstanceStatus.RUNNING]
+}
+
+/** 打印提示 */
+function handlePrintTip() {
+  toast.show('请前往 PC 打印')
 }
 
 /** 加载流程实例 */
@@ -125,10 +173,22 @@ async function loadProcessInstance() {
   }
   processInstance.value = data.processInstance
   processDefinition.value = data.processDefinition
+  formFieldsPermission.value = data.formFieldsPermission || {}
   // 获取审批节点，显示 Timeline 的数据
   activityNodes.value = data.activityNodes
 
   operationButtonRef.value?.init(data.processInstance, data.todoTask)
+}
+
+/** 校验流程表单中当前节点允许编辑的字段 */
+async function validateNormalForm() {
+  const result = await formDetailRef.value?.validate()
+  return result?.valid !== false
+}
+
+/** 获取流程表单中当前节点允许编辑的变量 */
+function getNormalFormVariables() {
+  return formDetailRef.value?.getWritableVariables() || {}
 }
 
 /** 加载任务列表 */
