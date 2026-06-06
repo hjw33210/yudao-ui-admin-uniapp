@@ -1,4 +1,5 @@
 import type { FormCreateRule, NormalizedFormCreateRule } from '../../../types/typing'
+import { isSubFormTypeName } from './registry'
 import { normalizeRules } from './utils'
 
 export type ParseSubFormRules = (rules: FormCreateRule[]) => FormCreateRule[]
@@ -7,11 +8,10 @@ interface GetSubFormRulesOptions {
   createColumnTitleRule?: (column: Record<string, any>, index: number) => FormCreateRule | undefined
 }
 
-const SUB_FORM_TYPES = new Set(['group', 'Group', 'fcGroup', 'FcGroup', 'array', 'Array', 'tableForm', 'subTable', 'fcTableForm'])
 const MAX_EXTRACT_DEPTH = 30
 
 export function isSubFormRule(rule: FormCreateRule) {
-  return SUB_FORM_TYPES.has(rule.type)
+  return isSubFormTypeName(rule.type)
 }
 
 export function getSubFormRules(rule: FormCreateRule, options: GetSubFormRulesOptions = {}): FormCreateRule[] {

@@ -1,13 +1,12 @@
 import type { FormCreateRule } from '../../../../types/typing'
 import type { ParseRule } from './utils'
+import { isLayoutGroupTypeName } from '../../../core/src'
 import { createLayoutTitleRule, getLayoutTitle, parseRuleChildren } from './utils'
-
-const GROUP_TYPES = new Set(['subForm', 'fcSubForm', 'FcSubForm'])
 
 export default {
   name: 'group',
   match(rule: FormCreateRule) {
-    return GROUP_TYPES.has(rule.type)
+    return isLayoutGroupTypeName(rule.type)
   },
   render(rule: FormCreateRule, indexPath: string, parseRule: ParseRule) {
     const children = getGroupChildren(rule, indexPath, parseRule)

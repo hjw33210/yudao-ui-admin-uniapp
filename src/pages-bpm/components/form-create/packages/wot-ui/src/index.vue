@@ -13,365 +13,8 @@
       >
         <wd-cell-group :border="formOption.form?.border !== false">
           <template v-for="rule in visibleRules" :key="rule.__fcId">
-            <view v-if="isHiddenFieldType(rule)" style="display: none" />
-
-            <view v-else-if="isLayoutTitleType(rule)" class="fc-wot__layout-title">
-              {{ rule.title }}
-            </view>
-
-            <view
-              v-else-if="isLayoutGapType(rule)"
-              class="fc-wot__layout-gap"
-              :style="{ height: getLayoutGapHeight(rule) }"
-            />
-
-            <FcAlert
-              v-else-if="isAlertType(rule)"
-              :rule="rule"
-              style=""
-            />
-
-            <FcTitle
-              v-else-if="isTitleType(rule)"
-              :rule="rule"
-              style=""
-            />
-
-            <FcHtml
-              v-else-if="isHtmlType(rule)"
-              :rule="rule"
-              style=""
-            />
-
-            <FcDivider
-              v-else-if="isDividerType(rule)"
-              :rule="rule"
-              style=""
-            />
-
-            <FcTag
-              v-else-if="isTagType(rule)"
-              :rule="rule"
-              style=""
-            />
-
-            <FcImage
-              v-else-if="isImageType(rule)"
-              :rule="rule"
-              style=""
-            />
-
-            <FcIframe
-              v-else-if="isIframeType(rule)"
-              :rule="rule"
-              :title-width="titleWidth"
-              style=""
-            />
-
-            <FcRichText
-              v-else-if="isRichTextType(rule)"
-              :model-value="getValue(rule)"
-              :rule="rule"
-              :title-width="titleWidth"
-              :disabled="isDisabled(rule)"
-              style=""
-              @update:model-value="handleUpdate(rule, $event)"
-            />
-
-            <FcSignature
-              v-else-if="isSignatureType(rule)"
-              :model-value="getValue(rule)"
-              :rule="rule"
-              :title-width="titleWidth"
-              :disabled="isDisabled(rule)"
-              style=""
-              @clear="handleRuleEvent(rule, 'clear')"
-              @confirm="handleRuleEvent(rule, 'confirm', $event)"
-              @update:model-value="handleUpdate(rule, $event)"
-            />
-
-            <FcButton
-              v-else-if="isButtonType(rule)"
-              :rule="rule"
-              :disabled="isDisabled(rule)"
-              style=""
-              @click="handleRuleEvent(rule, 'click')"
-            />
-
-            <wd-form-item
-              v-else-if="isInputType(rule)"
-              :title="rule.title"
-              :title-width="titleWidth"
-              :prop="rule.field"
-            >
-              <wd-input
-                :model-value="getValue(rule)"
-                :type="getInputType(rule)"
-                :placeholder="getPlaceholder(rule)"
-                :disabled="isDisabled(rule)"
-                clearable
-                v-bind="getRuleProps(rule)"
-                @blur="handleRuleEvent(rule, 'blur', $event)"
-                @clear="handleRuleEvent(rule, 'clear')"
-                @update:model-value="handleUpdate(rule, $event)"
-              />
-            </wd-form-item>
-
-            <wd-form-item
-              v-else-if="isTextareaType(rule)"
-              :title="rule.title"
-              :title-width="titleWidth"
-              :prop="rule.field"
-              layout="vertical"
-            >
-              <wd-textarea
-                :model-value="getValue(rule)"
-                :placeholder="getPlaceholder(rule)"
-                :disabled="isDisabled(rule)"
-                clearable
-                v-bind="getRuleProps(rule)"
-                @blur="handleRuleEvent(rule, 'blur', $event)"
-                @clear="handleRuleEvent(rule, 'clear')"
-                @update:model-value="handleUpdate(rule, $event)"
-              />
-            </wd-form-item>
-
-            <wd-form-item
-              v-else-if="isInputNumberType(rule)"
-              :title="rule.title"
-              :title-width="titleWidth"
-              :prop="rule.field"
-              center
-            >
-              <wd-input-number
-                v-bind="getRuleProps(rule)"
-                :model-value="getInputNumberValue(rule)"
-                :min="rule.props?.min"
-                :max="rule.props?.max"
-                :step="rule.props?.step || 1"
-                :allow-null="rule.props?.allowNull ?? true"
-                :update-on-init="rule.props?.updateOnInit ?? false"
-                :disabled="isDisabled(rule)"
-                @update:model-value="handleUpdate(rule, $event)"
-              />
-            </wd-form-item>
-
-            <FcUserSelect
-              v-else-if="isUserSelectType(rule)"
-              :model-value="getValue(rule)"
-              :rule="rule"
-              :title-width="titleWidth"
-              :disabled="isDisabled(rule)"
-              style=""
-              @update:model-value="handleUpdate(rule, $event)"
-            />
-
-            <FcDeptSelect
-              v-else-if="isDeptSelectType(rule)"
-              :model-value="getValue(rule)"
-              :rule="rule"
-              :title-width="titleWidth"
-              :disabled="isDisabled(rule)"
-              style=""
-              @update:model-value="handleUpdate(rule, $event)"
-            />
-
-            <FcDictSelect
-              v-else-if="isDictSelectType(rule)"
-              :model-value="getValue(rule)"
-              :rule="rule"
-              :title-width="titleWidth"
-              :disabled="isDisabled(rule)"
-              style=""
-              @update:model-value="handleUpdate(rule, $event)"
-            />
-
-            <FcApiSelect
-              v-else-if="isApiSelectType(rule)"
-              :model-value="getValue(rule)"
-              :rule="rule"
-              :title-width="titleWidth"
-              :disabled="isDisabled(rule)"
-              style=""
-              @update:model-value="handleUpdate(rule, $event)"
-            />
-
-            <FcAreaSelect
-              v-else-if="isAreaSelectType(rule)"
-              :model-value="getValue(rule)"
-              :rule="rule"
-              :title-width="titleWidth"
-              :disabled="isDisabled(rule)"
-              style=""
-              @update:model-value="handleUpdate(rule, $event)"
-            />
-
-            <FcCascader
-              v-else-if="isCascaderType(rule)"
-              :model-value="getValue(rule)"
-              :rule="rule"
-              :title-width="titleWidth"
-              :disabled="isDisabled(rule)"
-              style=""
-              @confirm="handleRuleEvent(rule, 'confirm', $event)"
-              @update:model-value="handleUpdate(rule, $event)"
-            />
-
-            <FcCalendar
-              v-else-if="isCalendarType(rule)"
-              :model-value="getValue(rule)"
-              :rule="rule"
-              :title-width="titleWidth"
-              :disabled="isDisabled(rule)"
-              style=""
-              @confirm="handleRuleEvent(rule, 'confirm', $event)"
-              @update:model-value="handleUpdate(rule, $event)"
-            />
-
-            <FcTreeSelect
-              v-else-if="isTreeSelectType(rule)"
-              :model-value="getValue(rule)"
-              :rule="rule"
-              :title-width="titleWidth"
-              :disabled="isDisabled(rule)"
-              style=""
-              @update:model-value="handleUpdate(rule, $event)"
-            />
-
-            <FcTransfer
-              v-else-if="isTransferType(rule)"
-              :model-value="getValue(rule)"
-              :rule="rule"
-              :title-width="titleWidth"
-              :disabled="isDisabled(rule)"
-              style=""
-              @update:model-value="handleUpdate(rule, $event)"
-            />
-
-            <FcSelect
-              v-else-if="isSelectType(rule)"
-              :model-value="getValue(rule)"
-              :rule="rule"
-              :title-width="titleWidth"
-              :disabled="isDisabled(rule)"
-              style=""
-              @confirm="handleRuleEvent(rule, 'confirm', $event)"
-              @update:model-value="handleUpdate(rule, $event)"
-            />
-
-            <FcColorPicker
-              v-else-if="isColorPickerType(rule)"
-              :model-value="getValue(rule)"
-              :rule="rule"
-              :title-width="titleWidth"
-              :disabled="isDisabled(rule)"
-              style=""
-              @update:model-value="handleUpdate(rule, $event)"
-            />
-
-            <FcRadio
-              v-else-if="rule.type === 'radio'"
-              :model-value="getValue(rule)"
-              :rule="rule"
-              :title-width="titleWidth"
-              :disabled="isDisabled(rule)"
-              style=""
-              @update:model-value="handleUpdate(rule, $event)"
-            />
-
-            <FcCheckbox
-              v-else-if="rule.type === 'checkbox'"
-              :model-value="getValue(rule)"
-              :rule="rule"
-              :title-width="titleWidth"
-              :disabled="isDisabled(rule)"
-              style=""
-              @update:model-value="handleUpdate(rule, $event)"
-            />
-
-            <wd-form-item
-              v-else-if="rule.type === 'switch'"
-              :title="rule.title"
-              :title-width="titleWidth"
-              :prop="rule.field"
-              center
-            >
-              <wd-switch
-                :model-value="getValue(rule)"
-                :disabled="isDisabled(rule)"
-                v-bind="getRuleProps(rule)"
-                @update:model-value="handleUpdate(rule, $event)"
-              />
-            </wd-form-item>
-
-            <FcDatePicker
-              v-else-if="isDatePickerType(rule)"
-              :model-value="getValue(rule)"
-              :rule="rule"
-              :title-width="titleWidth"
-              :disabled="isDisabled(rule)"
-              style=""
-              @confirm="handleRuleEvent(rule, 'confirm', $event)"
-              @update:model-value="handleUpdate(rule, $event)"
-            />
-
-            <FcTimePicker
-              v-else-if="isTimePickerType(rule)"
-              :model-value="getValue(rule)"
-              :rule="rule"
-              :title-width="titleWidth"
-              :disabled="isDisabled(rule)"
-              style=""
-              @confirm="handleRuleEvent(rule, 'confirm', $event)"
-              @update:model-value="handleUpdate(rule, $event)"
-            />
-
-            <wd-form-item
-              v-else-if="rule.type === 'rate'"
-              :title="rule.title"
-              :title-width="titleWidth"
-              :prop="rule.field"
-              center
-            >
-              <wd-rate
-                :model-value="getValue(rule)"
-                :disabled="isDisabled(rule)"
-                v-bind="getRuleProps(rule)"
-                @update:model-value="handleUpdate(rule, $event)"
-              />
-            </wd-form-item>
-
-            <wd-form-item
-              v-else-if="isSliderType(rule)"
-              :title="rule.title"
-              :title-width="titleWidth"
-              :prop="rule.field"
-              layout="vertical"
-            >
-              <wd-slider
-                :model-value="getValue(rule)"
-                :disabled="isDisabled(rule)"
-                v-bind="getRuleProps(rule)"
-                :range="isSliderRangeType(rule)"
-                @change="handleUpdate(rule, $event)"
-              />
-            </wd-form-item>
-
-            <FcUploader
-              v-else-if="isUploadType(rule)"
-              :model-value="getValue(rule)"
-              :rule="rule"
-              :title-width="titleWidth"
-              :disabled="isDisabled(rule)"
-              style=""
-              @fail="handleRuleEvent(rule, 'fail', $event)"
-              @remove="handleRuleEvent(rule, 'remove', $event)"
-              @success="handleRuleEvent(rule, 'success', $event)"
-              @update:model-value="handleUpdate(rule, $event)"
-            />
-
             <FcSubForm
-              v-else-if="isSubFormType(rule)"
+              v-if="isSubFormType(rule)"
               :model-value="getValue(rule)"
               :rule="rule"
               :api="api"
@@ -379,31 +22,21 @@
               :title-width="titleWidth"
               :disabled="isDisabled(rule)"
               style=""
+              @emit-event="handleSubFormEmitEvent"
+              @rule-emit="handleSubFormRuleEmit"
               @update:model-value="handleUpdate(rule, $event)"
             />
 
-            <wd-form-item
-              v-else-if="rule.type === 'span'"
-              :title="rule.title"
-              :title-width="titleWidth"
-              :prop="rule.field"
-            >
-              <view class="fc-wot__text">
-                {{ formatDisplayValue(getValue(rule)) }}
-              </view>
-            </wd-form-item>
-
-            <wd-form-item
+            <FcFieldRenderer
               v-else
-              :title="rule.title || rule.type"
+              :model-value="getValue(rule)"
+              :rule="rule"
               :title-width="titleWidth"
-              :prop="rule.field"
-              layout="vertical"
-            >
-              <view class="fc-wot__unsupported">
-                暂不支持「{{ rule.title || rule.type }}」组件
-              </view>
-            </wd-form-item>
+              :disabled="isDisabled(rule)"
+              style=""
+              @rule-event="(eventName, ...args) => handleRuleEvent(rule, eventName, ...args)"
+              @update:model-value="handleUpdate(rule, $event)"
+            />
           </template>
 
           <view v-if="visibleRules.length === 0" class="fc-wot__empty">
@@ -438,74 +71,15 @@ import {
   normalizeRules,
   resolveRuleFetchEffects,
 } from '../../core/src'
-import { deepMerge, hasOwn, toArray } from '../../utils/src'
-import FcButton from './components/button.vue'
-import FcCalendar from './components/calendar.vue'
-import FcCascader from './components/cascader.vue'
-import FcCheckbox from './components/checkbox.vue'
-import FcColorPicker from './components/colorPicker.vue'
-import FcApiSelect from './components/custom/apiSelect.vue'
-import FcAreaSelect from './components/custom/areaSelect.vue'
-import FcDeptSelect from './components/custom/deptSelect.vue'
-import FcDictSelect from './components/custom/dictSelect.vue'
-import FcUserSelect from './components/custom/userSelect.vue'
-import FcDatePicker from './components/datePicker.vue'
-import FcAlert from './components/display/alert.vue'
-import FcDivider from './components/display/divider.vue'
-import FcHtml from './components/display/html.vue'
-import FcImage from './components/display/image.vue'
-import FcTag from './components/display/tag.vue'
-import FcTitle from './components/display/title.vue'
-import FcIframe from './components/iframe.vue'
-import FcRadio from './components/radio.vue'
-import FcRichText from './components/richText.vue'
-import FcSelect from './components/select.vue'
-import FcSignature from './components/signature.vue'
+import { deepMerge, hasOwn } from '../../utils/src'
+import FcFieldRenderer from './components/fieldRenderer.vue'
 import FcSubForm from './components/subForm.vue'
-import FcTimePicker from './components/timePicker.vue'
-import FcTransfer from './components/transfer.vue'
-import FcTreeSelect from './components/treeSelect.vue'
-import FcUploader from './components/uploader.vue'
 import getConfig from './core/config'
 import {
-  getInputType,
-  getPlaceholder,
+  getRuleEmitEvents,
   getRuleEventHandler,
-  getRuleProps,
   getTitleWidth,
-  isAlertType,
-  isApiSelectType,
-  isAreaSelectType,
-  isButtonType,
-  isCalendarType,
-  isCascaderType,
-  isColorPickerType,
-  isDatePickerType,
-  isDeptSelectType,
-  isDictSelectType,
-  isDividerType,
-  isHiddenFieldType,
-  isHtmlType,
-  isIframeType,
-  isImageType,
-  isInputNumberType,
-  isInputType,
-  isLayoutGapType,
-  isLayoutTitleType,
-  isRichTextType,
-  isSelectType,
-  isSignatureType,
-  isSliderRangeType,
-  isSliderType,
   isSubFormType,
-  isTagType,
-  isTextareaType,
-  isTimePickerType,
-  isTitleType,
-  isTransferType,
-  isTreeSelectType,
-  isUploadType,
-  isUserSelectType,
 } from './core/utils'
 import { parseRules } from './parsers'
 
@@ -572,14 +146,26 @@ const providerContext: FormCreateProviderContext = {
 const rules = computed(() => applyRuleProviders(providerSourceRules.value, providerContext))
 const visibleRules = computed(() => rules.value.filter(rule => !isRuleHidden(rule, fieldStates[rule.field || ''])))
 const formSchema = computed(() => createFormSchema(() => rules.value, fieldStates, parseRules, providerContext))
+const MAX_RULE_UPDATE_DEPTH = 5
+
+interface RuleUpdateTask {
+  depth: number
+  linkField?: string
+  origin: NormalizedFormCreateRule
+  runSelf: boolean
+  sourceFields: string[]
+  sourceRule: NormalizedFormCreateRule
+  value: any
+}
+
+interface RuleValueChange {
+  field: string
+  rule: NormalizedFormCreateRule
+  value: any
+}
 
 function getValue(rule: NormalizedFormCreateRule) {
   return rule.field ? formData.value[rule.field] : undefined
-}
-
-function getInputNumberValue(rule: NormalizedFormCreateRule) {
-  const value = getValue(rule)
-  return value === undefined || value === null ? '' : value
 }
 
 function handleUpdate(rule: NormalizedFormCreateRule, value: any) {
@@ -625,37 +211,19 @@ function handleRuleEvent(rule: NormalizedFormCreateRule, eventName: string, ...a
     }
   }
   emit('emit-event', eventName, ...args, rule, api)
-  getRuleEmitEventNames(rule, eventName).forEach((emitName) => {
-    ;(emit as any)(emitName, ...args)
-    emit('emit-event', emitName, ...args, rule, api)
+  getRuleEmitEvents(rule, eventName, args, api).forEach((event) => {
+    ;(emit as any)(event.name, ...event.args)
+    emit('emit-event', event.name, ...event.args)
   })
 }
 
-function getRuleEmitEventNames(rule: NormalizedFormCreateRule, eventName: string) {
-  return toArray(rule.emit)
-    .map(item => normalizeRuleEmitName(rule, eventName, item))
-    .filter(Boolean) as string[]
+function handleSubFormEmitEvent(name: string, ...args: any[]) {
+  emit('emit-event', name, ...args)
 }
 
-function normalizeRuleEmitName(rule: NormalizedFormCreateRule, eventName: string, emitConfig: any) {
-  if (!emitConfig) {
-    return undefined
-  }
-  const name = typeof emitConfig === 'string' ? emitConfig : emitConfig.name
-  if (name !== eventName) {
-    return undefined
-  }
-  const prefix = typeof emitConfig === 'object'
-    ? emitConfig.prefix || emitConfig.emitPrefix || rule.emitPrefix || rule.field || rule.name
-    : rule.emitPrefix || rule.field || rule.name
-  return prefix ? toKebabCase(`${prefix}-${eventName}`) : undefined
-}
-
-function toKebabCase(value: string) {
-  return value
-    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
-    .replace(/[\s_:.]+/g, '-')
-    .toLowerCase()
+function handleSubFormRuleEmit(name: string, ...args: any[]) {
+  ;(emit as any)(name, ...args)
+  emit('emit-event', name, ...args)
 }
 
 function getRuleLinks(rule: NormalizedFormCreateRule) {
@@ -676,17 +244,60 @@ function runRuleUpdates(sourceRule: NormalizedFormCreateRule, value: any) {
   if (!sourceRule.field && !sourceRule.name) {
     return
   }
-  const sourceFields = [sourceRule.field, sourceRule.name].filter(Boolean) as string[]
   const visited = new Set<string>()
-  runRuleUpdate(sourceRule, sourceRule.field, value, sourceRule, visited)
+  const queue: RuleUpdateTask[] = [{
+    depth: 0,
+    linkField: sourceRule.field,
+    origin: sourceRule,
+    runSelf: true,
+    sourceFields: [sourceRule.field, sourceRule.name].filter(Boolean) as string[],
+    sourceRule,
+    value,
+  }]
+
+  while (queue.length > 0) {
+    const task = queue.shift()!
+    const changedFields = task.runSelf
+      ? runRuleUpdate(task.sourceRule, task.linkField, task.value, task.origin, visited)
+      : []
+    const sourceFields = Array.from(new Set([
+      ...task.sourceFields,
+      ...changedFields.map(item => item.field),
+    ]))
+    if (task.depth >= MAX_RULE_UPDATE_DEPTH) {
+      continue
+    }
+    runLinkedRuleUpdates(task, sourceFields, visited, queue)
+  }
+}
+
+function runLinkedRuleUpdates(
+  task: RuleUpdateTask,
+  sourceFields: string[],
+  visited: Set<string>,
+  queue: RuleUpdateTask[],
+) {
   rules.value.forEach((rule) => {
-    if (rule.__fcId === sourceRule.__fcId || typeof rule.update !== 'function') {
+    if (typeof rule.update !== 'function' || visited.has(rule.__fcId)) {
       return
     }
-    const links = getRuleLinks(rule)
-    if (links.some(link => sourceFields.includes(link))) {
-      runRuleUpdate(rule, sourceRule.field, value, sourceRule, visited)
+    const matchedField = getRuleLinks(rule).find(link => sourceFields.includes(link))
+    if (!matchedField) {
+      return
     }
+    const nextValue = hasOwn(formData.value, matchedField) ? formData.value[matchedField] : task.value
+    const changedFields = runRuleUpdate(rule, matchedField, nextValue, task.origin, visited)
+    changedFields.forEach((change) => {
+      queue.push({
+        depth: task.depth + 1,
+        linkField: change.field,
+        origin: task.origin,
+        runSelf: false,
+        sourceFields: [change.field],
+        sourceRule: change.rule,
+        value: change.value,
+      })
+    })
   })
 }
 
@@ -696,9 +307,9 @@ function runRuleUpdate(
   value: any,
   origin: NormalizedFormCreateRule,
   visited: Set<string>,
-) {
+): RuleValueChange[] {
   if (typeof rule.update !== 'function' || visited.has(rule.__fcId)) {
-    return
+    return []
   }
   visited.add(rule.__fcId)
   try {
@@ -714,11 +325,19 @@ function runRuleUpdate(
         api.hidden(result, rule.field)
       }
     } else if (isPartialRule(result)) {
+      const previousValue = rule.field ? formData.value[rule.field] : undefined
       api.mergeRule(rule.__fcId, result)
+      if (rule.field && hasOwn(result, 'value')) {
+        const nextValue = formData.value[rule.field]
+        if (!isSamePlainValue(previousValue, nextValue)) {
+          return [{ field: rule.field, rule, value: nextValue }]
+        }
+      }
     }
   } catch (error) {
     console.warn('[form-create] rule.update failed', error)
   }
+  return []
 }
 
 function emitReset() {
@@ -741,27 +360,6 @@ function emitValidateFail(errors: { prop: string, message: string }[]) {
 
 function isDisabled(rule: NormalizedFormCreateRule) {
   return isRuleDisabled(globalDisabled.value || !!rule.props?.disabled, fieldStates[rule.field || ''], rule)
-}
-
-function formatDisplayValue(value: any) {
-  if (Array.isArray(value)) {
-    return value.join('，')
-  }
-  if (value === undefined || value === null || value === '') {
-    return '-'
-  }
-  return String(value)
-}
-
-function getLayoutGapHeight(rule: NormalizedFormCreateRule) {
-  const height = rule.props?.height
-  if (typeof height === 'number') {
-    return `${height}px`
-  }
-  if (typeof height === 'string' && height.trim()) {
-    return height
-  }
-  return '24rpx'
 }
 
 function applyApiRulePatches(nextRules: NormalizedFormCreateRule[]) {
@@ -818,6 +416,7 @@ function isSamePlainValue(left: unknown, right: unknown) {
 watch(
   rules,
   (nextRules) => {
+    pruneRuleStateMaps(nextRules)
     nextRules.forEach((rule) => {
       if (rule.field && !fieldStates[rule.field]) {
         fieldStates[rule.field] = {}
@@ -836,7 +435,7 @@ watch(
   () => controlResult.value.fieldStates,
   (nextStates) => {
     const fields = new Set([
-      ...Object.keys(fieldStates),
+      ...rules.value.map(rule => rule.field).filter(Boolean) as string[],
       ...Object.keys(nextStates),
     ])
     fields.forEach((field) => {
@@ -890,6 +489,21 @@ onBeforeUnmount(() => {
     providerFetchTimer = undefined
   }
 })
+
+function pruneRuleStateMaps(nextRules: NormalizedFormCreateRule[]) {
+  const fieldIds = new Set(nextRules.map(rule => rule.field).filter(Boolean) as string[])
+  const ruleIds = new Set(nextRules.map(rule => rule.__fcId))
+  Object.keys(fieldStates).forEach((field) => {
+    if (!fieldIds.has(field)) {
+      delete fieldStates[field]
+    }
+  })
+  Object.keys(providerStates).forEach((fieldId) => {
+    if (!ruleIds.has(fieldId)) {
+      delete providerStates[fieldId]
+    }
+  })
+}
 
 onMounted(() => {
   emit('update:api', api)

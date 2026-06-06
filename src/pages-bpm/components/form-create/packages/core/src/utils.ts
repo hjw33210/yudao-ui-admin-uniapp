@@ -5,6 +5,16 @@ import type {
   NormalizedFormCreateRule,
 } from '../../../types/typing'
 import { getRuleChildren, hasOwn, isEmptyValue } from '../../utils/src'
+import {
+  isCalendarArrayValueType,
+  isCalendarTypeName,
+  isCascaderTypeName,
+  isInputNumberTypeName,
+  isMultipleValueType,
+  isSliderRangeTypeName,
+  isSubFormTypeName,
+  isTransferTypeName,
+} from './registry'
 
 export function normalizeRules(rules: FormCreateRule[] = []): NormalizedFormCreateRule[] {
   const result: NormalizedFormCreateRule[] = []
@@ -44,48 +54,31 @@ export function normalizeOptions(options?: FormCreateOptionItem[]) {
 }
 
 export function getDefaultValueByType(type: string): FormCreateValue {
-  switch (type) {
-    case 'checkbox':
-    case 'selectMultiple':
-    case 'upload':
-    case 'uploadFile':
-    case 'uploadImage':
-    case 'uploadImages':
-    case 'FileUpload':
-    case 'ImagesUpload':
-    case 'UploadImgs':
-    case 'group':
-    case 'Group':
-    case 'fcGroup':
-    case 'FcGroup':
-    case 'array':
-    case 'Array':
-    case 'tableForm':
-    case 'subTable':
-    case 'fcTableForm':
-    case 'transfer':
-    case 'Transfer':
-    case 'elTransfer':
-    case 'ElTransfer':
-      return []
-    case 'ImageUpload':
-    case 'UploadImg':
-    case 'UploadFile':
-      return ''
-    case 'switch':
-      return false
-    case 'inputNumber':
-    case 'InputNumber':
-    case 'number':
-      return undefined
-    case 'rate':
-    case 'slider':
-      return 0
-    case 'sliderRange':
-      return [0, 100]
-    default:
-      return ''
+  if (
+    type === 'checkbox'
+    || type === 'selectMultiple'
+    || ['upload', 'uploadFile', 'uploadImage', 'uploadImages', 'FileUpload', 'ImagesUpload', 'UploadImgs'].includes(type)
+    || isSubFormTypeName(type)
+    || isTransferTypeName(type)
+  ) {
+    return []
   }
+  if (['ImageUpload', 'UploadImg', 'UploadFile'].includes(type)) {
+    return ''
+  }
+  if (type === 'switch') {
+    return false
+  }
+  if (isInputNumberTypeName(type)) {
+    return undefined
+  }
+  if (type === 'rate' || type === 'slider') {
+    return 0
+  }
+  if (type === 'sliderRange') {
+    return [0, 100]
+  }
+  return ''
 }
 
 export function createInitialFormData(
@@ -109,22 +102,20 @@ export function createInitialFormData(
 }
 
 export function getDefaultValue(rule: NormalizedFormCreateRule): FormCreateValue {
-  const isMultiple = rule.type === 'treeSelectMultiple' || rule.props?.multiple || rule.props?.mode === 'multiple'
-  if ((rule.type === 'select' || rule.type === 'selectMultiple' || rule.type.endsWith('Select') || rule.type === 'treeSelectMultiple') && isMultiple) {
+  if ((rule.type === 'select' || rule.type === 'selectMultiple' || rule.type.endsWith('Select') || rule.type === 'treeSelectMultiple') && isMultipleValueType(rule.type, rule.props)) {
     return []
   }
-  if (rule.type === 'sliderRange' || rule.props?.range === true) {
+  if (isSliderRangeTypeName(rule.type, rule.props)) {
     return [rule.props?.min ?? 0, rule.props?.max ?? 100]
   }
-  if (rule.type === 'cascader' || rule.type === 'Cascader') {
+  if (isCascaderTypeName(rule.type)) {
     const emitPath = rule.props?.emitPath ?? rule.props?.props?.emitPath
     if (emitPath !== false) {
       return []
     }
   }
-  if (rule.type === 'calendar' || rule.type === 'Calendar' || ['date', 'datetime', 'month', 'week', 'dateRange', 'daterange', 'datetimeRange', 'datetimerange', 'monthRange', 'monthrange', 'weekRange', 'weekrange'].includes(rule.type)) {
-    const calendarType = String(rule.props?.type || rule.type || 'date').toLowerCase()
-    if (calendarType === 'dates' || calendarType === 'multiple' || calendarType.includes('range')) {
+  if (isCalendarTypeName(rule.type)) {
+    if (isCalendarArrayValueType(rule.type, rule.props)) {
       return []
     }
   }

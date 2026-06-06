@@ -24,289 +24,8 @@
 
         <view v-show="!isItemCollapsed(itemIndex)" class="fc-sub-form__body">
           <template v-for="childRule in getItemRules(itemIndex)" :key="`${itemIndex}_${childRule.__fcId}`">
-            <view v-if="isHiddenFieldType(childRule)" style="display: none" />
-
-            <view v-else-if="isLayoutTitleType(childRule)" class="fc-sub-form__layout-title">
-              {{ childRule.title }}
-            </view>
-
-            <view v-else-if="isLayoutGapType(childRule)" class="fc-sub-form__layout-gap" :style="{ height: getLayoutGapHeight(childRule) }" />
-
-            <FcAlert v-else-if="isAlertType(childRule)" :rule="getRenderRule(childRule, itemIndex)" style="" />
-
-            <FcTitle v-else-if="isTitleType(childRule)" :rule="getRenderRule(childRule, itemIndex)" style="" />
-
-            <FcHtml v-else-if="isHtmlType(childRule)" :rule="getRenderRule(childRule, itemIndex)" style="" />
-
-            <FcDivider v-else-if="isDividerType(childRule)" :rule="getRenderRule(childRule, itemIndex)" style="" />
-
-            <FcTag v-else-if="isTagType(childRule)" :rule="getRenderRule(childRule, itemIndex)" style="" />
-
-            <FcImage v-else-if="isImageType(childRule)" :rule="getRenderRule(childRule, itemIndex)" style="" />
-
-            <FcIframe v-else-if="isIframeType(childRule)" :rule="getRenderRule(childRule, itemIndex)" :title-width="childTitleWidth" style="" />
-
-            <FcRichText
-              v-else-if="isRichTextType(childRule)"
-              :model-value="getItemValue(itemIndex, childRule.field)"
-              :rule="getRenderRule(childRule, itemIndex)"
-              :title-width="childTitleWidth"
-              :disabled="isChildDisabled(childRule, itemIndex)"
-              style=""
-              @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
-            />
-
-            <FcSignature
-              v-else-if="isSignatureType(childRule)"
-              :model-value="getItemValue(itemIndex, childRule.field)"
-              :rule="getRenderRule(childRule, itemIndex)"
-              :title-width="childTitleWidth"
-              :disabled="isChildDisabled(childRule, itemIndex)"
-              style=""
-              @clear="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'clear')"
-              @confirm="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'confirm', $event)"
-              @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
-            />
-
-            <wd-form-item v-else-if="isInputType(childRule)" :title="childRule.title" :title-width="childTitleWidth" :prop="getChildProp(itemIndex, childRule.field)">
-              <wd-input
-                :model-value="getItemValue(itemIndex, childRule.field)"
-                :type="getInputType(childRule)"
-                :placeholder="getPlaceholder(childRule)"
-                :disabled="isChildDisabled(childRule, itemIndex)"
-                clearable
-                v-bind="getRuleProps(childRule)"
-                @blur="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'blur', $event)"
-                @clear="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'clear')"
-                @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
-              />
-            </wd-form-item>
-
-            <wd-form-item v-else-if="isTextareaType(childRule)" :title="childRule.title" :title-width="childTitleWidth" :prop="getChildProp(itemIndex, childRule.field)" layout="vertical">
-              <wd-textarea
-                :model-value="getItemValue(itemIndex, childRule.field)"
-                :placeholder="getPlaceholder(childRule)"
-                :disabled="isChildDisabled(childRule, itemIndex)"
-                clearable
-                v-bind="getRuleProps(childRule)"
-                @blur="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'blur', $event)"
-                @clear="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'clear')"
-                @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
-              />
-            </wd-form-item>
-
-            <wd-form-item v-else-if="isInputNumberType(childRule)" :title="childRule.title" :title-width="childTitleWidth" :prop="getChildProp(itemIndex, childRule.field)" center>
-              <wd-input-number
-                v-bind="getRuleProps(childRule)"
-                :model-value="getInputNumberValue(itemIndex, childRule.field)"
-                :min="childRule.props?.min"
-                :max="childRule.props?.max"
-                :step="childRule.props?.step || 1"
-                :allow-null="childRule.props?.allowNull ?? true"
-                :update-on-init="childRule.props?.updateOnInit ?? false"
-                :disabled="isChildDisabled(childRule, itemIndex)"
-                @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
-              />
-            </wd-form-item>
-
-            <FcUserSelect
-              v-else-if="isUserSelectType(childRule)"
-              :model-value="getItemValue(itemIndex, childRule.field)"
-              :rule="getRenderRule(childRule, itemIndex)"
-              :title-width="childTitleWidth"
-              :disabled="isChildDisabled(childRule, itemIndex)"
-              style=""
-              @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
-            />
-
-            <FcDeptSelect
-              v-else-if="isDeptSelectType(childRule)"
-              :model-value="getItemValue(itemIndex, childRule.field)"
-              :rule="getRenderRule(childRule, itemIndex)"
-              :title-width="childTitleWidth"
-              :disabled="isChildDisabled(childRule, itemIndex)"
-              style=""
-              @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
-            />
-
-            <FcDictSelect
-              v-else-if="isDictSelectType(childRule)"
-              :model-value="getItemValue(itemIndex, childRule.field)"
-              :rule="getRenderRule(childRule, itemIndex)"
-              :title-width="childTitleWidth"
-              :disabled="isChildDisabled(childRule, itemIndex)"
-              style=""
-              @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
-            />
-
-            <FcApiSelect
-              v-else-if="isApiSelectType(childRule)"
-              :model-value="getItemValue(itemIndex, childRule.field)"
-              :rule="getRenderRule(childRule, itemIndex)"
-              :title-width="childTitleWidth"
-              :disabled="isChildDisabled(childRule, itemIndex)"
-              style=""
-              @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
-            />
-
-            <FcAreaSelect
-              v-else-if="isAreaSelectType(childRule)"
-              :model-value="getItemValue(itemIndex, childRule.field)"
-              :rule="getRenderRule(childRule, itemIndex)"
-              :title-width="childTitleWidth"
-              :disabled="isChildDisabled(childRule, itemIndex)"
-              style=""
-              @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
-            />
-
-            <FcCascader
-              v-else-if="isCascaderType(childRule)"
-              :model-value="getItemValue(itemIndex, childRule.field)"
-              :rule="getRenderRule(childRule, itemIndex)"
-              :title-width="childTitleWidth"
-              :disabled="isChildDisabled(childRule, itemIndex)"
-              style=""
-              @confirm="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'confirm', $event)"
-              @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
-            />
-
-            <FcCalendar
-              v-else-if="isCalendarType(childRule)"
-              :model-value="getItemValue(itemIndex, childRule.field)"
-              :rule="getRenderRule(childRule, itemIndex)"
-              :title-width="childTitleWidth"
-              :disabled="isChildDisabled(childRule, itemIndex)"
-              style=""
-              @confirm="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'confirm', $event)"
-              @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
-            />
-
-            <FcTreeSelect
-              v-else-if="isTreeSelectType(childRule)"
-              :model-value="getItemValue(itemIndex, childRule.field)"
-              :rule="getRenderRule(childRule, itemIndex)"
-              :title-width="childTitleWidth"
-              :disabled="isChildDisabled(childRule, itemIndex)"
-              style=""
-              @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
-            />
-
-            <FcSelect
-              v-else-if="isSelectType(childRule)"
-              :model-value="getItemValue(itemIndex, childRule.field)"
-              :rule="getRenderRule(childRule, itemIndex)"
-              :title-width="childTitleWidth"
-              :disabled="isChildDisabled(childRule, itemIndex)"
-              style=""
-              @confirm="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'confirm', $event)"
-              @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
-            />
-
-            <FcColorPicker
-              v-else-if="isColorPickerType(childRule)"
-              :model-value="getItemValue(itemIndex, childRule.field)"
-              :rule="getRenderRule(childRule, itemIndex)"
-              :title-width="childTitleWidth"
-              :disabled="isChildDisabled(childRule, itemIndex)"
-              style=""
-              @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
-            />
-
-            <FcRadio
-              v-else-if="childRule.type === 'radio'"
-              :model-value="getItemValue(itemIndex, childRule.field)"
-              :rule="getRenderRule(childRule, itemIndex)"
-              :title-width="childTitleWidth"
-              :disabled="isChildDisabled(childRule, itemIndex)"
-              style=""
-              @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
-            />
-
-            <FcCheckbox
-              v-else-if="childRule.type === 'checkbox'"
-              :model-value="getItemValue(itemIndex, childRule.field)"
-              :rule="getRenderRule(childRule, itemIndex)"
-              :title-width="childTitleWidth"
-              :disabled="isChildDisabled(childRule, itemIndex)"
-              style=""
-              @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
-            />
-
-            <wd-form-item v-else-if="childRule.type === 'switch'" :title="childRule.title" :title-width="childTitleWidth" :prop="getChildProp(itemIndex, childRule.field)" center>
-              <wd-switch
-                :model-value="getItemValue(itemIndex, childRule.field)"
-                :disabled="isChildDisabled(childRule, itemIndex)"
-                v-bind="getRuleProps(childRule)"
-                @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
-              />
-            </wd-form-item>
-
-            <FcDatePicker
-              v-else-if="isDatePickerType(childRule)"
-              :model-value="getItemValue(itemIndex, childRule.field)"
-              :rule="getRenderRule(childRule, itemIndex)"
-              :title-width="childTitleWidth"
-              :disabled="isChildDisabled(childRule, itemIndex)"
-              style=""
-              @confirm="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'confirm', $event)"
-              @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
-            />
-
-            <FcTimePicker
-              v-else-if="isTimePickerType(childRule)"
-              :model-value="getItemValue(itemIndex, childRule.field)"
-              :rule="getRenderRule(childRule, itemIndex)"
-              :title-width="childTitleWidth"
-              :disabled="isChildDisabled(childRule, itemIndex)"
-              style=""
-              @confirm="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'confirm', $event)"
-              @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
-            />
-
-            <wd-form-item v-else-if="childRule.type === 'rate'" :title="childRule.title" :title-width="childTitleWidth" :prop="getChildProp(itemIndex, childRule.field)" center>
-              <wd-rate
-                :model-value="getItemValue(itemIndex, childRule.field)"
-                :disabled="isChildDisabled(childRule, itemIndex)"
-                v-bind="getRuleProps(childRule)"
-                @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
-              />
-            </wd-form-item>
-
-            <wd-form-item v-else-if="isSliderType(childRule)" :title="childRule.title" :title-width="childTitleWidth" :prop="getChildProp(itemIndex, childRule.field)" layout="vertical">
-              <wd-slider
-                :model-value="getItemValue(itemIndex, childRule.field)"
-                :disabled="isChildDisabled(childRule, itemIndex)"
-                v-bind="getRuleProps(childRule)"
-                :range="isSliderRangeType(childRule)"
-                @change="setItemValue(itemIndex, childRule.field, $event)"
-              />
-            </wd-form-item>
-
-            <FcUploader
-              v-else-if="isUploadType(childRule)"
-              :model-value="getItemValue(itemIndex, childRule.field)"
-              :rule="getRenderRule(childRule, itemIndex)"
-              :title-width="childTitleWidth"
-              :disabled="isChildDisabled(childRule, itemIndex)"
-              style=""
-              @fail="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'fail', $event)"
-              @remove="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'remove', $event)"
-              @success="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'success', $event)"
-              @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
-            />
-
-            <FcTransfer
-              v-else-if="isTransferType(childRule)"
-              :model-value="getItemValue(itemIndex, childRule.field)"
-              :rule="getRenderRule(childRule, itemIndex)"
-              :title-width="childTitleWidth"
-              :disabled="isChildDisabled(childRule, itemIndex)"
-              style=""
-              @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
-            />
-
             <FcSubForm
-              v-else-if="isSubFormType(childRule)"
+              v-if="isSubFormType(childRule)"
               :model-value="getItemValue(itemIndex, childRule.field)"
               :rule="getRenderRule(childRule, itemIndex)"
               :api="api"
@@ -314,26 +33,22 @@
               :title-width="childTitleWidth"
               :disabled="isChildDisabled(childRule, itemIndex)"
               style=""
+              @emit-event="emitChildEvent"
+              @rule-emit="emitChildRuleEvent"
               @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
             />
 
-            <FcButton
-              v-else-if="isButtonType(childRule)"
+            <FcFieldRenderer
+              v-else
+              :model-value="getItemValue(itemIndex, childRule.field)"
               :rule="getRenderRule(childRule, itemIndex)"
+              :title-width="childTitleWidth"
               :disabled="isChildDisabled(childRule, itemIndex)"
+              unsupported-suffix="子字段"
               style=""
-              @click="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'click')"
+              @rule-event="(eventName, ...args) => handleChildRuleEvent(getRenderRule(childRule, itemIndex), eventName, ...args)"
+              @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
             />
-
-            <wd-form-item v-else-if="childRule.type === 'span'" :title="childRule.title" :title-width="childTitleWidth" :prop="getChildProp(itemIndex, childRule.field)">
-              <view class="fc-sub-form__text">
-                {{ formatDisplayValue(getItemValue(itemIndex, childRule.field)) }}
-              </view>
-            </wd-form-item>
-
-            <view v-else class="fc-sub-form__unsupported">
-              暂不支持「{{ childRule.title || childRule.type }}」子字段
-            </view>
           </template>
         </view>
       </view>
@@ -350,77 +65,19 @@
 </template>
 
 <script lang="ts" setup>
-import type { FormCreateApi, FormCreateOption, FormCreateRule, NormalizedFormCreateRule } from '../../../../types/typing'
+import type { FormCreateApi, FormCreateFieldState, FormCreateOption, FormCreateRule, NormalizedFormCreateRule } from '../../../../types/typing'
 import type { FormCreateProviderContext, FormCreateProviderState } from '../../../core/src/provider'
 import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue'
 import { applyControlRules, applyRuleProviders, getDefaultValue, isRuleDisabled, isRuleHidden, normalizeSubFormRules, resolveRuleFetchEffects } from '../../../core/src'
+import { deepMerge, hasOwn } from '../../../utils/src'
 import {
-  getInputType,
-  getPlaceholder,
+  getRuleEmitEvents,
   getRuleEventHandler,
-  getRuleProps,
   INTERNAL_LAYOUT_TITLE_TYPE,
-  isAlertType,
-  isApiSelectType,
-  isAreaSelectType,
-  isButtonType,
-  isCalendarType,
-  isCascaderType,
-  isColorPickerType,
-  isDatePickerType,
-  isDeptSelectType,
-  isDictSelectType,
-  isDividerType,
-  isHiddenFieldType,
-  isHtmlType,
-  isIframeType,
-  isImageType,
-  isInputNumberType,
-  isInputType,
-  isLayoutGapType,
-  isLayoutTitleType,
-  isRichTextType,
-  isSelectType,
-  isSignatureType,
-  isSliderRangeType,
-  isSliderType,
   isSubFormType,
-  isTagType,
-  isTextareaType,
-  isTimePickerType,
-  isTitleType,
-  isTransferType,
-  isTreeSelectType,
-  isUploadType,
-  isUserSelectType,
 } from '../core/utils'
 import { parseRules } from '../parsers'
-import FcButton from './button.vue'
-import FcCalendar from './calendar.vue'
-import FcCascader from './cascader.vue'
-import FcCheckbox from './checkbox.vue'
-import FcColorPicker from './colorPicker.vue'
-import FcApiSelect from './custom/apiSelect.vue'
-import FcAreaSelect from './custom/areaSelect.vue'
-import FcDeptSelect from './custom/deptSelect.vue'
-import FcDictSelect from './custom/dictSelect.vue'
-import FcUserSelect from './custom/userSelect.vue'
-import FcDatePicker from './datePicker.vue'
-import FcAlert from './display/alert.vue'
-import FcDivider from './display/divider.vue'
-import FcHtml from './display/html.vue'
-import FcImage from './display/image.vue'
-import FcTag from './display/tag.vue'
-import FcTitle from './display/title.vue'
-import FcIframe from './iframe.vue'
-import FcRadio from './radio.vue'
-import FcRichText from './richText.vue'
-import FcSelect from './select.vue'
-import FcSignature from './signature.vue'
-import FcTimePicker from './timePicker.vue'
-import FcTransfer from './transfer.vue'
-import FcTreeSelect from './treeSelect.vue'
-import FcUploader from './uploader.vue'
+import FcFieldRenderer from './fieldRenderer.vue'
 
 defineOptions({
   name: 'FcSubForm',
@@ -438,9 +95,13 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [value: any[]]
   'change': [value: any[]]
+  'emit-event': [name: string, ...args: any[]]
+  'rule-emit': [name: string, ...args: any[]]
 }>()
 
 const collapsedRows = ref<Record<number, boolean>>({})
+const itemFieldStates = reactive<Record<string, Record<string, FormCreateFieldState>>>({})
+const itemRulePatches = reactive<Record<string, Record<string, Partial<NormalizedFormCreateRule>>>>({})
 const providerStates = reactive<Record<string, Record<string, FormCreateProviderState>>>({})
 const EMPTY_PROVIDER_STATES: Record<string, FormCreateProviderState> = {}
 const baseChildRules = computed(() => normalizeSubFormRules(props.rule, parseRules, {
@@ -458,6 +119,23 @@ const canRemove = computed(() => !props.disabled && rows.value.length > min.valu
 const canAdd = computed(() => !props.disabled && (!max.value || rows.value.length < max.value))
 let providerFetchVersion = 0
 let providerFetchTimer: ReturnType<typeof setTimeout> | undefined
+const MAX_RULE_UPDATE_DEPTH = 5
+
+interface ItemRuleUpdateTask {
+  depth: number
+  linkField?: string
+  origin: NormalizedFormCreateRule
+  runSelf: boolean
+  sourceFields: string[]
+  sourceRule: NormalizedFormCreateRule
+  value: any
+}
+
+interface ItemRuleValueChange {
+  field: string
+  rule: NormalizedFormCreateRule
+  value: any
+}
 
 watch(
   () => [props.modelValue, baseChildRules.value, min.value, expand.value],
@@ -468,6 +146,8 @@ watch(
 watch(
   () => baseChildRules.value,
   () => {
+    clearItemFieldStates()
+    clearItemRulePatches()
     clearProviderStates()
     scheduleProviderFetchEffects()
   },
@@ -535,16 +215,20 @@ function fillDefaultRow(row: Record<string, any>, rules: NormalizedFormCreateRul
 }
 
 function getItemRules(itemIndex: number) {
-  const result = getItemControlResult(itemIndex)
-  const providerContext = getItemProviderContext(itemIndex)
-  const rules = applyRuleProviders(result?.rules || baseChildRules.value, providerContext)
-  return rules.filter(rule => !isRuleHidden(rule, getItemFieldState(itemIndex, rule)))
+  return getItemAllRules(itemIndex).filter(rule => !isRuleHidden(rule, getItemFieldState(itemIndex, rule)))
 }
 
-function getItemProviderContext(itemIndex: number): FormCreateProviderContext {
+function getItemAllRules(itemIndex: number, rowOverride?: Record<string, any>) {
+  const result = getItemControlResult(itemIndex, rowOverride)
+  const providerContext = getItemProviderContext(itemIndex, rowOverride)
+  const rules = applyRuleProviders(result?.rules || baseChildRules.value, providerContext)
+  return applyItemRulePatches(itemIndex, rules)
+}
+
+function getItemProviderContext(itemIndex: number, rowOverride?: Record<string, any>): FormCreateProviderContext {
   return {
     api: props.api,
-    formData: rows.value[itemIndex] || {},
+    formData: rowOverride || rows.value[itemIndex] || {},
     option: props.option,
     states: getItemProviderStates(itemIndex) || EMPTY_PROVIDER_STATES,
   }
@@ -555,7 +239,7 @@ function getItemProviderStates(itemIndex: number) {
 }
 
 function ensureItemProviderStates(itemIndex: number) {
-  const key = String(itemIndex)
+  const key = getProviderStateKey(itemIndex)
   if (!providerStates[key]) {
     providerStates[key] = {}
   }
@@ -567,29 +251,65 @@ function getProviderStateKey(itemIndex: number) {
 }
 
 function getItemFieldState(itemIndex: number, rule: NormalizedFormCreateRule) {
-  return rule.field ? getItemControlResult(itemIndex)?.fieldStates[rule.field] : undefined
+  if (!rule.field) {
+    return undefined
+  }
+  const manualState = itemFieldStates[getProviderStateKey(itemIndex)]?.[rule.field]
+  const controlState = getItemControlResult(itemIndex)?.fieldStates[rule.field]
+  if (!manualState && !controlState) {
+    return undefined
+  }
+  return {
+    ...(manualState || {}),
+    ...(controlState || {}),
+  }
 }
 
 let controlCacheRules: NormalizedFormCreateRule[] | undefined
 let rowControlCache = new WeakMap<Record<string, any>, ReturnType<typeof applyControlRules>>()
 
-function getItemControlResult(itemIndex: number) {
-  const rules = baseChildRules.value
+function getItemControlResult(itemIndex: number, rowOverride?: Record<string, any>) {
+  const rules = getItemBaseRules(itemIndex)
+  const hasPatches = hasItemRulePatches(itemIndex)
   if (controlCacheRules !== rules) {
     controlCacheRules = rules
     rowControlCache = new WeakMap<Record<string, any>, ReturnType<typeof applyControlRules>>()
   }
-  const row = rows.value[itemIndex]
+  const row = rowOverride || rows.value[itemIndex]
   if (!row) {
-    return applyControlRules(rules, {})
+    const result = applyControlRules(rules, {})
+    return hasPatches ? { ...result, rules: applyItemRulePatches(itemIndex, result.rules) } : result
   }
-  const cached = rowControlCache.get(row)
+  const cached = !hasPatches && !rowOverride ? rowControlCache.get(row) : undefined
   if (cached) {
     return cached
   }
   const result = applyControlRules(rules, row)
-  rowControlCache.set(row, result)
-  return result
+  const patchedResult = hasPatches ? { ...result, rules: applyItemRulePatches(itemIndex, result.rules) } : result
+  if (!hasPatches && !rowOverride) {
+    rowControlCache.set(row, patchedResult)
+  }
+  return patchedResult
+}
+
+function getItemBaseRules(itemIndex: number) {
+  return applyItemRulePatches(itemIndex, baseChildRules.value)
+}
+
+function applyItemRulePatches(itemIndex: number, rules: NormalizedFormCreateRule[]) {
+  const patches = itemRulePatches[getProviderStateKey(itemIndex)]
+  if (!patches || Object.keys(patches).length === 0) {
+    return rules
+  }
+  return rules.map((rule) => {
+    const patch = patches[rule.__fcId]
+    return patch ? deepMerge<NormalizedFormCreateRule>(rule, patch) : rule
+  })
+}
+
+function hasItemRulePatches(itemIndex: number) {
+  const patches = itemRulePatches[getProviderStateKey(itemIndex)]
+  return !!patches && Object.keys(patches).length > 0
 }
 
 function getRenderRule(rule: NormalizedFormCreateRule, itemIndex: number): NormalizedFormCreateRule {
@@ -610,11 +330,6 @@ function getItemValue(itemIndex: number, field?: string) {
   return rows.value[itemIndex]?.[field]
 }
 
-function getInputNumberValue(itemIndex: number, field?: string) {
-  const value = getItemValue(itemIndex, field)
-  return value === undefined || value === null ? '' : value
-}
-
 function setItemValue(itemIndex: number, field: string | undefined, value: any) {
   if (!field) {
     return
@@ -624,22 +339,213 @@ function setItemValue(itemIndex: number, field: string | undefined, value: any) 
     ...(nextRows[itemIndex] || {}),
     [field]: value,
   }
-  emitValue(nextRows)
-  const rule = getItemRules(itemIndex).find(item => item.field === field)
+  const rule = getItemAllRules(itemIndex, nextRows[itemIndex]).find(item => item.field === field)
   if (rule) {
     handleChildRuleEvent(getRenderRule(rule, itemIndex), 'change', value)
+    runItemRuleUpdates(itemIndex, rule, value, nextRows)
   }
+  emitValue(nextRows)
 }
 
 function handleChildRuleEvent(rule: NormalizedFormCreateRule, eventName: string, ...args: any[]) {
   const handler = getRuleEventHandler(rule, eventName)
-  if (typeof handler !== 'function') {
+  if (typeof handler === 'function') {
+    try {
+      handler(...args, rule, props.api)
+    } catch (error) {
+      console.warn(`[form-create] child rule ${eventName} event failed`, error)
+    }
+  }
+  emit('emit-event', eventName, ...args, rule, props.api)
+  getRuleEmitEvents(rule, eventName, args, props.api).forEach((event) => {
+    emit('rule-emit', event.name, ...event.args)
+  })
+}
+
+function emitChildEvent(name: string, ...args: any[]) {
+  emit('emit-event', name, ...args)
+}
+
+function emitChildRuleEvent(name: string, ...args: any[]) {
+  emit('rule-emit', name, ...args)
+}
+
+function getRuleLinks(rule: NormalizedFormCreateRule) {
+  if (!rule.link) {
+    return []
+  }
+  return Array.isArray(rule.link) ? rule.link : [rule.link]
+}
+
+function isPartialRule(value: unknown): value is Partial<FormCreateRule> {
+  return !!value
+    && typeof value === 'object'
+    && !Array.isArray(value)
+    && typeof (value as { then?: unknown }).then !== 'function'
+}
+
+function runItemRuleUpdates(
+  itemIndex: number,
+  sourceRule: NormalizedFormCreateRule,
+  value: any,
+  nextRows: Record<string, any>[],
+) {
+  if (!sourceRule.field && !sourceRule.name) {
     return
   }
+  const visited = new Set<string>()
+  const queue: ItemRuleUpdateTask[] = [{
+    depth: 0,
+    linkField: sourceRule.field,
+    origin: sourceRule,
+    runSelf: true,
+    sourceFields: [sourceRule.field, sourceRule.name].filter(Boolean) as string[],
+    sourceRule,
+    value,
+  }]
+
+  while (queue.length > 0) {
+    const task = queue.shift()!
+    const changedFields = task.runSelf
+      ? runItemRuleUpdate(itemIndex, task.sourceRule, task.linkField, task.value, task.origin, visited, nextRows)
+      : []
+    const sourceFields = Array.from(new Set([
+      ...task.sourceFields,
+      ...changedFields.map(item => item.field),
+    ]))
+    if (task.depth >= MAX_RULE_UPDATE_DEPTH) {
+      continue
+    }
+    runLinkedItemRuleUpdates(itemIndex, task, sourceFields, visited, queue, nextRows)
+  }
+}
+
+function runLinkedItemRuleUpdates(
+  itemIndex: number,
+  task: ItemRuleUpdateTask,
+  sourceFields: string[],
+  visited: Set<string>,
+  queue: ItemRuleUpdateTask[],
+  nextRows: Record<string, any>[],
+) {
+  getItemAllRules(itemIndex, nextRows[itemIndex]).forEach((rule) => {
+    if (typeof rule.update !== 'function' || visited.has(rule.__fcId)) {
+      return
+    }
+    const matchedField = getRuleLinks(rule).find(link => sourceFields.includes(link))
+    if (!matchedField) {
+      return
+    }
+    const row = nextRows[itemIndex] || {}
+    const nextValue = hasOwn(row, matchedField) ? row[matchedField] : task.value
+    const changedFields = runItemRuleUpdate(itemIndex, rule, matchedField, nextValue, task.origin, visited, nextRows)
+    changedFields.forEach((change) => {
+      queue.push({
+        depth: task.depth + 1,
+        linkField: change.field,
+        origin: task.origin,
+        runSelf: false,
+        sourceFields: [change.field],
+        sourceRule: change.rule,
+        value: change.value,
+      })
+    })
+  })
+}
+
+function runItemRuleUpdate(
+  itemIndex: number,
+  rule: NormalizedFormCreateRule,
+  linkField: string | undefined,
+  value: any,
+  origin: NormalizedFormCreateRule,
+  visited: Set<string>,
+  nextRows: Record<string, any>[],
+): ItemRuleValueChange[] {
+  if (typeof rule.update !== 'function' || visited.has(rule.__fcId)) {
+    return []
+  }
+  visited.add(rule.__fcId)
+  const row = nextRows[itemIndex] || {}
   try {
-    handler(...args, rule, props.api)
+    const result = rule.update(rule.field ? row[rule.field] : value, rule, props.api!, {
+      field: rule.field,
+      formData: { ...row },
+      linkField,
+      origin,
+      value,
+    })
+    if (typeof result === 'boolean') {
+      setItemRuleHidden(itemIndex, rule, result)
+    } else if (isPartialRule(result)) {
+      const previousValue = rule.field ? row[rule.field] : undefined
+      mergeItemRule(itemIndex, rule, result, nextRows)
+      if (rule.field && hasOwn(result, 'value')) {
+        const nextValue = nextRows[itemIndex]?.[rule.field]
+        if (!isSamePlainValue(previousValue, nextValue)) {
+          return [{ field: rule.field, rule, value: nextValue }]
+        }
+      }
+    }
   } catch (error) {
-    console.warn(`[form-create] child rule ${eventName} event failed`, error)
+    console.warn('[form-create] child rule.update failed', error)
+  }
+  return []
+}
+
+function setItemRuleHidden(itemIndex: number, rule: NormalizedFormCreateRule, hidden: boolean) {
+  if (!rule.field) {
+    return
+  }
+  const states = ensureItemFieldStates(itemIndex)
+  states[rule.field] = {
+    ...(states[rule.field] || {}),
+    hidden,
+  }
+}
+
+function mergeItemRule(
+  itemIndex: number,
+  rule: NormalizedFormCreateRule,
+  patch: Partial<FormCreateRule>,
+  nextRows: Record<string, any>[],
+) {
+  const patches = ensureItemRulePatches(itemIndex)
+  patches[rule.__fcId] = {
+    ...deepMerge(patches[rule.__fcId], patch),
+    __fcId: rule.__fcId,
+    __originType: rule.__originType,
+  } as Partial<NormalizedFormCreateRule>
+  if (rule.field && hasOwn(patch, 'value')) {
+    nextRows[itemIndex] = {
+      ...(nextRows[itemIndex] || {}),
+      [rule.field]: patch.value,
+    }
+  }
+  scheduleProviderFetchEffects()
+}
+
+function ensureItemFieldStates(itemIndex: number) {
+  const key = getProviderStateKey(itemIndex)
+  if (!itemFieldStates[key]) {
+    itemFieldStates[key] = {}
+  }
+  return itemFieldStates[key]
+}
+
+function ensureItemRulePatches(itemIndex: number) {
+  const key = getProviderStateKey(itemIndex)
+  if (!itemRulePatches[key]) {
+    itemRulePatches[key] = {}
+  }
+  return itemRulePatches[key]
+}
+
+function isSamePlainValue(left: unknown, right: unknown) {
+  try {
+    return JSON.stringify(left) === JSON.stringify(right)
+  } catch {
+    return false
   }
 }
 
@@ -657,6 +563,8 @@ function removeItem(itemIndex: number) {
   const nextRows = [...rows.value]
   nextRows.splice(itemIndex, 1)
   removeCollapsedRow(itemIndex)
+  removeItemFieldStateRow(itemIndex)
+  removeItemRulePatchRow(itemIndex)
   removeProviderRow(itemIndex)
   emitValue(nextRows)
 }
@@ -669,6 +577,8 @@ function moveItem(fromIndex: number, toIndex: number) {
   const [item] = nextRows.splice(fromIndex, 1)
   nextRows.splice(toIndex, 0, item)
   moveCollapsedRow(fromIndex, toIndex)
+  moveItemFieldStateRow(fromIndex, toIndex)
+  moveItemRulePatchRow(fromIndex, toIndex)
   moveProviderRow(fromIndex, toIndex)
   emitValue(nextRows)
 }
@@ -703,42 +613,82 @@ function moveCollapsedRow(fromIndex: number, toIndex: number) {
   collapsedRows.value = nextCollapsed
 }
 
+function clearItemFieldStates() {
+  Object.keys(itemFieldStates).forEach((key) => {
+    delete itemFieldStates[key]
+  })
+}
+
+function clearItemRulePatches() {
+  Object.keys(itemRulePatches).forEach((key) => {
+    delete itemRulePatches[key]
+  })
+}
+
 function clearProviderStates() {
   Object.keys(providerStates).forEach((key) => {
     delete providerStates[key]
   })
 }
 
+function removeItemFieldStateRow(removeIndex: number) {
+  reindexRowRecord(itemFieldStates, removeIndex)
+}
+
+function removeItemRulePatchRow(removeIndex: number) {
+  reindexRowRecord(itemRulePatches, removeIndex)
+}
+
 function removeProviderRow(removeIndex: number) {
-  const nextStates: Record<string, Record<string, FormCreateProviderState>> = {}
-  Object.entries(providerStates).forEach(([key, value]) => {
+  reindexRowRecord(providerStates, removeIndex)
+}
+
+function moveItemFieldStateRow(fromIndex: number, toIndex: number) {
+  moveRowRecord(itemFieldStates, fromIndex, toIndex)
+}
+
+function moveItemRulePatchRow(fromIndex: number, toIndex: number) {
+  moveRowRecord(itemRulePatches, fromIndex, toIndex)
+}
+
+function moveProviderRow(fromIndex: number, toIndex: number) {
+  moveRowRecord(providerStates, fromIndex, toIndex)
+}
+
+function reindexRowRecord<T>(record: Record<string, T>, removeIndex: number) {
+  const nextRecord: Record<string, T> = {}
+  Object.entries(record).forEach(([key, value]) => {
     const index = Number(key)
     if (!Number.isInteger(index) || index === removeIndex) {
       return
     }
-    nextStates[String(index > removeIndex ? index - 1 : index)] = value
+    nextRecord[String(index > removeIndex ? index - 1 : index)] = value
   })
-  clearProviderStates()
-  Object.assign(providerStates, nextStates)
+  Object.keys(record).forEach((key) => {
+    delete record[key]
+  })
+  Object.assign(record, nextRecord)
 }
 
-function moveProviderRow(fromIndex: number, toIndex: number) {
-  const nextStates: Record<string, Record<string, FormCreateProviderState>> = {}
-  Object.entries(providerStates).forEach(([key, value]) => {
+function moveRowRecord<T>(record: Record<string, T>, fromIndex: number, toIndex: number) {
+  const nextRecord: Record<string, T> = {}
+  Object.entries(record).forEach(([key, value]) => {
     const index = Number(key)
     if (!Number.isInteger(index)) {
       return
     }
     if (index === fromIndex) {
-      nextStates[String(toIndex)] = value
+      nextRecord[String(toIndex)] = value
     } else if (index === toIndex) {
-      nextStates[String(fromIndex)] = value
+      nextRecord[String(fromIndex)] = value
     } else {
-      nextStates[key] = value
+      nextRecord[key] = value
     }
   })
-  clearProviderStates()
-  Object.assign(providerStates, nextStates)
+  Object.keys(record).forEach((key) => {
+    delete record[key]
+  })
+  Object.assign(record, nextRecord)
 }
 
 function emitValue(value: Record<string, any>[]) {
@@ -773,27 +723,6 @@ function getItemTitle(itemIndex: number) {
     return title.replace('{index}', String(itemIndex + 1))
   }
   return `${props.rule.title || '子表单'} ${itemIndex + 1}`
-}
-
-function formatDisplayValue(value: any) {
-  if (Array.isArray(value)) {
-    return value.join('，')
-  }
-  if (value === undefined || value === null || value === '') {
-    return '-'
-  }
-  return String(value)
-}
-
-function getLayoutGapHeight(rule: NormalizedFormCreateRule) {
-  const height = rule.props?.height
-  if (typeof height === 'number') {
-    return `${height}px`
-  }
-  if (typeof height === 'string' && height.trim()) {
-    return height
-  }
-  return '24rpx'
 }
 
 function scheduleProviderFetchEffects() {

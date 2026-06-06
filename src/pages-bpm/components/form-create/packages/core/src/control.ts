@@ -173,7 +173,7 @@ function compareValue(value: any, compare: any, condition: string) {
     case 'notIn':
       return !compareValue(value, compare, 'in')
     case 'between':
-      return Array.isArray(compare) ? value > compare[0] && value < compare[1] : false
+      return Array.isArray(compare) ? value >= compare[0] && value <= compare[1] : false
     case 'notBetween':
       return Array.isArray(compare) ? value < compare[0] || value > compare[1] : false
     case 'empty':

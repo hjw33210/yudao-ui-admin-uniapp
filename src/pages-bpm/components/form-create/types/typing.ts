@@ -174,7 +174,7 @@ export interface FormCreateApi {
   changeStatus: () => boolean
   clearChangeStatus: () => void
   hideForm: (status?: boolean) => void
-  /** 仅序列化 JSON 可表达的规则属性，函数类配置不会被保留。 */
+  /** 导出当前运行期规则快照；函数会序列化为 form-create marker 字符串，可由 parseJson 还原。 */
   toJson: (space?: number) => string | undefined
   resetFields: (fields?: string | string[]) => void
   formData: () => Record<string, any>
