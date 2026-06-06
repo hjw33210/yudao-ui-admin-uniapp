@@ -63,6 +63,8 @@
               :title-width="childTitleWidth"
               :disabled="isChildDisabled(childRule, itemIndex)"
               style=""
+              @clear="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'clear')"
+              @confirm="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'confirm', $event)"
               @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
             />
 
@@ -74,6 +76,8 @@
                 :disabled="isChildDisabled(childRule, itemIndex)"
                 clearable
                 v-bind="getRuleProps(childRule)"
+                @blur="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'blur', $event)"
+                @clear="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'clear')"
                 @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
               />
             </wd-form-item>
@@ -85,6 +89,8 @@
                 :disabled="isChildDisabled(childRule, itemIndex)"
                 clearable
                 v-bind="getRuleProps(childRule)"
+                @blur="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'blur', $event)"
+                @clear="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'clear')"
                 @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
               />
             </wd-form-item>
@@ -160,6 +166,7 @@
               :title-width="childTitleWidth"
               :disabled="isChildDisabled(childRule, itemIndex)"
               style=""
+              @confirm="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'confirm', $event)"
               @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
             />
 
@@ -170,6 +177,7 @@
               :title-width="childTitleWidth"
               :disabled="isChildDisabled(childRule, itemIndex)"
               style=""
+              @confirm="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'confirm', $event)"
               @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
             />
 
@@ -190,6 +198,7 @@
               :title-width="childTitleWidth"
               :disabled="isChildDisabled(childRule, itemIndex)"
               style=""
+              @confirm="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'confirm', $event)"
               @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
             />
 
@@ -239,6 +248,7 @@
               :title-width="childTitleWidth"
               :disabled="isChildDisabled(childRule, itemIndex)"
               style=""
+              @confirm="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'confirm', $event)"
               @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
             />
 
@@ -249,6 +259,7 @@
               :title-width="childTitleWidth"
               :disabled="isChildDisabled(childRule, itemIndex)"
               style=""
+              @confirm="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'confirm', $event)"
               @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
             />
 
@@ -278,6 +289,9 @@
               :title-width="childTitleWidth"
               :disabled="isChildDisabled(childRule, itemIndex)"
               style=""
+              @fail="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'fail', $event)"
+              @remove="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'remove', $event)"
+              @success="handleChildRuleEvent(getRenderRule(childRule, itemIndex), 'success', $event)"
               @update:model-value="setItemValue(itemIndex, childRule.field, $event)"
             />
 
@@ -341,11 +355,11 @@ import type { FormCreateProviderContext, FormCreateProviderState } from '../../.
 import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue'
 import { applyControlRules, applyRuleProviders, getDefaultValue, isRuleDisabled, isRuleHidden, normalizeSubFormRules, resolveRuleFetchEffects } from '../../../core/src'
 import {
-  INTERNAL_LAYOUT_TITLE_TYPE,
   getInputType,
   getPlaceholder,
   getRuleEventHandler,
   getRuleProps,
+  INTERNAL_LAYOUT_TITLE_TYPE,
   isAlertType,
   isApiSelectType,
   isAreaSelectType,

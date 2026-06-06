@@ -157,13 +157,13 @@ export async function fetchProviderData(option: string | FormCreateFetchOption, 
   const body = await (context.option?.fetch
     ? context.option.fetch({ ...normalized, action, data, method, query }, { api: context.api, rule })
     : http<any>({
-      data,
-      header: normalized.header || normalized.headers,
-      hideErrorToast: true,
-      method: method as UniApp.RequestOptions['method'],
-      query,
-      url: action,
-    }))
+        data,
+        header: normalized.header || normalized.headers,
+        hideErrorToast: true,
+        method: method as UniApp.RequestOptions['method'],
+        query,
+        url: action,
+      }))
   return parseFetchBody(body, normalized, rule, context)
 }
 

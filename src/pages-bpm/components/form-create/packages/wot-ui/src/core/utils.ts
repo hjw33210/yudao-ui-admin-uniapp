@@ -188,6 +188,7 @@ export function getTitleWidth(option: FormCreateOption) {
 
 export function getRuleProps(rule: NormalizedFormCreateRule) {
   const props = { ...(rule.props || {}) }
+  delete props.disabled
   delete props.modelValue
   delete props.on
   delete props.onChange

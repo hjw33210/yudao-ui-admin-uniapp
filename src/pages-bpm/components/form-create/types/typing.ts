@@ -85,6 +85,8 @@ export interface FormCreateRule {
   $required?: boolean | string | FormCreateValidateRule
   hidden?: boolean
   display?: boolean
+  emit?: Array<string | { emitPrefix?: string, inject?: boolean, name: string, prefix?: string }>
+  emitPrefix?: string
   info?: string
   name?: string
   className?: string

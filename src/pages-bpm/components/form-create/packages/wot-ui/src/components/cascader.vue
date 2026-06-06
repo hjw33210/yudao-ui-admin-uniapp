@@ -43,6 +43,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [value: any]
   'change': [value: any]
+  'confirm': [value: any]
 }>()
 
 const visible = ref(false)
@@ -71,6 +72,7 @@ function handleConfirm({ value, selectedOptions }: { value: any, selectedOptions
 
   emit('update:modelValue', nextValue)
   emit('change', nextValue)
+  emit('confirm', nextValue)
 }
 
 function getSourceOptions() {

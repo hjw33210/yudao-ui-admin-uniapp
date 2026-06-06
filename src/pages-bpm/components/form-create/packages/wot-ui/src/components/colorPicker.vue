@@ -36,6 +36,18 @@ defineOptions({
   name: 'FcColorPicker',
 })
 
+const props = defineProps<{
+  disabled?: boolean
+  modelValue?: any
+  rule: NormalizedFormCreateRule
+  titleWidth?: string | number
+}>()
+
+const emit = defineEmits<{
+  'update:modelValue': [value: any]
+  'change': [value: any]
+}>()
+
 const DEFAULT_COLORS = [
   '#f5222d',
   '#fa8c16',
@@ -48,18 +60,6 @@ const DEFAULT_COLORS = [
   '#000000',
   '#ffffff',
 ]
-
-const props = defineProps<{
-  disabled?: boolean
-  modelValue?: any
-  rule: NormalizedFormCreateRule
-  titleWidth?: string | number
-}>()
-
-const emit = defineEmits<{
-  'update:modelValue': [value: any]
-  'change': [value: any]
-}>()
 
 const inputValue = computed(() => props.modelValue === undefined || props.modelValue === null ? '' : String(props.modelValue))
 const placeholder = computed(() => getPlaceholder(props.rule))

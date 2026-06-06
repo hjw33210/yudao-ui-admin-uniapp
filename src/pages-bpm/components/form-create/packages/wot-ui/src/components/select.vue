@@ -61,6 +61,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [value: any]
   'change': [value: any]
+  'confirm': [value: any]
 }>()
 
 const visible = ref(false)
@@ -98,6 +99,7 @@ function handleConfirm({ value }: { value: any[] }) {
   const nextValue = value?.[0]
   emit('update:modelValue', nextValue)
   emit('change', nextValue)
+  emit('confirm', nextValue)
 }
 
 function handleMultipleChange({ value }: { value: any[] }) {

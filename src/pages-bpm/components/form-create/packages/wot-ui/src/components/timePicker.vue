@@ -34,12 +34,13 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [value: any]
   'change': [value: any]
+  'confirm': [value: any]
 }>()
 
 const visible = ref(false)
 const placeholder = computed(() => getPlaceholder(props.rule, '请选择'))
-const pickerValue = computed(() => props.modelValue || '09:00')
-const displayValue = computed(() => props.modelValue ? String(props.modelValue) : '')
+const pickerValue = computed(() => normalizeTimeValue(props.modelValue) || props.rule.props?.defaultValue || '09:00')
+const displayValue = computed(() => normalizeTimeValue(props.modelValue))
 
 function open() {
   if (!props.disabled) {
@@ -48,7 +49,19 @@ function open() {
 }
 
 function handleConfirm({ value }: { value: any }) {
-  emit('update:modelValue', value)
-  emit('change', value)
+  const nextValue = normalizeTimeValue(value)
+  emit('update:modelValue', nextValue)
+  emit('change', nextValue)
+  emit('confirm', nextValue)
+}
+
+function normalizeTimeValue(value: any) {
+  if (value === undefined || value === null || value === '') {
+    return ''
+  }
+  if (value instanceof Date) {
+    return value.toTimeString().slice(0, props.rule.props?.showSecond ? 8 : 5)
+  }
+  return String(value)
 }
 </script>

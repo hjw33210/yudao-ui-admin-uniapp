@@ -32,76 +32,76 @@
       custom-style="height: 78vh; overflow: hidden;"
     >
       <view class="fc-dept-select">
-      <view class="fc-dept-select__header">
-        <wd-button size="small" variant="plain" @click="clearMultiValue">
-          清空
-        </wd-button>
-        <text class="fc-dept-select__title">{{ rule.title || '选择部门' }}</text>
-        <wd-icon name="close" size="20px" color="#666" @click="multiVisible = false" />
-      </view>
-
-      <wd-search
-        v-model="keyword"
-        :placeholder="rule.props?.filterPlaceholder || '搜索部门'"
-        hide-cancel
-        placeholder-left
-        custom-class="fc-dept-select__search"
-      />
-
-      <view v-if="!keyword.trim()" class="fc-dept-select__breadcrumb">
-        <text
-          v-for="(item, index) in breadcrumbs"
-          :key="index"
-          class="fc-dept-select__breadcrumb-item"
-          @click="activeDept = item.option"
-        >
-          {{ item.name }}
-        </text>
-      </view>
-
-      <scroll-view scroll-y class="fc-dept-select__body">
-        <view v-if="loading" class="fc-dept-select__empty">
-          加载中...
+        <view class="fc-dept-select__header">
+          <wd-button size="small" variant="plain" @click="clearMultiValue">
+            清空
+          </wd-button>
+          <text class="fc-dept-select__title">{{ rule.title || '选择部门' }}</text>
+          <wd-icon name="close" size="20px" color="#666" @click="multiVisible = false" />
         </view>
-        <view v-else-if="visibleDeptOptions.length === 0" class="fc-dept-select__empty">
-          暂无部门
-        </view>
-        <template v-else>
-          <view
-            v-for="option in visibleDeptOptions"
-            :key="String(option.value)"
-            class="fc-dept-select__item"
-            :class="{ 'is-selected': isDeptSelected(option), 'is-disabled': option.disabled }"
+
+        <wd-search
+          v-model="keyword"
+          :placeholder="rule.props?.filterPlaceholder || '搜索部门'"
+          hide-cancel
+          placeholder-left
+          custom-class="fc-dept-select__search"
+        />
+
+        <view v-if="!keyword.trim()" class="fc-dept-select__breadcrumb">
+          <text
+            v-for="(item, index) in breadcrumbs"
+            :key="index"
+            class="fc-dept-select__breadcrumb-item"
+            @click="activeDept = item.option"
           >
-            <view class="fc-dept-select__item-main" @click="toggleDept(option)">
-              <view class="fc-dept-select__check">
-                <wd-icon v-if="isDeptSelected(option)" name="check" size="14px" color="#fff" />
-              </view>
-              <view class="fc-dept-select__text">
-                <text class="fc-dept-select__name">{{ option.name }}</text>
-                <text v-if="keyword.trim() && option.path" class="fc-dept-select__path">
-                  {{ option.path }}
-                </text>
-              </view>
-            </view>
-            <view
-              v-if="!keyword.trim() && hasChildren(option)"
-              class="fc-dept-select__children"
-              @click.stop="activeDept = option"
-            >
-              <text>下级</text>
-              <wd-icon name="arrow-right" size="14px" color="#999" />
-            </view>
-          </view>
-        </template>
-      </scroll-view>
+            {{ item.name }}
+          </text>
+        </view>
 
-      <view class="fc-dept-select__footer">
-        <text class="fc-dept-select__count">已选 {{ multiValue.length }} 个部门</text>
-        <wd-button size="small" type="primary" @click="handleMultiConfirm">
-          确定
-        </wd-button>
-      </view>
+        <scroll-view scroll-y class="fc-dept-select__body">
+          <view v-if="loading" class="fc-dept-select__empty">
+            加载中...
+          </view>
+          <view v-else-if="visibleDeptOptions.length === 0" class="fc-dept-select__empty">
+            暂无部门
+          </view>
+          <template v-else>
+            <view
+              v-for="option in visibleDeptOptions"
+              :key="String(option.value)"
+              class="fc-dept-select__item"
+              :class="{ 'is-selected': isDeptSelected(option), 'is-disabled': option.disabled }"
+            >
+              <view class="fc-dept-select__item-main" @click="toggleDept(option)">
+                <view class="fc-dept-select__check">
+                  <wd-icon v-if="isDeptSelected(option)" name="check" size="14px" color="#fff" />
+                </view>
+                <view class="fc-dept-select__text">
+                  <text class="fc-dept-select__name">{{ option.name }}</text>
+                  <text v-if="keyword.trim() && option.path" class="fc-dept-select__path">
+                    {{ option.path }}
+                  </text>
+                </view>
+              </view>
+              <view
+                v-if="!keyword.trim() && hasChildren(option)"
+                class="fc-dept-select__children"
+                @click.stop="activeDept = option"
+              >
+                <text>下级</text>
+                <wd-icon name="arrow-right" size="14px" color="#999" />
+              </view>
+            </view>
+          </template>
+        </scroll-view>
+
+        <view class="fc-dept-select__footer">
+          <text class="fc-dept-select__count">已选 {{ multiValue.length }} 个部门</text>
+          <wd-button size="small" type="primary" @click="handleMultiConfirm">
+            确定
+          </wd-button>
+        </view>
       </view>
     </wd-popup>
   </view>

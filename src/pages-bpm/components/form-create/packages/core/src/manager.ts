@@ -5,7 +5,8 @@ import type { ParseSubFormRules } from './subForm'
 import { applyControlRules } from './control'
 import { getValidateRules } from './provider'
 import { isSubFormRule, normalizeSubFormRules } from './subForm'
-import { isEmptyValue, isRuleHidden } from './utils'
+import { isRuleHidden } from './utils'
+import { validateFormCreateRule } from './validate'
 
 export function createFormSchema(
   rules: () => NormalizedFormCreateRule[],
@@ -26,26 +27,10 @@ export function createFormSchema(
           continue
         }
         for (const validateRule of getValidateRules(rule, fieldStates[rule.field], providerContext)) {
-          if (validateRule.required && isEmptyValue(value)) {
-            issues.push(createIssue(rule.field, validateRule.message || `${rule.title || '该字段'}不能为空`))
+          const message = await validateFormCreateRule(value, validateRule, rule, providerContext?.api)
+          if (message) {
+            issues.push(createIssue(rule.field, message))
             break
-          }
-          if (isEmptyValue(value)) {
-            continue
-          }
-          if (validateRule.pattern) {
-            const pattern = typeof validateRule.pattern === 'string' ? new RegExp(validateRule.pattern) : validateRule.pattern
-            if (!pattern.test(String(value))) {
-              issues.push(createIssue(rule.field, validateRule.message || `${rule.title || '该字段'}格式不正确`))
-              break
-            }
-          }
-          if (validateRule.validator) {
-            const result = await validateRule.validator(value, rule, providerContext?.api)
-            if (result === false || typeof result === 'string') {
-              issues.push(createIssue(rule.field, typeof result === 'string' ? result : validateRule.message || `${rule.title || '该字段'}校验失败`))
-              break
-            }
           }
         }
       }
@@ -105,26 +90,10 @@ async function validateSubFormRule(
         ...providerContext,
         formData: row || {},
       })) {
-        if (validateRule.required && isEmptyValue(childValue)) {
-          issues.push(createIssue(childPath, validateRule.message || `${childRule.title || '该字段'}不能为空`))
+        const message = await validateFormCreateRule(childValue, validateRule, childRule, providerContext?.api)
+        if (message) {
+          issues.push(createIssue(childPath, message))
           break
-        }
-        if (isEmptyValue(childValue)) {
-          continue
-        }
-        if (validateRule.pattern) {
-          const pattern = typeof validateRule.pattern === 'string' ? new RegExp(validateRule.pattern) : validateRule.pattern
-          if (!pattern.test(String(childValue))) {
-            issues.push(createIssue(childPath, validateRule.message || `${childRule.title || '该字段'}格式不正确`))
-            break
-          }
-        }
-        if (validateRule.validator) {
-          const result = await validateRule.validator(childValue, childRule, providerContext?.api)
-          if (result === false || typeof result === 'string') {
-            issues.push(createIssue(childPath, typeof result === 'string' ? result : validateRule.message || `${childRule.title || '该字段'}校验失败`))
-            break
-          }
         }
       }
     }

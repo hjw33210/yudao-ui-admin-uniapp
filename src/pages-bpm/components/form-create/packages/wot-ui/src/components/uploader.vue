@@ -12,15 +12,19 @@
       :auto-upload="true"
       :upload-method="uploadMethod"
       @change="handleFileChange"
-      @remove="handleFileChange"
+      @fail="handleFail"
+      @remove="handleRemove"
+      @success="handleSuccess"
     />
   </wd-form-item>
 </template>
 
 <script lang="ts" setup>
-import type { UploadFileItem, UploadFileType } from '@wot-ui/ui/components/wd-upload/types'
+import type { UploadFileItem, UploadFileType, UploadMethod } from '@wot-ui/ui/components/wd-upload/types'
 import type { NormalizedFormCreateRule } from '../../../../types/typing'
 import { computed } from 'vue'
+import { uploadFile as uploadFileToServer } from '@/api/infra/file'
+import { hasOwn } from '../../../utils/src'
 
 const props = defineProps<{
   disabled?: boolean
@@ -32,6 +36,9 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [value: any]
   'change': [value: any]
+  'fail': [event: any]
+  'remove': [event: any]
+  'success': [event: any]
 }>()
 
 const IMAGE_UPLOAD_TYPES = new Set(['ImageUpload', 'ImagesUpload', 'UploadImg', 'UploadImgs', 'uploadImage', 'uploadImages'])
@@ -75,7 +82,7 @@ const maxSize = computed(() => {
 })
 const action = computed(() => props.rule.props?.action || '/infra/file/upload')
 const fileList = computed(() => normalizeFileList(props.modelValue))
-const uploadMethod = computed(() => props.rule.props?.uploadMethod)
+const uploadMethod = computed<UploadMethod>(() => props.rule.props?.uploadMethod || defaultUploadMethod)
 
 function normalizeFileList(value: any): UploadFileItem[] {
   const list = Array.isArray(value)
@@ -105,6 +112,43 @@ function normalizeFileList(value: any): UploadFileItem[] {
 
 function handleFileChange(event: { fileList?: UploadFileItem[] }) {
   emitValue(event.fileList || fileList.value)
+}
+
+function handleSuccess(event: any) {
+  emit('success', event)
+}
+
+function handleFail(event: any) {
+  emit('fail', event)
+}
+
+function handleRemove(event: any) {
+  emit('remove', event)
+}
+
+function defaultUploadMethod(file: UploadFileItem, formData: Record<string, any>, options: Parameters<UploadMethod>[2]) {
+  const filePath = file.url || (file as any).path
+  if (!filePath) {
+    options.onError({ errMsg: '上传文件路径为空' } as UniApp.GeneralCallbackResult, file, formData)
+    return
+  }
+
+  return uploadFileToServer(filePath, props.rule.props?.directory || props.rule.props?.uploadDirectory)
+    .then((url) => {
+      options.onSuccess({
+        data: JSON.stringify({ code: 0, data: url }),
+        errMsg: 'uploadFile:ok',
+        statusCode: 200,
+      } as UniApp.UploadFileSuccessCallbackResult, file, formData)
+    })
+    .catch((error) => {
+      const message = getErrorMessage(error)
+      uni.showToast({
+        icon: 'none',
+        title: message,
+      })
+      options.onError({ errMsg: message } as UniApp.GeneralCallbackResult, file, formData)
+    })
 }
 
 function emitValue(nextFileList: UploadFileItem[]) {
@@ -175,14 +219,26 @@ function getUploadedUrl(item: UploadFileItem) {
   if (typeof response === 'string') {
     return response
   }
-  const data = response?.data
+  if (hasOwn(response, 'code')) {
+    if (response.code === 0) {
+      return extractUploadedUrl(response.data) || response.url
+    }
+    uni.showToast({
+      icon: 'none',
+      title: response.msg || response.message || '上传失败',
+    })
+    return undefined
+  }
+  return extractUploadedUrl(response?.data) || response?.url || item.url
+}
+
+function extractUploadedUrl(data: any) {
   if (typeof data === 'string') {
     return data
   }
   if (data && typeof data === 'object') {
     return data.url || data.fileUrl || data.path
   }
-  return response?.url || item.url
 }
 
 function parseResponse(response?: string | Record<string, any>) {
@@ -197,5 +253,9 @@ function parseResponse(response?: string | Record<string, any>) {
   } catch {
     return response
   }
+}
+
+function getErrorMessage(error: any) {
+  return error?.message || error?.errMsg || '上传失败'
 }
 </script>

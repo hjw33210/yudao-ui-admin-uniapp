@@ -35,24 +35,20 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [value: any]
   'change': [value: any]
+  'confirm': [value: any]
 }>()
 
 const visible = ref(false)
 const placeholder = computed(() => getPlaceholder(props.rule, '请选择'))
 const pickerType = computed(() => props.rule.props?.type || 'date')
-const pickerValue = computed(() => props.modelValue === undefined || props.modelValue === null || props.modelValue === '' ? Date.now() : props.modelValue)
+const valueFormat = computed(() => props.rule.props?.valueFormat || props.rule.props?.format)
+const pickerValue = computed(() => normalizePickerValue(props.modelValue) ?? Date.now())
 const displayValue = computed(() => {
-  if (props.modelValue === undefined || props.modelValue === null || props.modelValue === '') {
+  const value = normalizePickerValue(props.modelValue)
+  if (value === undefined) {
     return ''
   }
-  const format = pickerType.value === 'datetime'
-    ? 'YYYY-MM-DD HH:mm'
-    : pickerType.value === 'year-month'
-      ? 'YYYY-MM'
-      : pickerType.value === 'year'
-        ? 'YYYY'
-        : 'YYYY-MM-DD'
-  return dayjs(props.modelValue).isValid() ? dayjs(props.modelValue).format(format) : String(props.modelValue)
+  return dayjs(value).format(getDefaultFormat())
 })
 
 function open() {
@@ -62,7 +58,70 @@ function open() {
 }
 
 function handleConfirm({ value }: { value: any }) {
-  emit('update:modelValue', value)
-  emit('change', value)
+  const nextValue = formatSubmitValue(value)
+  emit('update:modelValue', nextValue)
+  emit('change', nextValue)
+  emit('confirm', nextValue)
+}
+
+function normalizePickerValue(value: any): number | undefined {
+  if (value === undefined || value === null || value === '') {
+    return undefined
+  }
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return normalizeNumericTimestamp(value)
+  }
+  if (value instanceof Date) {
+    return value.getTime()
+  }
+  const parsedNumber = Number(value)
+  if (Number.isFinite(parsedNumber) && String(value).trim() !== '') {
+    return normalizeNumericTimestamp(parsedNumber)
+  }
+  const parsedDate = dayjs(value)
+  return parsedDate.isValid() ? parsedDate.valueOf() : undefined
+}
+
+function normalizeNumericTimestamp(value: number) {
+  if (valueFormat.value === 'X') {
+    return value * 1000
+  }
+  if (valueFormat.value === 'x' || valueFormat.value === 'timestamp' || valueFormat.value === 'number') {
+    return value
+  }
+  return value < 10000000000 ? value * 1000 : value
+}
+
+function formatSubmitValue(value: any) {
+  if (value === undefined || value === null || value === '') {
+    return undefined
+  }
+  const timestamp = normalizePickerValue(value)
+  if (timestamp === undefined) {
+    return value
+  }
+  if (valueFormat.value === 'timestamp' || valueFormat.value === 'number' || valueFormat.value === 'x') {
+    return timestamp
+  }
+  if (valueFormat.value === 'X') {
+    return Math.floor(timestamp / 1000)
+  }
+  if (typeof valueFormat.value === 'string' && valueFormat.value.trim()) {
+    return dayjs(timestamp).format(valueFormat.value)
+  }
+  return dayjs(timestamp).format(getDefaultFormat())
+}
+
+function getDefaultFormat() {
+  if (pickerType.value === 'datetime') {
+    return props.rule.props?.hideSecond ? 'YYYY-MM-DD HH:mm' : 'YYYY-MM-DD HH:mm:ss'
+  }
+  if (pickerType.value === 'year-month') {
+    return 'YYYY-MM'
+  }
+  if (pickerType.value === 'year') {
+    return 'YYYY'
+  }
+  return 'YYYY-MM-DD'
 }
 </script>

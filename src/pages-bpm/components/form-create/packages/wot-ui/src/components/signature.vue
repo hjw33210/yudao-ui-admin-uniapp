@@ -60,6 +60,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [value: any]
   'change': [value: any]
+  'clear': []
+  'confirm': [value: any]
 }>()
 
 const uploading = ref(false)
@@ -104,6 +106,7 @@ async function handleConfirm(result: SignatureResult) {
       ? await uploadFileFromPath(result.tempFilePath, uploadDirectory.value, uploadMimeType.value)
       : result.tempFilePath
     emitValue(value)
+    emit('confirm', value)
   } catch (error) {
     console.error('签名上传失败:', error)
     uni.showToast({
@@ -117,6 +120,7 @@ async function handleConfirm(result: SignatureResult) {
 
 function handleClear() {
   emitValue('')
+  emit('clear')
 }
 
 function emitValue(value: string) {
