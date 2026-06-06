@@ -61,7 +61,7 @@ definePage({
 })
 
 const toast = useToast()
-const formData = ref<SmsLog>()
+const formData = ref<SmsLog>() // 详情数据
 
 /** 返回上一页 */
 function handleBack() {

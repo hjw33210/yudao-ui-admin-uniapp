@@ -67,7 +67,7 @@ definePage({
 })
 
 const toast = useToast()
-const formData = ref<SocialUser>()
+const formData = ref<SocialUser>() // 详情数据
 
 /** 返回上一页 */
 function handleBack() {

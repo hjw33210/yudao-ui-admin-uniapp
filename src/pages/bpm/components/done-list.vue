@@ -60,15 +60,15 @@ import { formatDateTime } from '@/utils/date'
 import DoneSearchForm from './done-search-form.vue'
 import '../styles/index.scss'
 
-const total = ref(0)
-const list = ref<Task[]>([])
-const loadMoreState = ref<LoadMoreState>('loading')
+const total = ref(0) // 列表总数
+const list = ref<Task[]>([]) // 列表数据
+const loadMoreState = ref<LoadMoreState>('loading') // 分页加载状态
 const queryParams = ref({
   pageNo: 1,
   pageSize: 10,
-})
+}) // 查询参数
 
-/** 查询列表 */
+/** 查询已办任务列表 */
 async function getList() {
   loadMoreState.value = 'loading'
   try {

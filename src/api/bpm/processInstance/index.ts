@@ -1,4 +1,5 @@
 import type { Task } from '@/api/bpm/task'
+import type { ProcessDefinition } from '@/api/bpm/definition'
 import type { PageParam, PageResult } from '@/http/types'
 import type {
   BpmCandidateStrategyEnum,
@@ -12,21 +13,7 @@ export interface User {
   avatar?: string
   deptName?: string
 }
-
-/** 流程定义 */
-export interface ProcessDefinition {
-  id: string
-  key: string
-  name: string
-  description?: string
-  icon?: string
-  category: string
-  formType?: number
-  formId?: number
-  formCustomCreatePath?: string
-  formCustomViewPath?: string
-  suspensionState: number
-}
+export type { ProcessDefinition } from '@/api/bpm/definition'
 
 /** 流程实例 */
 export interface ProcessInstance {
@@ -40,6 +27,7 @@ export interface ProcessInstance {
   endTime?: number
   startUser?: User
   businessKey?: string
+  formVariables?: Record<string, any>
   processDefinition?: ProcessDefinition
   summary?: {
     key: string
@@ -53,6 +41,8 @@ export interface ApprovalDetail {
   processDefinition: ProcessDefinition
   activityNodes: ApprovalNodeInfo[]
   todoTask: Task
+  formFieldsPermission?: Record<string, string>
+  status?: number
 }
 
 /** 审批详情的节点信息 */
@@ -116,6 +106,7 @@ export function getApprovalDetail(params: { processDefinitionId?: string, proces
 export function createProcessInstance(data: {
   processDefinitionId: string
   variables: Record<string, any>
+  startUserSelectAssignees?: Record<string, number[]>
 }) {
   return http.post<string>('/bpm/process-instance/create', data)
 }
@@ -136,6 +127,6 @@ export function cancelProcessInstanceByAdmin(id: string, reason: string) {
 }
 
 /** 获取下一个节点审批人 */
-export function getNextApproveNodes(params) {
+export function getNextApproveNodes(params: { processInstanceId?: string, taskId?: string, processVariablesStr?: string }) {
   return http.get<ApprovalNodeInfo[]>('/bpm/process-instance/get-next-approval-nodes', params)
 }

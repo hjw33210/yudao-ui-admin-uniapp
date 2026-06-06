@@ -132,7 +132,7 @@ definePage({
 
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑字典数据' : '新增字典数据')
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const formData = ref<DictData>({
   id: undefined,
   dictType: props.dictType || '',
@@ -143,7 +143,7 @@ const formData = ref<DictData>({
   colorType: '',
   cssClass: '',
   remark: '',
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   dictType: [{ required: true, message: '字典类型不能为空' }],
   label: [{ required: true, message: '数据标签不能为空' }],
@@ -151,7 +151,7 @@ const formSchema = createFormSchema({
   sort: [{ required: true, message: '显示排序不能为空' }],
   status: [{ required: true, message: '状态不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 const pickerVisible = ref<Record<string, boolean>>({})
 
 /** 字典类型选项 */

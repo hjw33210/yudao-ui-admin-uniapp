@@ -93,11 +93,11 @@ const emit = defineEmits<{
   readAll: []
 }>()
 
-const visible = ref(false)
+const visible = ref(false) // 搜索弹窗显示状态
 const formData = reactive({
   readStatus: -1 as -1 | boolean, // -1 表示全部, true 已读, false 未读
   createTime: [undefined, undefined] as [number | undefined, number | undefined],
-})
+}) // 搜索表单数据
 
 /** 搜索条件 placeholder 拼接 */
 const placeholder = computed(() => {
@@ -118,17 +118,16 @@ function handleReadAll() {
   emit('readAll')
 }
 
-// 时间选择器状态
-const visibleCreateTime = ref<[boolean, boolean]>([false, false])
-const tempCreateTime = ref<[number, number]>([Date.now(), Date.now()])
+const visibleCreateTime = ref<[boolean, boolean]>([false, false]) // 创建时间选择器状态
+const tempCreateTime = ref<[number, number]>([Date.now(), Date.now()]) // 创建时间临时值
 
-/** 创建时间[0]确认 */
+/** 确认创建时间开始日期 */
 function handleCreateTime0Confirm() {
   formData.createTime = [tempCreateTime.value[0], formData.createTime?.[1]]
   visibleCreateTime.value[0] = false
 }
 
-/** 创建时间[1]确认 */
+/** 确认创建时间结束日期 */
 function handleCreateTime1Confirm() {
   formData.createTime = [formData.createTime?.[0], tempCreateTime.value[1]]
   visibleCreateTime.value[1] = false

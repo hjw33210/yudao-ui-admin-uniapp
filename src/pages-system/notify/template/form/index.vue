@@ -115,7 +115,7 @@ definePage({
 
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑站内信模板' : '新增站内信模板')
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const formData = ref<NotifyTemplate>({
   id: undefined,
   name: '',
@@ -125,7 +125,7 @@ const formData = ref<NotifyTemplate>({
   type: undefined,
   status: CommonStatusEnum.ENABLE,
   remark: '',
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   name: [{ required: true, message: '模板名称不能为空' }],
   code: [{ required: true, message: '模板编码不能为空' }],
@@ -134,7 +134,7 @@ const formSchema = createFormSchema({
   status: [{ required: true, message: '状态不能为空' }],
   content: [{ required: true, message: '模板内容不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 const pickerVisible = ref<Record<string, boolean>>({})
 
 /** 模板类型选项 */

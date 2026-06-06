@@ -55,13 +55,13 @@ import { DICT_TYPE } from '@/utils/constants'
 import { formatDateTime } from '@/utils/date'
 import LogSearchForm from './log-search-form.vue'
 
-const total = ref(0)
-const list = ref<MailLog[]>([])
-const loadMoreState = ref<LoadMoreState>('loading')
+const total = ref(0) // 列表总数
+const list = ref<MailLog[]>([]) // 列表数据
+const loadMoreState = ref<LoadMoreState>('loading') // 分页加载状态
 const queryParams = ref({
   pageNo: 1,
   pageSize: 10,
-})
+}) // 查询参数
 
 /** 格式化邮件列表 */
 function formatMails(mails?: string[]) {
@@ -85,7 +85,7 @@ async function getList() {
   }
 }
 
-/** 搜索按钮操作 */
+/** 搜索 */
 function handleQuery(data?: Record<string, any>) {
   queryParams.value = {
     ...data,
@@ -96,7 +96,7 @@ function handleQuery(data?: Record<string, any>) {
   getList()
 }
 
-/** 重置按钮操作 */
+/** 重置 */
 function handleReset() {
   handleQuery()
 }

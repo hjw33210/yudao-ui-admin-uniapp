@@ -92,7 +92,7 @@ definePage({
   },
 })
 
-const loading = ref(false)
+const loading = ref(false) // 列表加载状态
 const deptList = ref<Dept[]>([]) // 完整部门列表（树形结构）
 const userList = ref<User[]>([]) // 用户列表
 const toast = useToast()

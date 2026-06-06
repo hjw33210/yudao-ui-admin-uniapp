@@ -2,7 +2,7 @@
   <view class="yd-page-container">
     <!-- 顶部导航栏 -->
     <wd-navbar
-      title="加签任务"
+      title="抄送任务"
       left-arrow placeholder safe-area-inset-top fixed
       @click-left="handleBack"
     />
@@ -11,20 +11,20 @@
     <view class="p-24rpx">
       <wd-form ref="formRef" :model="formData" :schema="formSchema">
         <wd-cell-group border>
-          <!-- 加签处理人 -->
+          <!-- 抄送人 -->
           <UserPicker
-            v-model="formData.userIds"
-            prop="userIds"
+            v-model="formData.copyUserIds"
+            prop="copyUserIds"
             type="checkbox"
-            label="加签处理人："
-            label-width="200rpx"
-            placeholder="请选择加签处理人"
+            label="抄送人："
+            label-width="180rpx"
+            placeholder="请选择抄送人"
           />
-          <!-- 审批意见 -->
-          <wd-form-item prop="reason" title="审批意见：" title-width="200rpx">
+          <!-- 抄送意见 -->
+          <wd-form-item prop="reason" title="抄送意见：" title-width="180rpx">
             <wd-textarea
               v-model="formData.reason"
-              placeholder="请输入审批意见"
+              placeholder="请输入抄送意见"
               :maxlength="500"
               show-word-limit
               clearable
@@ -32,25 +32,15 @@
           </wd-form-item>
         </wd-cell-group>
         <!-- 提交按钮 -->
-        <view class="mt-48rpx flex gap-16rpx">
+        <view class="mt-48rpx">
           <wd-button
             type="primary"
-            class="flex-1"
-            variant="plain"
+            block
             :loading="formLoading"
             :disabled="formLoading"
-            @click="handleSubmit('before')"
+            @click="handleSubmit"
           >
-            向前加签
-          </wd-button>
-          <wd-button
-            type="primary"
-            class="flex-1"
-            :loading="formLoading"
-            :disabled="formLoading"
-            @click="handleSubmit('after')"
-          >
-            向后加签
+            抄送
           </wd-button>
         </view>
       </wd-form>
@@ -62,7 +52,7 @@
 import type { FormInstance } from '@wot-ui/ui/components/wd-form/types'
 import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { computed, reactive, ref } from 'vue'
-import { signCreateTask } from '@/api/bpm/task'
+import { copyTask } from '@/api/bpm/task'
 import UserPicker from '@/components/system-select/user-picker.vue'
 import { navigateBackPlus } from '@/utils'
 import { createFormSchema } from '@/utils/wot'
@@ -82,14 +72,13 @@ definePage({
 const taskId = computed(() => props.taskId)
 const processInstanceId = computed(() => props.processInstanceId)
 const toast = useToast()
-const formLoading = ref(false) // 加签提交状态
+const formLoading = ref(false) // 抄送提交状态
 const formData = reactive({
-  userIds: [] as number[],
+  copyUserIds: [] as number[],
   reason: '',
 }) // 表单数据
 const formSchema = createFormSchema({
-  userIds: [{ required: true, message: '加签处理人不能为空' }],
-  reason: [{ required: true, message: '审批意见不能为空' }],
+  copyUserIds: [{ required: true, message: '抄送人不能为空' }],
 })
 const formRef = ref<FormInstance>() // 表单组件引用
 
@@ -99,7 +88,7 @@ function handleBack() {
 }
 
 /** 提交表单 */
-async function handleSubmit(type: 'before' | 'after') {
+async function handleSubmit() {
   if (formLoading.value) {
     return
   }
@@ -107,16 +96,15 @@ async function handleSubmit(type: 'before' | 'after') {
   if (!valid) {
     return
   }
+
   formLoading.value = true
   try {
-    await signCreateTask({
+    await copyTask({
       id: taskId.value as string,
-      type,
-      userIds: formData.userIds,
+      copyUserIds: formData.copyUserIds,
       reason: formData.reason,
     })
-    const actionText = type === 'before' ? '向前加签' : '向后加签'
-    toast.success(`${actionText}成功`)
+    toast.success('抄送成功')
     setTimeout(() => {
       uni.redirectTo({
         url: `/pages-bpm/processInstance/detail/index?id=${processInstanceId.value}&taskId=${taskId.value}`,

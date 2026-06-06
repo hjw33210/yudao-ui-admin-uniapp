@@ -81,8 +81,8 @@ definePage({
 const { hasAccessByCodes } = useAccess()
 const toast = useToast()
 const dialog = useDialog()
-const formData = ref<NotifyTemplate>()
-const deleting = ref(false)
+const formData = ref<NotifyTemplate>() // 详情数据
+const deleting = ref(false) // 删除状态
 
 // 发送测试站内信相关
 const sendVisible = ref(false)

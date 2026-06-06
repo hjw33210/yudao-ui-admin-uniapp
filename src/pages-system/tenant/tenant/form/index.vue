@@ -144,7 +144,7 @@ definePage({
 
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑租户' : '新增租户')
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const formData = ref<Tenant & { username?: string, password?: string }>({
   id: undefined,
   name: '',
@@ -157,7 +157,7 @@ const formData = ref<Tenant & { username?: string, password?: string }>({
   status: CommonStatusEnum.ENABLE,
   username: '',
   password: '',
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   name: [{ required: true, message: '租户名称不能为空' }],
   packageId: [{ required: true, message: '租户套餐不能为空' }],
@@ -167,7 +167,7 @@ const formSchema = createFormSchema({
   username: [{ required: () => !props.id, message: '用户名称不能为空' }],
   password: [{ required: () => !props.id, message: '用户密码不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 const pickerVisible = ref<Record<string, boolean>>({})
 const packageOptions = ref<TenantPackage[]>([])
 

@@ -82,7 +82,7 @@ definePage({
 })
 
 const toast = useToast()
-const loading = ref(false) // 加载状态
+const loading = ref(false) // 表单提交状态
 const tenantPickerRef = ref<InstanceType<typeof TenantPicker>>() // 租户选择器引用
 
 const formData = reactive({

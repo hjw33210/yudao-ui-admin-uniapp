@@ -82,8 +82,8 @@ definePage({
 const { hasAccessByCodes } = useAccess()
 const toast = useToast()
 const dialog = useDialog()
-const formData = ref<MailTemplate>()
-const deleting = ref(false)
+const formData = ref<MailTemplate>() // 详情数据
+const deleting = ref(false) // 删除状态
 
 // 发送测试邮件相关
 const sendVisible = ref(false)

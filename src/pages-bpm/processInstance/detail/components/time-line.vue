@@ -89,8 +89,15 @@
             :key="user.id || userIndex"
             class="mb-8rpx mr-16rpx flex items-center rounded-32rpx bg-[#f5f5f5] pr-16rpx"
           >
-            <view class="mr-8rpx h-48rpx w-48rpx flex items-center justify-center rounded-full bg-[#1890ff] text-24rpx text-white">
-              {{ user.nickname?.[0] || '?' }}
+            <view class="mr-8rpx h-48rpx w-48rpx flex items-center justify-center overflow-hidden rounded-full bg-[#1890ff] text-24rpx text-white">
+              <image
+                v-if="shouldShowAvatar(user)"
+                :src="user.avatar"
+                class="h-48rpx w-48rpx rounded-full"
+                mode="aspectFill"
+                @error="handleAvatarError(user)"
+              />
+              <text v-else>{{ getUserInitial(user) }}</text>
             </view>
             <text class="text-24rpx text-[#333]">{{ user.nickname }}</text>
           </view>
@@ -108,9 +115,17 @@
           >
             <!-- 审批人信息 -->
             <view v-if="task.assigneeUser || task.ownerUser" class="mb-8rpx flex items-center">
-              <!-- TODO @jason 用户头像显示 -->
-              <view class="relative mr-8rpx h-48rpx w-48rpx flex items-center justify-center rounded-full bg-[#1890ff] text-24rpx text-white">
-                {{ (task.assigneeUser?.nickname || task.ownerUser?.nickname)?.[0] || '?' }}
+              <view class="relative mr-8rpx h-48rpx w-48rpx">
+                <view class="h-48rpx w-48rpx flex items-center justify-center overflow-hidden rounded-full bg-[#1890ff] text-24rpx text-white">
+                  <image
+                    v-if="shouldShowAvatar(getTaskUser(task))"
+                    :src="getTaskUser(task)?.avatar"
+                    class="h-48rpx w-48rpx rounded-full"
+                    mode="aspectFill"
+                    @error="handleAvatarError(getTaskUser(task))"
+                  />
+                  <text v-else>{{ getUserInitial(getTaskUser(task)) }}</text>
+                </view>
 
                 <!-- 任务状态小图标 -->
                 <view
@@ -179,8 +194,17 @@
             :key="userIndex"
             class="mb-8rpx flex items-center"
           >
-            <view class="relative mr-8rpx h-48rpx w-48rpx flex items-center justify-center rounded-full bg-[#1890ff] text-24rpx text-white">
-              {{ user.nickname?.[0] || '?' }}
+            <view class="relative mr-8rpx h-48rpx w-48rpx">
+              <view class="h-48rpx w-48rpx flex items-center justify-center overflow-hidden rounded-full bg-[#1890ff] text-24rpx text-white">
+                <image
+                  v-if="shouldShowAvatar(user)"
+                  :src="user.avatar"
+                  class="h-48rpx w-48rpx rounded-full"
+                  mode="aspectFill"
+                  @error="handleAvatarError(user)"
+                />
+                <text v-else>{{ getUserInitial(user) }}</text>
+              </view>
 
               <!-- 候选状态图标 -->
               <view
@@ -206,7 +230,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { ApprovalNodeInfo } from '@/api/bpm/processInstance'
+import type { ApprovalNodeInfo, ApprovalTaskInfo, User } from '@/api/bpm/processInstance'
 import { ref } from 'vue'
 import UserPicker from '@/components/system-select/user-picker.vue'
 import { BpmCandidateStrategyEnum, BpmNodeTypeEnum, BpmTaskStatusEnum } from '@/utils/constants'
@@ -230,10 +254,10 @@ const emit = defineEmits<{
 
 // 状态图标映射
 const statusIconMap: Record<string, { color: string, icon: string }> = {
-  '-2': { color: '#909398', icon: 'skip-forward' }, // 跳过
+  '-2': { color: '#909398', icon: 'skip-next' }, // 跳过
   '-1': { color: '#909398', icon: 'clock-circle' }, // 审批未开始
-  '0': { color: '#f59e0b', icon: 'refresh1' }, // 待审批
-  '1': { color: '#f59e0b', icon: 'refresh1' }, // 审批中
+  '0': { color: '#f59e0b', icon: 'clock-circle' }, // 待审批
+  '1': { color: '#f59e0b', icon: 'sync' }, // 审批中
   '2': { color: '#00b32a', icon: 'check' }, // 审批通过
   '3': { color: '#f46b6c', icon: 'close' }, // 审批不通过
   '4': { color: '#cccccc', icon: 'delete' }, // 已取消
@@ -242,37 +266,43 @@ const statusIconMap: Record<string, { color: string, icon: string }> = {
   '7': { color: '#00b32a', icon: 'check' }, // 审批通过中
 }
 
-// 节点类型图标映射 TODO 图标重新选一下
+// 节点类型图标映射
 const nodeTypeSvgMap: Record<number, { color: string, icon: string }> = {
   [BpmNodeTypeEnum.END_EVENT_NODE]: { color: '#909398', icon: 'poweroff' },
   [BpmNodeTypeEnum.START_USER_NODE]: { color: '#909398', icon: 'user' },
-  [BpmNodeTypeEnum.USER_TASK_NODE]: { color: '#ff943e', icon: 'user-talk' },
+  [BpmNodeTypeEnum.USER_TASK_NODE]: { color: '#ff943e', icon: 'user' },
   [BpmNodeTypeEnum.TRANSACTOR_NODE]: { color: '#ff943e', icon: 'edit' },
   [BpmNodeTypeEnum.COPY_TASK_NODE]: { color: '#3296fb', icon: 'copy' },
-  [BpmNodeTypeEnum.CONDITION_NODE]: { color: '#14bb83', icon: 'branch' },
+  [BpmNodeTypeEnum.DELAY_TIMER_NODE]: { color: '#448ef7', icon: 'clock-circle' },
+  [BpmNodeTypeEnum.TRIGGER_NODE]: { color: '#9b7feb', icon: 'thunderbolt' },
+  [BpmNodeTypeEnum.CONDITION_NODE]: { color: '#14bb83', icon: 'filter' },
+  [BpmNodeTypeEnum.CONDITION_BRANCH_NODE]: { color: '#14bb83', icon: 'branch' },
   [BpmNodeTypeEnum.PARALLEL_BRANCH_NODE]: { color: '#14bb83', icon: 'branch' },
-  [BpmNodeTypeEnum.CHILD_PROCESS_NODE]: { color: '#14bb83', icon: 'cluster' },
+  [BpmNodeTypeEnum.INCLUSIVE_BRANCH_NODE]: { color: '#14bb83', icon: 'branch' },
+  [BpmNodeTypeEnum.ROUTER_BRANCH_NODE]: { color: '#14bb83', icon: 'share-alt' },
+  [BpmNodeTypeEnum.CHILD_PROCESS_NODE]: { color: '#14bb83', icon: 'organization' },
 }
 
 const onlyStatusIconShow = [BpmTaskStatusEnum.NOT_START, BpmTaskStatusEnum.RUNNING, BpmTaskStatusEnum.WAIT] // 只有状态是 -1、0、1 才展示头像右小角状态小 icon
 
 // 响应式数据
 const customApproveUsers = ref<Record<string, any[]>>({})
+const failedAvatarKeys = ref<Set<string>>(new Set())
 const showUserPicker = ref(false)
 const selectedUserIds = ref<number[]>([])
 const selectedActivityNodeId = ref<string>()
 
 /** 获取审批节点类型图标 */
 function getApprovalNodeTypeIcon(nodeType: number) {
-  return nodeTypeSvgMap[nodeType]?.icon || 'time'
+  return nodeTypeSvgMap[nodeType]?.icon || 'clock-circle'
 }
 
 /** 获取审批节点图标 */
 function getApprovalNodeIcon(taskStatus: number, nodeType: number) {
   if (taskStatus === BpmTaskStatusEnum.NOT_START) {
-    return statusIconMap[taskStatus]?.icon || 'time'
+    return statusIconMap[taskStatus]?.icon || 'clock-circle'
   }
-  return statusIconMap[taskStatus]?.icon || 'time'
+  return statusIconMap[taskStatus]?.icon || 'clock-circle'
 }
 
 /** 获取审批节点颜色 */
@@ -294,6 +324,36 @@ function getApprovalNodeTime(node: ApprovalNodeInfo) {
   return ''
 }
 
+/** 获取任务处理人 */
+function getTaskUser(task: ApprovalTaskInfo) {
+  return task.assigneeUser || task.ownerUser
+}
+
+/** 获取用户头像兜底文字 */
+function getUserInitial(user?: Partial<User>) {
+  return user?.nickname?.[0] || '?'
+}
+
+/** 是否显示用户头像 */
+function shouldShowAvatar(user?: Partial<User>) {
+  return !!user?.avatar && !failedAvatarKeys.value.has(getUserAvatarKey(user))
+}
+
+/** 标记头像加载失败 */
+function handleAvatarError(user?: Partial<User>) {
+  if (!user?.avatar) {
+    return
+  }
+  const nextKeys = new Set(failedAvatarKeys.value)
+  nextKeys.add(getUserAvatarKey(user))
+  failedAvatarKeys.value = nextKeys
+}
+
+/** 获取用户头像缓存键 */
+function getUserAvatarKey(user?: Partial<User>) {
+  return `${user?.id || ''}:${user?.avatar || ''}`
+}
+
 /** 是否显示任务状态图标 */
 function shouldShowTaskStatusIcon(status: number) {
   return onlyStatusIconShow.includes(status)
@@ -301,6 +361,7 @@ function shouldShowTaskStatusIcon(status: number) {
 
 /** 判断是否需要显示自定义选择审批人 */
 function shouldShowCustomUserSelect(activity: ApprovalNodeInfo) {
+  // 已有任务时不再显示候选人选择
   return (
     (!activity.tasks || activity.tasks.length === 0)
     && ((BpmCandidateStrategyEnum.START_USER_SELECT === activity.candidateStrategy
@@ -346,6 +407,7 @@ function getStatusText(status: number) {
 
 /** 用户选择确认 */
 function handleCustomUserSelectConfirm(activityId: string, users: any[]) {
+  // 同步本地展示，并通知审批页提交下一节点审批人
   customApproveUsers.value[activityId] = users || []
   emit('selectUserConfirm', activityId, users)
 }
@@ -381,12 +443,13 @@ function setCustomApproveUsers(activityId: string, users: any[]) {
 
 /** 批量设置多个节点的自定义审批人 */
 function batchSetCustomApproveUsers(data: Record<string, any[]>) {
+  // 审批表单变量变化后，父组件会重新下发下一节点审批人
   Object.keys(data).forEach((activityId) => {
     customApproveUsers.value[activityId] = data[activityId] || []
   })
 }
 
-// 暴露方法给父组件
+// 暴露给父组件同步下一节点审批人
 defineExpose({
   setCustomApproveUsers,
   batchSetCustomApproveUsers,

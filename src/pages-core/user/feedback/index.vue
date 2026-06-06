@@ -66,18 +66,18 @@ definePage({
 })
 
 const toast = useToast()
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const fileList = ref<UploadFile[]>([])
 const formData = ref({
   content: '',
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   content: [
     { required: true, message: '请输入反馈内容' },
     { validator: value => String(value).length >= 10 || '反馈内容至少10个字符' },
   ],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 
 /** 返回上一页 */
 function handleBack() {
@@ -140,7 +140,7 @@ async function handleSubmit() {
         }),
     }
 
-    // TODO: 替换为真实 API 调用
+    // TODO @芋艿：替换为真实反馈 API 调用
     await mockSubmitFeedback(submitData)
 
     toast.success('提交成功，感谢您的反馈！')
@@ -153,7 +153,7 @@ async function handleSubmit() {
 }
 
 // ===================== Mock API =====================
-// TODO: 后端 API 实现后，删除此 mock 函数，替换为真实 API 调用
+// TODO @芋艿：后端 API 实现后，删除此 mock 函数
 
 interface FeedbackData {
   content: string

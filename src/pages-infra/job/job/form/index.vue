@@ -104,7 +104,7 @@ definePage({
 
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑定时任务' : '新增定时任务')
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const formData = ref<Job>({
   id: undefined,
   name: '',
@@ -115,7 +115,7 @@ const formData = ref<Job>({
   retryCount: 0,
   retryInterval: 0,
   monitorTimeout: 0,
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   name: [{ required: true, message: '任务名称不能为空' }],
   handlerName: [{ required: true, message: '处理器名称不能为空' }],
@@ -123,7 +123,7 @@ const formSchema = createFormSchema({
   retryCount: [{ required: true, message: '重试次数不能为空' }],
   retryInterval: [{ required: true, message: '重试间隔不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 
 /** 返回上一页 */
 function handleBack() {

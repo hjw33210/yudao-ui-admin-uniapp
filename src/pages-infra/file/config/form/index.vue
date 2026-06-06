@@ -206,7 +206,7 @@ definePage({
 
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑文件配置' : '新增文件配置')
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const formData = ref<FileConfig>({
   id: undefined,
   name: '',
@@ -228,12 +228,12 @@ const formData = ref<FileConfig>({
     region: '',
     domain: '',
   },
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   name: [{ required: true, message: '配置名不能为空' }],
   storage: [{ required: true, message: '存储器不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 const pickerVisible = ref<Record<string, boolean>>({})
 
 /** 返回上一页 */

@@ -78,19 +78,19 @@ definePage({
 
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑流程表达式' : '新增流程表达式')
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const formData = ref<ProcessExpression>({
   id: undefined,
   name: '',
   status: CommonStatusEnum.ENABLE,
   expression: '',
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   name: [{ required: true, message: '表达式名字不能为空' }],
   status: [{ required: true, message: '表达式状态不能为空' }],
   expression: [{ required: true, message: '表达式不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 
 /** 返回上一页 */
 function handleBack() {

@@ -78,8 +78,8 @@ definePage({
 
 const { hasAccessByCodes } = useAccess()
 const toast = useToast()
-const list = ref<DataSourceConfig[]>([])
-const loading = ref(false)
+const list = ref<DataSourceConfig[]>([]) // 列表数据
+const loading = ref(false) // 列表加载状态
 
 /** 返回上一页 */
 function handleBack() {

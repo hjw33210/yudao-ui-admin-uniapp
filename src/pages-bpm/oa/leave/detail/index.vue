@@ -48,14 +48,14 @@ definePage({
 })
 
 const toast = useToast()
-const formData = ref<Partial<Leave>>({})
+const formData = ref<Partial<Leave>>({}) // 详情数据
 
 /** 返回上一页 */
 function handleBack() {
   navigateBackPlus('/pages-bpm/oa/leave/index')
 }
 
-/** 获取详情数据 */
+/** 加载请假详情 */
 async function getDetail() {
   if (!props.id) {
     toast.show('参数错误')

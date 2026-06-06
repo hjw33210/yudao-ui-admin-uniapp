@@ -114,7 +114,7 @@ definePage({
 
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑短信渠道' : '新增短信渠道')
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const formData = ref<SmsChannel>({
   id: undefined,
   signature: '',
@@ -124,14 +124,14 @@ const formData = ref<SmsChannel>({
   apiSecret: '',
   callbackUrl: '',
   remark: '',
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   signature: [{ required: true, message: '短信签名不能为空' }],
   code: [{ required: true, message: '渠道编码不能为空' }],
   status: [{ required: true, message: '启用状态不能为空' }],
   apiKey: [{ required: true, message: 'API 账号不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 const pickerVisible = ref<Record<string, boolean>>({})
 
 /** 返回上一页 */

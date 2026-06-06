@@ -124,7 +124,7 @@ definePage({
 
 const toast = useToast()
 const dialog = useDialog()
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const processTimeLineLoading = ref(false) // 流程预览加载状态
 
 // 流程相关数据
@@ -140,14 +140,14 @@ const formData = ref<Partial<Leave>>({
   startTime: undefined,
   endTime: undefined,
   reason: undefined,
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   type: [{ required: true, message: '请选择请假类型' }],
   startTime: [{ required: true, message: '请选择开始时间' }],
   endTime: [{ required: true, message: '请选择结束时间' }],
   reason: [{ required: true, message: '请输入请假原因' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 const pickerVisible = ref<Record<string, boolean>>({})
 
 // 计算请假天数

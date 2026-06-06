@@ -93,8 +93,8 @@ const formData = reactive({
   dictType: undefined as string | undefined,
   label: undefined as string | undefined,
   status: -1,
-})
-const visible = ref(false)
+}) // 搜索表单数据
+const visible = ref(false) // 搜索弹窗显示状态
 const pickerVisible = ref<Record<string, boolean>>({})
 
 /** 字典类型选项 */

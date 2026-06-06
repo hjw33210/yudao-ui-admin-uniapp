@@ -109,13 +109,13 @@ const emit = defineEmits<{
   reset: []
 }>()
 
-const visible = ref(false)
+const visible = ref(false) // 搜索弹窗显示状态
 const formData = reactive({
   userId: undefined as number | undefined,
   applicationName: undefined as string | undefined,
   processStatus: -1, // -1 表示全部
   exceptionTime: [undefined, undefined] as [number | undefined, number | undefined],
-})
+}) // 搜索表单数据
 
 /** 搜索条件 placeholder 拼接 */
 const placeholder = computed(() => {
@@ -136,17 +136,16 @@ const placeholder = computed(() => {
   return conditions.length > 0 ? conditions.join(' | ') : '搜索日志'
 })
 
-// 时间范围选择器状态
-const visibleExceptionTime = ref<[boolean, boolean]>([false, false])
-const tempExceptionTime = ref<[number, number]>([Date.now(), Date.now()])
+const visibleExceptionTime = ref<[boolean, boolean]>([false, false]) // 异常时间选择器状态
+const tempExceptionTime = ref<[number, number]>([Date.now(), Date.now()]) // 异常时间临时值
 
-/** 异常时间[0]确认 */
+/** 确认异常时间开始日期 */
 function handleExceptionTime0Confirm() {
   formData.exceptionTime = [tempExceptionTime.value[0], formData.exceptionTime?.[1]]
   visibleExceptionTime.value[0] = false
 }
 
-/** 异常时间[1]确认 */
+/** 确认异常时间结束日期 */
 function handleExceptionTime1Confirm() {
   formData.exceptionTime = [formData.exceptionTime?.[0], tempExceptionTime.value[1]]
   visibleExceptionTime.value[1] = false

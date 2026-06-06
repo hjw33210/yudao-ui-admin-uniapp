@@ -114,13 +114,13 @@ const emit = defineEmits<{
   reset: []
 }>()
 
-const visible = ref(false)
+const visible = ref(false) // 搜索弹窗显示状态
 const formData = reactive({
   jobId: undefined as number | undefined,
   handlerName: undefined as string | undefined,
   status: -1, // -1 表示全部
   beginTime: [undefined, undefined] as [number | undefined, number | undefined],
-})
+}) // 搜索表单数据
 
 /** 搜索条件 placeholder 拼接 */
 const placeholder = computed(() => {
@@ -140,17 +140,16 @@ const placeholder = computed(() => {
   return conditions.length > 0 ? conditions.join(' | ') : '搜索调度日志'
 })
 
-// 时间范围选择器状态
-const visibleBeginTime = ref<[boolean, boolean]>([false, false])
-const tempBeginTime = ref<[number, number]>([Date.now(), Date.now()])
+const visibleBeginTime = ref<[boolean, boolean]>([false, false]) // 开始时间选择器状态
+const tempBeginTime = ref<[number, number]>([Date.now(), Date.now()]) // 开始时间临时值
 
-/** 开始时间[0]确认 */
+/** 确认开始时间开始日期 */
 function handleBeginTime0Confirm() {
   formData.beginTime = [tempBeginTime.value[0], formData.beginTime?.[1]]
   visibleBeginTime.value[0] = false
 }
 
-/** 开始时间[1]确认 */
+/** 确认开始时间结束日期 */
 function handleBeginTime1Confirm() {
   formData.beginTime = [formData.beginTime?.[0], tempBeginTime.value[1]]
   visibleBeginTime.value[1] = false

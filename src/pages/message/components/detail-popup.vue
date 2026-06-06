@@ -64,8 +64,8 @@ import { getDictLabel } from '@/hooks/useDict'
 import { DICT_TYPE } from '@/utils/constants'
 import { formatDateTime } from '@/utils/date'
 
-const visible = ref(false)
-const formData = ref<NotifyMessage>()
+const visible = ref(false) // 详情弹窗显示状态
+const formData = ref<NotifyMessage>() // 详情数据
 
 /** 打开弹窗 */
 function open(data: NotifyMessage) {

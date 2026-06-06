@@ -139,7 +139,7 @@ definePage({
 
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑菜单' : '新增菜单')
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const formData = ref<Menu>({
   id: undefined,
   name: '',
@@ -155,14 +155,14 @@ const formData = ref<Menu>({
   visible: true,
   keepAlive: true,
   alwaysShow: true,
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   name: [{ required: true, message: '菜单名称不能为空' }],
   type: [{ required: true, message: '菜单类型不能为空' }],
   sort: [{ required: true, message: '显示排序不能为空' }],
   status: [{ required: true, message: '状态不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 
 /** 返回上一页 */
 function handleBack() {

@@ -84,8 +84,8 @@ definePage({
 const { hasAccessByCodes } = useAccess()
 const toast = useToast()
 const dialog = useDialog()
-const formData = ref<SmsTemplate>()
-const deleting = ref(false)
+const formData = ref<SmsTemplate>() // 详情数据
+const deleting = ref(false) // 删除状态
 
 // 发送测试短信相关
 const sendVisible = ref(false)

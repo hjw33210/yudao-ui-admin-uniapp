@@ -4,14 +4,20 @@ import { http } from '@/http/http'
 export interface ProcessDefinition {
   id: string
   key: string
+  version?: number
   name: string
   description?: string
   icon?: string
   category: string
   formType?: number
   formId?: number
+  formName?: string
+  formConf?: string
+  formFields?: string[]
   formCustomCreatePath?: string
   formCustomViewPath?: string
+  bpmnXml?: string
+  simpleModel?: string
   suspensionState: number
 }
 

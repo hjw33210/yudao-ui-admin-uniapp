@@ -62,8 +62,8 @@ definePage({
 
 const dialog = useDialog()
 const toast = useToast()
-const formData = ref<Dept>()
-const deleting = ref(false)
+const formData = ref<Dept>() // 详情数据
+const deleting = ref(false) // 删除状态
 const deptList = ref<Dept[]>([])
 const userList = ref<User[]>([])
 

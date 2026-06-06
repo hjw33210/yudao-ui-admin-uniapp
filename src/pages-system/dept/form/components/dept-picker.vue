@@ -50,7 +50,7 @@ const emit = defineEmits<{
 
 const deptList = ref<Dept[]>([])
 const selectedValue = ref<number | string>('')
-const visible = ref(false)
+const visible = ref(false) // 选择弹窗显示状态
 
 const deptOptions = computed(() => {
   const topDepts = buildDeptTree(0)

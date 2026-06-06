@@ -272,6 +272,7 @@ export const BpmProcessInstanceStatus = {
   APPROVE: 2, // 审批通过
   REJECT: 3, // 审批不通过
   CANCEL: 4, // 已取消
+  APPROVING: 7, // 审批通过中
 }
 
 /**

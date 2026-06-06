@@ -123,7 +123,7 @@ function handleBack() {
   navigateBackPlus()
 }
 
-/** 初始化数据 */
+/** 初始化 */
 function initData() {
   menuGroups.value = getMenuGroups()
 }

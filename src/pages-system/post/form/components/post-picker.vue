@@ -35,7 +35,7 @@ const emit = defineEmits<{
 
 const postList = ref<Post[]>([])
 const selectedIds = ref<number[]>([])
-const visible = ref(false)
+const visible = ref(false) // 选择弹窗显示状态
 
 const selectedLabel = computed(() => {
   if (selectedIds.value.length === 0) {

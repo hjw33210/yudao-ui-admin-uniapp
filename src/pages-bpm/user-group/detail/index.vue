@@ -80,8 +80,8 @@ definePage({
 const { hasAccessByCodes } = useAccess()
 const toast = useToast()
 const dialog = useDialog()
-const formData = ref<UserGroup>()
-const deleting = ref(false)
+const formData = ref<UserGroup>() // 详情数据
+const deleting = ref(false) // 删除状态
 const userList = ref<User[]>([])
 
 /** 返回上一页 */

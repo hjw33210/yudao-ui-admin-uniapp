@@ -79,16 +79,16 @@ definePage({
 const taskId = computed(() => props.taskId)
 const processInstanceId = computed(() => props.processInstanceId)
 const toast = useToast()
-const formLoading = ref(false)
+const formLoading = ref(false) // 退回提交状态
 const formData = reactive({
   targetActivityId: '',
   reason: '',
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   targetActivityId: [{ required: true, message: '退回节点不能为空' }],
   reason: [{ required: true, message: '退回原因不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 const pickerVisible = ref<Record<string, boolean>>({})
 const activityOptions = ref<any[]>([])
 
@@ -103,7 +103,7 @@ async function loadReturnTaskList() {
   activityOptions.value = result
 }
 
-/** 提交操作 */
+/** 提交表单 */
 async function handleSubmit() {
   if (formLoading.value) {
     return
@@ -131,9 +131,8 @@ async function handleSubmit() {
   }
 }
 
-/** 页面加载时获取可退回节点列表 */
+/** 初始化 */
 onMounted(() => {
-  /** 初始化校验 */
   if (!props.taskId || !props.processInstanceId) {
     toast.show('参数错误')
     return

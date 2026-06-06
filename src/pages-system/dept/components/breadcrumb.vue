@@ -80,7 +80,7 @@ function back(): boolean {
   return true
 }
 
-/** 重置 */
+/** 重置面包屑 */
 function reset() {
   breadcrumbList.value = []
   emit('update:modelValue', 0)

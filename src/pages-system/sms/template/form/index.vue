@@ -132,7 +132,7 @@ definePage({
 
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑短信模板' : '新增短信模板')
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const formData = ref<SmsTemplate>({
   id: undefined,
   type: undefined,
@@ -143,7 +143,7 @@ const formData = ref<SmsTemplate>({
   content: '',
   apiTemplateId: '',
   remark: '',
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   type: [{ required: true, message: '短信类型不能为空' }],
   name: [{ required: true, message: '模板名称不能为空' }],
@@ -153,7 +153,7 @@ const formSchema = createFormSchema({
   content: [{ required: true, message: '模板内容不能为空' }],
   apiTemplateId: [{ required: true, message: 'API 模板编号不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 const pickerVisible = ref<Record<string, boolean>>({})
 
 /** 短信渠道列表 */

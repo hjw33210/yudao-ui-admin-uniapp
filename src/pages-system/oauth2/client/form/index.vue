@@ -108,7 +108,7 @@ definePage({
 
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑应用' : '新增应用')
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const formData = ref<OAuth2Client>({
   id: undefined,
   clientId: '',
@@ -126,7 +126,7 @@ const formData = ref<OAuth2Client>({
   authorities: [],
   resourceIds: [],
   additionalInformation: '',
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   clientId: [{ required: true, message: '客户端编号不能为空' }],
   secret: [{ required: true, message: '客户端密钥不能为空' }],
@@ -134,7 +134,7 @@ const formSchema = createFormSchema({
   accessTokenValiditySeconds: [{ required: true, message: '访问令牌有效期不能为空' }],
   refreshTokenValiditySeconds: [{ required: true, message: '刷新令牌有效期不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 
 /** 返回上一页 */
 function handleBack() {

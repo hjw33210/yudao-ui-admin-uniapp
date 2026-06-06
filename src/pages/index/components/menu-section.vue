@@ -56,7 +56,7 @@ const favoriteMenuItems = computed<MenuItem[]>(() => {
   return keys.map(key => getMenuItemByKey(key)).filter(Boolean) as MenuItem[]
 })
 
-/** 初始化数据 */
+/** 初始化 */
 function initData() {
   menuGroups.value = getMenuGroups()
 }

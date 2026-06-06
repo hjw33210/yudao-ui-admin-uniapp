@@ -33,7 +33,7 @@ export const toLoginPage = debounce((options: ToLoginPageOptions = {}) => {
 
   // 获取当前页面路径
   const currentPage = getLastPage()
-  const currentPath = `/${currentPage.route}`
+  const currentPath = currentPage?.route ? `/${currentPage.route}` : ''
   // 如果已经在登录页，则不跳转
   if (currentPath === LOGIN_PAGE) {
     return

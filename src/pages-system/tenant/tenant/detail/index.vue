@@ -72,9 +72,9 @@ definePage({
 const { hasAccessByCodes } = useAccess()
 const toast = useToast()
 const dialog = useDialog()
-const formData = ref<Tenant>()
+const formData = ref<Tenant>() // 详情数据
 const packageList = ref<TenantPackage[]>([])
-const deleting = ref(false)
+const deleting = ref(false) // 删除状态
 
 /** 获取套餐名称 */
 function getPackageName(packageId?: number) {

@@ -88,7 +88,7 @@ definePage({
 
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑岗位' : '新增岗位')
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const formData = ref<Post>({
   id: undefined,
   name: '',
@@ -96,14 +96,14 @@ const formData = ref<Post>({
   sort: 0,
   status: CommonStatusEnum.ENABLE,
   remark: '',
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   name: [{ required: true, message: '岗位名称不能为空' }],
   code: [{ required: true, message: '岗位编码不能为空' }],
   sort: [{ required: true, message: '显示顺序不能为空' }],
   status: [{ required: true, message: '状态不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 
 /** 返回上一页 */
 function handleBack() {

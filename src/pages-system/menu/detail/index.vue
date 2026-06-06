@@ -80,8 +80,8 @@ definePage({
 
 const toast = useToast()
 const dialog = useDialog()
-const formData = ref<Menu>()
-const deleting = ref(false)
+const formData = ref<Menu>() // 详情数据
+const deleting = ref(false) // 删除状态
 const parentMenuName = ref('-')
 
 /** 返回上一页 */
