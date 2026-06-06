@@ -251,7 +251,7 @@ async function loadDefinitionList() {
   definitionList.value = await getProcessDefinitionList({ suspensionState: 1 })
 }
 
-/** 初始化可发起流程列表 */
+/** 初始化 */
 onLoad(async (options) => {
   // 分类和流程定义互不依赖，并行加载减少首屏等待时间
   await Promise.all([loadCategoryList(), loadDefinitionList()])

@@ -87,7 +87,7 @@ definePage({
 
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑用户分组' : '新增用户分组')
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const formData = ref<UserGroup>({
   id: undefined,
   name: '',
@@ -95,13 +95,13 @@ const formData = ref<UserGroup>({
   userIds: [],
   status: CommonStatusEnum.ENABLE,
   remark: '',
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   name: [{ required: true, message: '组名不能为空' }],
   userIds: [{ required: true, message: '成员不能为空' }],
   status: [{ required: true, message: '状态不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 const userPickerRef = ref()
 
 /** 返回上一页 */

@@ -69,15 +69,15 @@ import { formatPast } from '@/utils/date'
 import TodoSearchForm from './todo-search-form.vue'
 import '../styles/index.scss'
 
-const total = ref(0)
-const list = ref<Task[]>([])
-const loadMoreState = ref<LoadMoreState>('loading')
+const total = ref(0) // 列表总数
+const list = ref<Task[]>([]) // 列表数据
+const loadMoreState = ref<LoadMoreState>('loading') // 分页加载状态
 const queryParams = ref({
   pageNo: 1,
   pageSize: 10,
-})
+}) // 查询参数
 
-/** 查询列表 */
+/** 查询待办任务列表 */
 async function getList() {
   loadMoreState.value = 'loading'
   try {
@@ -121,12 +121,12 @@ function handleDetail(item: Task) {
   uni.navigateTo({ url: `/pages-bpm/processInstance/detail/index?id=${item.processInstance.id}&taskId=${item.id}` })
 }
 
-/** 同意 */
+/** 进入同意审批页 */
 function handleApprove(item: Task) {
   uni.navigateTo({ url: `/pages-bpm/processInstance/detail/audit/index?processInstanceId=${item.processInstance.id}&taskId=${item.id}&pass=true` })
 }
 
-/** 拒绝 */
+/** 进入拒绝审批页 */
 function handleReject(item: Task) {
   uni.navigateTo({ url: `/pages-bpm/processInstance/detail/audit/index?processInstanceId=${item.processInstance.id}&taskId=${item.id}&pass=false` })
 }

@@ -96,7 +96,7 @@ definePage({
 
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑参数配置' : '新增参数配置')
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const formData = ref<Config>({
   id: undefined,
   category: '',
@@ -106,7 +106,7 @@ const formData = ref<Config>({
   type: undefined,
   visible: true,
   remark: '',
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   category: [{ required: true, message: '参数分类不能为空' }],
   name: [{ required: true, message: '参数名称不能为空' }],
@@ -114,7 +114,7 @@ const formSchema = createFormSchema({
   value: [{ required: true, message: '参数键值不能为空' }],
   visible: [{ required: true, message: '是否可见不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 
 /** 返回上一页 */
 function handleBack() {

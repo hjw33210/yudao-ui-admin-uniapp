@@ -108,7 +108,7 @@ definePage({
 
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑邮箱账号' : '新增邮箱账号')
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const formData = ref<MailAccount>({
   id: undefined,
   mail: '',
@@ -118,7 +118,7 @@ const formData = ref<MailAccount>({
   port: 25,
   sslEnable: true,
   starttlsEnable: false,
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   mail: [{ required: true, message: '邮箱不能为空' }],
   username: [{ required: true, message: '用户名不能为空' }],
@@ -128,7 +128,7 @@ const formSchema = createFormSchema({
   sslEnable: [{ required: true, message: '是否开启 SSL 不能为空' }],
   starttlsEnable: [{ required: true, message: '是否开启 STARTTLS 不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 
 /** 返回上一页 */
 function handleBack() {

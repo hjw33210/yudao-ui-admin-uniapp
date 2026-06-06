@@ -127,7 +127,7 @@ definePage({
 
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑三方应用' : '新增三方应用')
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const formData = ref<SocialClient>({
   id: undefined,
   name: '',
@@ -138,7 +138,7 @@ const formData = ref<SocialClient>({
   agentId: '',
   publicKey: '',
   status: CommonStatusEnum.ENABLE,
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   name: [{ required: true, message: '应用名不能为空' }],
   socialType: [{ required: true, message: '社交平台不能为空' }],
@@ -146,7 +146,7 @@ const formSchema = createFormSchema({
   clientId: [{ required: true, message: '应用编号不能为空' }],
   clientSecret: [{ required: true, message: '应用密钥不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 const pickerVisible = ref<Record<string, boolean>>({})
 
 /** 返回上一页 */

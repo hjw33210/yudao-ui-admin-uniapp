@@ -76,13 +76,13 @@ const emit = defineEmits<{
 }>()
 
 const { hasAccessByCodes } = useAccess()
-const total = ref(0)
-const list = ref<DictType[]>([])
-const loadMoreState = ref<LoadMoreState>('loading')
+const total = ref(0) // 列表总数
+const list = ref<DictType[]>([]) // 列表数据
+const loadMoreState = ref<LoadMoreState>('loading') // 分页加载状态
 const queryParams = ref({
   pageNo: 1,
   pageSize: 10,
-})
+}) // 查询参数
 
 /** 查询列表 */
 async function getList() {
@@ -98,7 +98,7 @@ async function getList() {
   }
 }
 
-/** 搜索按钮操作 */
+/** 搜索 */
 function handleQuery(data?: Record<string, any>) {
   queryParams.value = {
     ...data,
@@ -109,7 +109,7 @@ function handleQuery(data?: Record<string, any>) {
   getList()
 }
 
-/** 重置按钮操作 */
+/** 重置 */
 function handleReset() {
   handleQuery()
 }

@@ -127,7 +127,7 @@ const EVENT_OPTIONS = [
 
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑流程监听器' : '新增流程监听器')
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const formData = ref<ProcessListener>({
   id: undefined,
   name: '',
@@ -136,7 +136,7 @@ const formData = ref<ProcessListener>({
   event: '',
   valueType: '',
   value: '',
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   name: [{ required: true, message: '监听器名字不能为空' }],
   type: [{ required: true, message: '监听器类型不能为空' }],
@@ -145,7 +145,7 @@ const formSchema = createFormSchema({
   valueType: [{ required: true, message: '值类型不能为空' }],
   value: [{ required: true, message: '值不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 
 /** 根据类型获取事件选项 */
 const eventOptions = computed(() => {

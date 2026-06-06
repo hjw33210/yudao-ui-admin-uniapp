@@ -79,8 +79,8 @@ definePage({
 const { hasAccessByCodes } = useAccess()
 const toast = useToast()
 const dialog = useDialog()
-const formData = ref<Job>()
-const deleting = ref(false)
+const formData = ref<Job>() // 详情数据
+const deleting = ref(false) // 删除状态
 
 const moreActionVisible = ref(false) // 更多操作菜单
 const moreActions = computed(() => {

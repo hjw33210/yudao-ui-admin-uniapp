@@ -80,21 +80,21 @@ definePage({
 
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑数据源' : '新增数据源')
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const formData = ref<DataSourceConfig>({
   id: undefined,
   name: '',
   url: '',
   username: '',
   password: '',
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   name: [{ required: true, message: '数据源名称不能为空' }],
   url: [{ required: true, message: '数据源连接不能为空' }],
   username: [{ required: true, message: '用户名不能为空' }],
   password: [{ required: true, message: '密码不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 
 /** 返回上一页 */
 function handleBack() {

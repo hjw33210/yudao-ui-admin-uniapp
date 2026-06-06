@@ -82,23 +82,23 @@ definePage({
 const taskId = computed(() => props.taskId)
 const processInstanceId = computed(() => props.processInstanceId)
 const toast = useToast()
-const formLoading = ref(false)
+const formLoading = ref(false) // 加签提交状态
 const formData = reactive({
   userIds: [] as number[],
   reason: '',
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   userIds: [{ required: true, message: '加签处理人不能为空' }],
   reason: [{ required: true, message: '审批意见不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 
 /** 返回上一页 */
 function handleBack() {
   navigateBackPlus(`/pages-bpm/processInstance/detail/index?id=${processInstanceId.value}&taskId=${taskId.value}`)
 }
 
-/** 提交操作 */
+/** 提交表单 */
 async function handleSubmit(type: 'before' | 'after') {
   if (formLoading.value) {
     return
@@ -127,9 +127,8 @@ async function handleSubmit(type: 'before' | 'after') {
   }
 }
 
-/** 页面加载时 */
+/** 初始化 */
 onMounted(() => {
-  /** 初始化校验 */
   if (!props.taskId || !props.processInstanceId) {
     toast.show('参数错误')
   }

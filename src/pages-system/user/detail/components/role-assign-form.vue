@@ -40,8 +40,8 @@ const toast = useToast()
 const visible = computed({
   get: () => props.modelValue,
   set: val => emit('update:modelValue', val),
-})
-const loading = ref(false)
+}) // 分配角色弹窗显示状态
+const loading = ref(false) // 表单提交状态
 const roleList = ref<Role[]>([])
 const selectedIds = ref<number[]>([])
 
@@ -65,7 +65,7 @@ function handleClose() {
   visible.value = false
 }
 
-/** 确认提交 */
+/** 提交表单 */
 async function handleConfirm() {
   loading.value = true
   try {

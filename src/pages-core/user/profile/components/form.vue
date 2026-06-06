@@ -80,7 +80,7 @@ const toast = useToast()
 const visible = computed({
   get: () => props.modelValue,
   set: val => emit('update:modelValue', val),
-})
+}) // 编辑弹窗显示状态
 const formValue = ref<string | number>('') // 表单值
 const submitting = ref(false) // 提交中状态
 

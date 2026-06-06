@@ -59,7 +59,7 @@ definePage({
 })
 
 const toast = useToast()
-const formData = ref<OperateLog>()
+const formData = ref<OperateLog>() // 详情数据
 
 /** 返回上一页 */
 function handleBack() {

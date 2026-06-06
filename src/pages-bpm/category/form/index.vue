@@ -93,7 +93,7 @@ definePage({
 
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑流程分类' : '新增流程分类')
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const formData = ref<Category>({
   id: undefined,
   name: '',
@@ -101,13 +101,13 @@ const formData = ref<Category>({
   status: CommonStatusEnum.ENABLE,
   description: '',
   sort: 0,
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   name: [{ required: true, message: '分类名不能为空' }],
   code: [{ required: true, message: '分类标志不能为空' }],
   status: [{ required: true, message: '分类状态不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 
 /** 返回上一页 */
 function handleBack() {

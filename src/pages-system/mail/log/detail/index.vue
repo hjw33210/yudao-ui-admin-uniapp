@@ -50,7 +50,7 @@ definePage({
 })
 
 const toast = useToast()
-const formData = ref<MailLog>()
+const formData = ref<MailLog>() // 详情数据
 
 /** 返回上一页 */
 function handleBack() {

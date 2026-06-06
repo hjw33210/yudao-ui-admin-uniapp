@@ -126,7 +126,7 @@ definePage({
 
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑邮件模板' : '新增邮件模板')
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const formData = ref<MailTemplate>({
   id: undefined,
   name: '',
@@ -137,7 +137,7 @@ const formData = ref<MailTemplate>({
   content: '',
   status: CommonStatusEnum.ENABLE,
   remark: '',
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   name: [{ required: true, message: '模板名称不能为空' }],
   code: [{ required: true, message: '模板编码不能为空' }],
@@ -146,7 +146,7 @@ const formSchema = createFormSchema({
   content: [{ required: true, message: '模板内容不能为空' }],
   status: [{ required: true, message: '开启状态不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 const pickerVisible = ref<Record<string, boolean>>({})
 
 /** 邮箱账号列表 */

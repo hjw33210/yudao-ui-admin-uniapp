@@ -157,11 +157,11 @@ const showSignatureModal = ref(false) // 签名相关
 const formData = reactive({
   reason: '',
   signPicUrl: '', // 签名图片 URL
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   reason: [{ required: () => !!taskInfo.value?.reasonRequire, message: '审批意见不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 
 /** 返回上一页 */
 function handleBack() {
@@ -321,7 +321,7 @@ function previewSignature() {
   }
 }
 
-/** 提交审批 */
+/** 提交表单 */
 async function handleSubmit() {
   if (formLoading.value) {
     return
@@ -407,9 +407,9 @@ onBeforeUnmount(() => {
   clearNextAssigneeTimer()
 })
 
-/** 初始化审批页数据 */
+/** 初始化 */
 onMounted(async () => {
-  /** 初始化校验 */
+  // 参数校验
   if (!props.taskId || !props.processInstanceId) {
     toast.show('参数错误')
     return

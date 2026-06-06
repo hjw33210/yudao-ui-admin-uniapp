@@ -43,7 +43,7 @@ const emit = defineEmits<{
 
 const menuList = ref<Menu[]>([])
 const selectedValue = ref<number | string>(0)
-const visible = ref(false)
+const visible = ref(false) // 选择弹窗显示状态
 
 const menuOptions = computed(() => [
   { id: 0, name: '主类目' },

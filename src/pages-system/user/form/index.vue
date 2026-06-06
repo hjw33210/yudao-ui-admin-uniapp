@@ -119,7 +119,7 @@ definePage({
 
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑用户' : '新增用户')
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const formData = ref<User>({
   id: undefined,
   username: '',
@@ -132,7 +132,7 @@ const formData = ref<User>({
   postIds: [],
   status: CommonStatusEnum.ENABLE,
   remark: '',
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   username: [{ required: true, message: '用户名称不能为空' }],
   nickname: [{ required: true, message: '用户昵称不能为空' }],
@@ -142,7 +142,7 @@ const formSchema = createFormSchema({
   sex: [{ required: true, message: '性别不能为空' }],
   status: [{ required: true, message: '状态不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 
 /** 返回上一页 */
 function handleBack() {

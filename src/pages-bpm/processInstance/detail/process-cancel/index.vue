@@ -71,14 +71,14 @@ definePage({
 const processInstanceId = computed(() => props.processInstanceId)
 const taskId = computed(() => props.taskId)
 const toast = useToast()
-const formLoading = ref(false)
+const formLoading = ref(false) // 取消流程提交状态
 const formData = reactive({
   cancelReason: '',
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   cancelReason: [{ required: true, message: '取消理由不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 
 /** 返回上一页 */
 function handleBack() {
@@ -88,7 +88,7 @@ function handleBack() {
   navigateBackPlus(backUrl)
 }
 
-/** 提交操作 */
+/** 提交表单 */
 async function handleSubmit() {
   if (formLoading.value) {
     return
@@ -114,9 +114,8 @@ async function handleSubmit() {
   }
 }
 
-/** 页面加载时 */
+/** 初始化 */
 onMounted(() => {
-  /** 初始化校验 */
   if (!props.processInstanceId) {
     toast.show('参数错误')
   }

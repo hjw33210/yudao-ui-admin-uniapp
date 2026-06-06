@@ -138,8 +138,8 @@ const formData = reactive({
   name: undefined as string | undefined,
   accountId: undefined as number | undefined,
   createTime: [undefined, undefined] as [number | undefined, number | undefined],
-})
-const visible = ref(false)
+}) // 搜索表单数据
+const visible = ref(false) // 搜索弹窗显示状态
 const pickerVisible = ref<Record<string, boolean>>({})
 
 /** 邮箱账号列表 */
@@ -179,17 +179,16 @@ const placeholder = computed(() => {
   return conditions.length > 0 ? conditions.join(' | ') : '搜索邮件模板'
 })
 
-// 时间范围选择器状态
-const visibleCreateTime = ref<[boolean, boolean]>([false, false])
-const tempCreateTime = ref<[number, number]>([Date.now(), Date.now()])
+const visibleCreateTime = ref<[boolean, boolean]>([false, false]) // 创建时间选择器状态
+const tempCreateTime = ref<[number, number]>([Date.now(), Date.now()]) // 创建时间临时值
 
-/** 创建时间[0]确认 */
+/** 确认创建时间开始日期 */
 function handleCreateTime0Confirm() {
   formData.createTime = [tempCreateTime.value[0], formData.createTime?.[1]]
   visibleCreateTime.value[0] = false
 }
 
-/** 创建时间[1]确认 */
+/** 确认创建时间结束日期 */
 function handleCreateTime1Confirm() {
   formData.createTime = [formData.createTime?.[0], tempCreateTime.value[1]]
   visibleCreateTime.value[1] = false

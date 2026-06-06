@@ -117,13 +117,13 @@ const emit = defineEmits<{
   reset: []
 }>()
 
-const visible = ref(false)
+const visible = ref(false) // 搜索弹窗显示状态
 const formData = reactive({
   mobile: undefined as string | undefined,
   sendStatus: -1,
   receiveStatus: -1,
   sendTime: [undefined, undefined] as [number | undefined, number | undefined],
-})
+}) // 搜索表单数据
 
 /** 搜索条件 placeholder 拼接 */
 const placeholder = computed(() => {
@@ -143,17 +143,16 @@ const placeholder = computed(() => {
   return conditions.length > 0 ? conditions.join(' | ') : '搜索短信日志'
 })
 
-// 时间范围选择器状态
-const visibleSendTime = ref<[boolean, boolean]>([false, false])
-const tempSendTime = ref<[number, number]>([Date.now(), Date.now()])
+const visibleSendTime = ref<[boolean, boolean]>([false, false]) // 发送时间选择器状态
+const tempSendTime = ref<[number, number]>([Date.now(), Date.now()]) // 发送时间临时值
 
-/** 发送时间[0]确认 */
+/** 确认发送时间开始日期 */
 function handleSendTime0Confirm() {
   formData.sendTime = [tempSendTime.value[0], formData.sendTime?.[1]]
   visibleSendTime.value[0] = false
 }
 
-/** 发送时间[1]确认 */
+/** 确认发送时间结束日期 */
 function handleSendTime1Confirm() {
   formData.sendTime = [formData.sendTime?.[0], tempSendTime.value[1]]
   visibleSendTime.value[1] = false

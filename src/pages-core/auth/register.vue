@@ -109,7 +109,7 @@ definePage({
 })
 
 const toast = useToast()
-const loading = ref(false) // 加载状态
+const loading = ref(false) // 表单提交状态
 const agreePolicy = ref(false) // 用户协议勾选
 const tenantPickerRef = ref<InstanceType<typeof TenantPicker>>() // 租户选择器引用
 const captchaEnabled = import.meta.env.VITE_APP_CAPTCHA_ENABLE === 'true' // 验证码开关

@@ -81,7 +81,7 @@ const visible = computed({
   set(value: boolean) {
     emit('update:modelValue', value)
   },
-})
+}) // 发送弹窗显示状态
 
 const sendLoading = ref(false)
 const sendFormRef = ref<any>()
@@ -118,7 +118,7 @@ function normalizeMailList(text: string) {
   return list
 }
 
-/** 初始化发送表单 */
+/** 初始化 */
 function initSendForm() {
   sendFormData.value = {
     content: props.template?.content || '',
@@ -143,7 +143,7 @@ watch(
   },
 )
 
-/** 提交发送 */
+/** 提交表单 */
 async function handleSendSubmit() {
   const { valid } = await sendFormRef.value.validate()
   if (!valid) {

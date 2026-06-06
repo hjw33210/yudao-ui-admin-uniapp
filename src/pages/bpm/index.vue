@@ -39,7 +39,7 @@ definePage({
 })
 
 const tabTypes: string[] = ['todo', 'done', 'my', 'copy']
-const tabIndex = ref(0)
+const tabIndex = ref(0) // 当前选中的审批列表页签下标
 const tabType = computed<string>(() => tabTypes[tabIndex.value])
 
 /** Tab 切换 */
@@ -47,7 +47,7 @@ function handleTabChange({ index }: { index: number }) {
   tabIndex.value = index
 }
 
-/** 初始化：根据 tab 参数设置默认 tab */
+/** 初始化 */
 onShow(() => {
   // 从 globalData 获取参数（switchTab 跳转时使用）
   const tabParams = getAndClearTabParams()

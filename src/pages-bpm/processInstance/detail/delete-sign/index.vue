@@ -80,16 +80,16 @@ definePage({
 const taskId = computed(() => props.taskId)
 const processInstanceId = computed(() => props.processInstanceId)
 const toast = useToast()
-const formLoading = ref(false)
+const formLoading = ref(false) // 减签提交状态
 const formData = reactive({
   deleteSignTaskId: '',
   reason: '',
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   deleteSignTaskId: [{ required: true, message: '减签人员不能为空' }],
   reason: [{ required: true, message: '审批意见不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 const pickerVisible = ref<Record<string, boolean>>({})
 const taskOptions = ref<any[]>([])
 
@@ -128,7 +128,7 @@ async function loadDeleteSignTaskList() {
   }))
 }
 
-/** 提交操作 */
+/** 提交表单 */
 async function handleSubmit() {
   if (formLoading.value) {
     return
@@ -155,9 +155,8 @@ async function handleSubmit() {
   }
 }
 
-/** 页面加载时，获取可减签任务列表 */
+/** 初始化 */
 onMounted(() => {
-  /** 初始化校验 */
   if (!props.taskId || !props.processInstanceId) {
     toast.show('参数错误')
     return

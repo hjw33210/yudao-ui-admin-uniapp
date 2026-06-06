@@ -41,9 +41,9 @@ const emit = defineEmits<{
   'update:modelValue': [value: boolean]
 }>()
 
-const visible = ref(false)
-const ipAddress = ref('')
-const ipResult = ref('')
+const visible = ref(false) // IP 查询弹窗显示状态
+const ipAddress = ref('') // IP 地址
+const ipResult = ref('') // 查询结果
 const toast = useToast()
 
 watch(() => props.modelValue, (val) => {

@@ -62,7 +62,7 @@ definePage({
 
 const toast = useToast()
 const userStore = useUserStore()
-const loading = ref(true)
+const loading = ref(true) // 用户信息加载状态
 const userProfile = ref<UserProfileVO | null>(null)
 
 // 头像裁剪相关

@@ -67,13 +67,13 @@ const toast = useToast()
 const visible = computed({
   get: () => props.modelValue,
   set: val => emit('update:modelValue', val),
-})
+}) // 修改密码弹窗显示状态
 
 const formData = reactive({
   oldPassword: '',
   newPassword: '',
   confirmPassword: '',
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   oldPassword: [{ required: true, message: '请输入旧密码' }],
   newPassword: [{ required: true, message: '请输入新密码' }],
@@ -82,8 +82,8 @@ const formSchema = createFormSchema({
     { validator: (value, model) => value === model.newPassword || '两次输入的密码不一致' },
   ],
 })
-const formRef = ref<FormInstance>()
-const submitting = ref(false)
+const formRef = ref<FormInstance>() // 表单组件引用
+const submitting = ref(false) // 表单提交状态
 
 /** 监听弹窗打开，重置表单 */
 watch(

@@ -73,12 +73,12 @@ const emit = defineEmits<{
   reset: []
 }>()
 
-const visible = ref(false)
+const visible = ref(false) // 搜索弹窗显示状态
 const formData = reactive({
   userId: undefined as string | undefined,
   userType: -1,
   clientId: undefined as string | undefined,
-})
+}) // 搜索表单数据
 
 /** 搜索条件 placeholder 拼接 */
 const placeholder = computed(() => {

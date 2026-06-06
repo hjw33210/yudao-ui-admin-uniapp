@@ -84,7 +84,7 @@ definePage({
   },
 })
 
-const loading = ref(false)
+const loading = ref(false) // 列表加载状态
 const list = ref<Menu[]>([]) // 完整菜单列表（树形结构）
 
 const currentParentId = ref(0) // 当前层级的父节点编号
@@ -96,7 +96,7 @@ const currentList = computed(() => {
 }) // 当前层级的菜单列表
 const breadcrumbRef = ref<InstanceType<typeof Breadcrumb>>()
 
-const queryParams = ref<Record<string, any>>({})
+const queryParams = ref<Record<string, any>>({}) // 查询参数
 
 /** 返回上一页或上一层级 */
 function handleBack() {
@@ -163,7 +163,7 @@ async function getList() {
   }
 }
 
-/** 搜索按钮操作 */
+/** 搜索 */
 function handleQuery(data?: Record<string, any>) {
   queryParams.value = { ...data }
   // 重置面包屑
@@ -172,7 +172,7 @@ function handleQuery(data?: Record<string, any>) {
   getList()
 }
 
-/** 重置按钮操作 */
+/** 重置 */
 function handleReset() {
   handleQuery()
 }

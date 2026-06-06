@@ -230,10 +230,10 @@ const emit = defineEmits<{
 
 // 状态图标映射
 const statusIconMap: Record<string, { color: string, icon: string }> = {
-  '-2': { color: '#909398', icon: 'skip-forward' }, // 跳过
+  '-2': { color: '#909398', icon: 'skip-next' }, // 跳过
   '-1': { color: '#909398', icon: 'clock-circle' }, // 审批未开始
-  '0': { color: '#f59e0b', icon: 'refresh1' }, // 待审批
-  '1': { color: '#f59e0b', icon: 'refresh1' }, // 审批中
+  '0': { color: '#f59e0b', icon: 'clock-circle' }, // 待审批
+  '1': { color: '#f59e0b', icon: 'sync' }, // 审批中
   '2': { color: '#00b32a', icon: 'check' }, // 审批通过
   '3': { color: '#f46b6c', icon: 'close' }, // 审批不通过
   '4': { color: '#cccccc', icon: 'delete' }, // 已取消
@@ -242,16 +242,21 @@ const statusIconMap: Record<string, { color: string, icon: string }> = {
   '7': { color: '#00b32a', icon: 'check' }, // 审批通过中
 }
 
-// 节点类型图标映射 TODO 图标重新选一下
+// 节点类型图标映射
 const nodeTypeSvgMap: Record<number, { color: string, icon: string }> = {
   [BpmNodeTypeEnum.END_EVENT_NODE]: { color: '#909398', icon: 'poweroff' },
   [BpmNodeTypeEnum.START_USER_NODE]: { color: '#909398', icon: 'user' },
-  [BpmNodeTypeEnum.USER_TASK_NODE]: { color: '#ff943e', icon: 'user-talk' },
+  [BpmNodeTypeEnum.USER_TASK_NODE]: { color: '#ff943e', icon: 'user' },
   [BpmNodeTypeEnum.TRANSACTOR_NODE]: { color: '#ff943e', icon: 'edit' },
   [BpmNodeTypeEnum.COPY_TASK_NODE]: { color: '#3296fb', icon: 'copy' },
-  [BpmNodeTypeEnum.CONDITION_NODE]: { color: '#14bb83', icon: 'branch' },
+  [BpmNodeTypeEnum.DELAY_TIMER_NODE]: { color: '#448ef7', icon: 'clock-circle' },
+  [BpmNodeTypeEnum.TRIGGER_NODE]: { color: '#9b7feb', icon: 'thunderbolt' },
+  [BpmNodeTypeEnum.CONDITION_NODE]: { color: '#14bb83', icon: 'filter' },
+  [BpmNodeTypeEnum.CONDITION_BRANCH_NODE]: { color: '#14bb83', icon: 'branch' },
   [BpmNodeTypeEnum.PARALLEL_BRANCH_NODE]: { color: '#14bb83', icon: 'branch' },
-  [BpmNodeTypeEnum.CHILD_PROCESS_NODE]: { color: '#14bb83', icon: 'cluster' },
+  [BpmNodeTypeEnum.INCLUSIVE_BRANCH_NODE]: { color: '#14bb83', icon: 'branch' },
+  [BpmNodeTypeEnum.ROUTER_BRANCH_NODE]: { color: '#14bb83', icon: 'share-alt' },
+  [BpmNodeTypeEnum.CHILD_PROCESS_NODE]: { color: '#14bb83', icon: 'organization' },
 }
 
 const onlyStatusIconShow = [BpmTaskStatusEnum.NOT_START, BpmTaskStatusEnum.RUNNING, BpmTaskStatusEnum.WAIT] // 只有状态是 -1、0、1 才展示头像右小角状态小 icon
@@ -264,15 +269,15 @@ const selectedActivityNodeId = ref<string>()
 
 /** 获取审批节点类型图标 */
 function getApprovalNodeTypeIcon(nodeType: number) {
-  return nodeTypeSvgMap[nodeType]?.icon || 'time'
+  return nodeTypeSvgMap[nodeType]?.icon || 'clock-circle'
 }
 
 /** 获取审批节点图标 */
 function getApprovalNodeIcon(taskStatus: number, nodeType: number) {
   if (taskStatus === BpmTaskStatusEnum.NOT_START) {
-    return statusIconMap[taskStatus]?.icon || 'time'
+    return statusIconMap[taskStatus]?.icon || 'clock-circle'
   }
-  return statusIconMap[taskStatus]?.icon || 'time'
+  return statusIconMap[taskStatus]?.icon || 'clock-circle'
 }
 
 /** 获取审批节点颜色 */

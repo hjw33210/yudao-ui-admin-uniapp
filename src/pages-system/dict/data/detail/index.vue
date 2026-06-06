@@ -81,8 +81,8 @@ definePage({
 const { hasAccessByCodes } = useAccess()
 const dialog = useDialog()
 const toast = useToast()
-const formData = ref<DictData>()
-const deleting = ref(false)
+const formData = ref<DictData>() // 详情数据
+const deleting = ref(false) // 删除状态
 
 /** 颜色类型 => wd-tag 的 type 映射 */
 const COLOR_TYPE_MAP: Record<string, TagType> = {

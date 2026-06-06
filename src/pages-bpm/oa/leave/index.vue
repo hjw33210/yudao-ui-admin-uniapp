@@ -116,21 +116,20 @@ const userStore = useUserStore()
 const toast = useToast()
 const userNickname = computed(() => userStore.userInfo?.nickname || '')
 
-const total = ref(0)
-const list = ref<Leave[]>([])
-const loadMoreState = ref<LoadMoreState>('loading')
-
+const total = ref(0) // 列表总数
+const list = ref<Leave[]>([]) // 列表数据
+const loadMoreState = ref<LoadMoreState>('loading') // 分页加载状态
 const queryParams = ref({
   pageNo: 1,
   pageSize: 10,
-})
+}) // 查询参数
 
 /** 返回上一页 */
 function handleBack() {
   navigateBackPlus()
 }
 
-/** 查询列表 */
+/** 查询请假记录列表 */
 async function getList() {
   loadMoreState.value = 'loading'
   try {

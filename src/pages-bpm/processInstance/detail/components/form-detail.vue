@@ -63,7 +63,7 @@ const normalForm = ref<FormCreatePreview>({
   value: {},
 })
 
-/** 初始化流程表单配置和数据 */
+/** 初始化 */
 watch(
   () => [
     props.processDefinition?.formConf,

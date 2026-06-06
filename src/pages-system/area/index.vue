@@ -56,8 +56,8 @@ definePage({
   },
 })
 
-const loading = ref(false)
-const areaList = ref<Area[]>([])
+const loading = ref(false) // 地区树加载状态
+const areaList = ref<Area[]>([]) // 地区树数据
 
 const showIpQuery = ref(false) // 是否显示 IP 查询弹窗
 

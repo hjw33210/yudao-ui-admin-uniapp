@@ -165,7 +165,7 @@ function selectUserConfirm(activityId: string, userList: any[]) {
   startUserSelectAssignees.value[activityId] = userList?.map(item => item.id) || []
 }
 
-/** 提交流程表单 */
+/** 提交表单 */
 async function handleSubmit() {
   if (!fApi.value || submitting.value) {
     return
@@ -223,7 +223,7 @@ watch(
   { deep: true },
 )
 
-/** 初始化流程表单 */
+/** 初始化 */
 onLoad(async (options) => {
   const id = options?.processDefinitionId
   const instanceId = options?.processInstanceId

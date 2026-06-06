@@ -101,7 +101,7 @@ definePage({
 
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑部门' : '新增部门')
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const formData = ref<Dept>({
   id: undefined,
   name: '',
@@ -111,14 +111,14 @@ const formData = ref<Dept>({
   leaderUserId: undefined,
   phone: '',
   email: '',
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   parentId: [{ required: true, message: '上级部门不能为空' }],
   name: [{ required: true, message: '部门名称不能为空' }],
   sort: [{ required: true, message: '显示顺序不能为空' }],
   status: [{ required: true, message: '状态不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 
 /** 返回上一页 */
 function handleBack() {

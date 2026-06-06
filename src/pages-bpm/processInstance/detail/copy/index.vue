@@ -72,22 +72,22 @@ definePage({
 const taskId = computed(() => props.taskId)
 const processInstanceId = computed(() => props.processInstanceId)
 const toast = useToast()
-const formLoading = ref(false)
+const formLoading = ref(false) // 抄送提交状态
 const formData = reactive({
   copyUserIds: [] as number[],
   reason: '',
-})
+}) // 表单数据
 const formSchema = createFormSchema({
   copyUserIds: [{ required: true, message: '抄送人不能为空' }],
 })
-const formRef = ref<FormInstance>()
+const formRef = ref<FormInstance>() // 表单组件引用
 
 /** 返回上一页 */
 function handleBack() {
   navigateBackPlus(`/pages-bpm/processInstance/detail/index?id=${processInstanceId.value}&taskId=${taskId.value}`)
 }
 
-/** 提交操作 */
+/** 提交表单 */
 async function handleSubmit() {
   if (formLoading.value) {
     return
@@ -115,9 +115,8 @@ async function handleSubmit() {
   }
 }
 
-/** 页面加载时 */
+/** 初始化 */
 onMounted(() => {
-  /** 初始化校验 */
   if (!props.taskId || !props.processInstanceId) {
     toast.show('参数错误')
   }
