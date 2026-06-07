@@ -49,25 +49,26 @@ export const navigateToInterceptor = {
     FG_LOG_ENABLE && console.log('路由拦截器 2: path->', path, ', _query ->', _query)
     FG_LOG_ENABLE && console.log('路由拦截器 3: myQuery ->', myQuery)
 
-    // 处理相对路径
-    if (!path.startsWith('/')) {
-      const currentPath = getLastPage()?.route || ''
-      const normalizedCurrentPath = currentPath.startsWith('/') ? currentPath : `/${currentPath}`
-      const baseDir = normalizedCurrentPath.substring(0, normalizedCurrentPath.lastIndexOf('/'))
-      path = `${baseDir}/${path}`
-    }
-
-    // 处理路由不存在的情况
-    if (path !== '/' && !getAllPages().some(page => page.path !== path)) {
-      console.warn('路由不存在:', path)
-      uni.navigateTo({ url: NOT_FOUND_PAGE })
-      return false // 明确表示阻止原路由继续执行
-    }
-
-    // 插件页面
+    // 插件页面不参与普通页面路径校验
     if (url.startsWith('plugin://')) {
       FG_LOG_ENABLE && console.log('路由拦截器 4: plugin:// 路径 ==>', url)
       path = url
+    }
+    else {
+      // 处理相对路径
+      if (!path.startsWith('/')) {
+        const currentPath = getLastPage()?.route || ''
+        const normalizedCurrentPath = currentPath.startsWith('/') ? currentPath : `/${currentPath}`
+        const baseDir = normalizedCurrentPath.substring(0, normalizedCurrentPath.lastIndexOf('/'))
+        path = `${baseDir}/${path}`
+      }
+
+      // 处理路由不存在的情况
+      if (path !== '/' && !getAllPages().some(page => page.path === path)) {
+        console.warn('路由不存在:', path)
+        uni.navigateTo({ url: NOT_FOUND_PAGE })
+        return false // 明确表示阻止原路由继续执行
+      }
     }
 
     // 处理直接进入路由非首页时，tabbarIndex 不正确的问题
