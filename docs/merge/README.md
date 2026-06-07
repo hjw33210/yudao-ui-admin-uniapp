@@ -4,7 +4,8 @@
 
 - 截图起始提交：`05cb9eba9c4886fa059315758eb468418fffee2f`
 - 当前项目分支：`master`
-- 当前项目 HEAD：`d50300dd`
+- 合并计划创建时 HEAD：`d50300dd`
+- 2026-05 低风险项实施前 HEAD：`880d31f4`
 - 当前项目与 `origin/main`（`codercup/unibest`）的 merge-base：`05cb9eba9c4886fa059315758eb468418fffee2f`
 - 按要求克隆过的仓库：`https://github.com/uni-run/unibest.git`
 - 原临时克隆目录：`/tmp/unibest.JX5Sbf/unibest`，当前已不是 git repo，不能作为后续实施依据
@@ -13,12 +14,11 @@
 
 ## 实施前置条件
 
-- 当前仓库没有配置 `uni-run/unibest` remote。
-- 2026-05 提交（`03e115f` 到 `1a1e253`）不在当前 object store。
-- 实施 2026-05 相关改动前，需要先执行类似命令：
+- 当前仓库已配置 `uni-run/unibest` remote。
+- 已执行 `git fetch unibest main`，2026-05 提交（`03e115f6` 到 `1a1e2531`）已经在当前 object store。
+- 后续继续实施新月份前，仍建议先执行类似命令刷新上游：
 
 ```bash
-git remote add unibest https://github.com/uni-run/unibest.git
 git fetch unibest main
 ```
 
@@ -44,7 +44,7 @@ git fetch unibest main
 | 2026-02 | [2026-02.md](./2026-02.md) | 已部分合并 `b9ef57a5` 的 token 响应式和 `SKIP_OPEN_DEVTOOLS`；未引入 CLI、demo、upload 和依赖升级。 |
 | 2026-03 | [2026-03.md](./2026-03.md) | 已部分合并 `7ccd1640` 的 `bump-version` 和 H5 dev Eruda；角色 tabbar 单独立需求。 |
 | 2026-04 | [2026-04.md](./2026-04.md) | 已合并 `UniOptimization` 平台限制和 VS Code TypeScript SDK 配置；CLI Wot UI 2 提交跳过。 |
-| 2026-05 | [2026-05.md](./2026-05.md) | 先做低风险项；tabbar 同步单独专项。 |
+| 2026-05 | [2026-05.md](./2026-05.md) | 已合并低风险配置修复；tabbar 同步单独专项。 |
 
 ## 建议分支
 

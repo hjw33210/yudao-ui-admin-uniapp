@@ -118,32 +118,21 @@ export function getCurrentPageI18nKey() {
  * 根据微信小程序当前环境，判断应该获取的 baseUrl
  */
 export function getEnvBaseUrl() {
-  // 请求基准地址
+  // 默认请求地址。微信小程序如果没有配置专用地址，也会回退到这个地址。
   let baseUrl = import.meta.env.VITE_SERVER_BASEURL
-
-  // # 有些同学可能需要在微信小程序里面根据 develop、trial、release 分别设置上传地址，参考代码如下。
-  // TODO @芋艿：这个后续也要调整。
-  const VITE_SERVER_BASEURL__WEIXIN_DEVELOP = 'http://localhost:48080/admin-api'
-  const VITE_SERVER_BASEURL__WEIXIN_TRIAL = 'http://localhost:48080/admin-api'
-  const VITE_SERVER_BASEURL__WEIXIN_RELEASE = 'http://localhost:48080/admin-api'
 
   // 微信小程序端环境区分
   if (isMpWeixin) {
     const {
       miniProgram: { envVersion },
     } = uni.getAccountInfoSync()
-
-    switch (envVersion) {
-      case 'develop':
-        baseUrl = VITE_SERVER_BASEURL__WEIXIN_DEVELOP || baseUrl
-        break
-      case 'trial':
-        baseUrl = VITE_SERVER_BASEURL__WEIXIN_TRIAL || baseUrl
-        break
-      case 'release':
-        baseUrl = VITE_SERVER_BASEURL__WEIXIN_RELEASE || baseUrl
-        break
+    const weixinBaseUrlMap: Record<string, string | undefined> = {
+      develop: import.meta.env.VITE_SERVER_BASEURL__WEIXIN_DEVELOP,
+      trial: import.meta.env.VITE_SERVER_BASEURL__WEIXIN_TRIAL,
+      release: import.meta.env.VITE_SERVER_BASEURL__WEIXIN_RELEASE,
     }
+
+    baseUrl = weixinBaseUrlMap[envVersion] || baseUrl
   }
 
   return baseUrl

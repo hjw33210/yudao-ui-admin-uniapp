@@ -154,9 +154,8 @@ export function copyNativeResources(options: CopyNativeResourcesOptions = {}): P
         })
 
         if (verbose) {
-          console.log(`${logPrefix} ✅ UniApp 本地原生插件复制完成`)
+          console.log(`${logPrefix} ✅ UniApp 本地原生插件复制完成: ${sourcePath} -> ${targetPath}`)
           console.log(`${logPrefix} 已成功复制 ${sourceFiles.length} 个文件/目录到构建目录`)
-          console.log(`${logPrefix} 原生插件现在可以在 App 中正常使用`)
         }
       }
       catch (error) {
