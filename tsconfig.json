@@ -39,7 +39,13 @@
     "src/**/*.tsx",
     "src/**/*.jsx",
     "src/**/*.vue",
-    "src/**/*.json"
+    "src/**/*.json",
+    "vite.config.ts",
+    "pages.config.ts",
+    "manifest.config.ts",
+    "uno.config.ts",
+    "scripts/**/*.js",
+    "vite-plugins/**/*.ts"
   ],
   "exclude": ["node_modules", "dist"]
 }

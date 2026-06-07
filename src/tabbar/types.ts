@@ -29,6 +29,8 @@ export interface CustomTabBarItem {
   iconActive?: string
   /** badge 显示一个数字或 小红点 */
   badge?: CustomTabBarItemBadge
+  /** 可见角色标识列表。不配置表示所有登录用户可见 */
+  roles?: string[]
   /** 是否是中间的鼓包tabbarItem */
   isBulge?: boolean
 }

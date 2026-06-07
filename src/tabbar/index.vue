@@ -23,15 +23,19 @@ function handleClickBulge() {
 }
 
 function handleClick(index: number) {
+  const item = tabbarList[index]
+  if (!item || !tabbarStore.isTabbarItemVisible(index)) {
+    return
+  }
   // 当前高亮和真实页面都已经是目标 tab 时，不重复跳转
   if (index === tabbarStore.curIdx && tabbarStore.isCurrentRouteTabbarItem(index)) {
     return
   }
-  if (tabbarList[index].isBulge) {
+  if (item.isBulge) {
     handleClickBulge()
     return
   }
-  const url = tabbarList[index].pagePath
+  const url = item.pagePath
   const prevIdx = tabbarStore.curIdx
   const syncTabbarAfterNavigation = () => {
     tabbarStore.syncCurIdxByCurrentPageAsync()
@@ -104,50 +108,52 @@ function getImageByIndex(index: number, item: CustomTabBarItem) {
   <view v-if="customTabbarEnable" class="h-50px pb-safe">
     <view class="border-and-fixed bg-white" @touchmove.stop.prevent>
       <view class="h-50px flex items-center">
-        <view
-          v-for="(item, index) in tabbarList" :key="index"
-          class="flex flex-1 flex-col items-center justify-center"
-          :style="{ color: getColorByIndex(index) }"
-          @click="handleClick(index)"
-        >
-          <view v-if="item.isBulge" class="relative">
-            <!-- 中间一个鼓包tabbarItem的处理 -->
-            <view class="bulge">
-              <!-- TODO 2/2: 中间鼓包tabbarItem配置：通常是一个图片，或者icon，点击触发业务逻辑 -->
-              <!-- 常见的是：扫描按钮、发布按钮、更多按钮等 -->
-              <image class="mt-6rpx h-200rpx w-200rpx" src="/static/tabbar/scan.png" />
+        <template v-for="(item, index) in tabbarList" :key="index">
+          <view
+            v-if="tabbarStore.isTabbarItemVisible(index)"
+            class="flex flex-1 flex-col items-center justify-center"
+            :style="{ color: getColorByIndex(index) }"
+            @click="handleClick(index)"
+          >
+            <view v-if="item.isBulge" class="relative">
+              <!-- 中间一个鼓包tabbarItem的处理 -->
+              <view class="bulge">
+                <!-- TODO 2/2: 中间鼓包tabbarItem配置：通常是一个图片，或者icon，点击触发业务逻辑 -->
+                <!-- 常见的是：扫描按钮、发布按钮、更多按钮等 -->
+                <image class="mt-6rpx h-200rpx w-200rpx" src="/static/tabbar/scan.png" />
+              </view>
+            </view>
+            <view v-else class="relative px-3 text-center">
+              <template v-if="item.iconType === 'uiLib'">
+                <!-- TODO: 以下内容请根据选择的UI库自行替换 -->
+                <!-- 如：<wd-icon name="home" /> (https://wot-ui.cn/component/icon.html) -->
+                <!-- 如：<uv-icon name="home" /> (https://www.uvui.cn/components/icon.html) -->
+                <!-- 如：<sar-icon name="image" /> (https://sard.wzt.zone/sard-uniapp-docs/components/icon)(sar没有home图标^_^) -->
+                <wd-icon :name="item.icon" size="20" />
+              </template>
+              <template v-if="item.iconType === 'unocss' || item.iconType === 'iconfont'">
+                <view :class="item.icon" class="text-20px" />
+              </template>
+              <template v-if="item.iconType === 'image'">
+                <image :src="getImageByIndex(index, item)" mode="scaleToFill" class="h-20px w-20px" />
+              </template>
+              <view class="mt-2px text-12px">
+                {{ item.text }}
+              </view>
+              <!-- 角标显示 -->
+              <view v-if="item.badge">
+                <template v-if="item.badge === 'dot'">
+                  <view class="absolute right-0 top-0 h-2 w-2 rounded-full bg-#f56c6c" />
+                </template>
+                <template v-else>
+                  <view class="absolute top-0 box-border h-5 min-w-5 center rounded-full bg-#f56c6c px-1 text-center text-xs text-white -right-3">
+                    {{ item.badge > 99 ? '99+' : item.badge }}
+                  </view>
+                </template>
+              </view>
             </view>
           </view>
-          <view v-else class="relative px-3 text-center">
-            <template v-if="item.iconType === 'uiLib'">
-              <!-- TODO: 以下内容请根据选择的UI库自行替换 -->
-              <!-- 如：<wd-icon name="home" /> (https://wot-ui.cn/component/icon.html) -->
-              <!-- 如：<uv-icon name="home" /> (https://www.uvui.cn/components/icon.html) -->
-              <!-- 如：<sar-icon name="image" /> (https://sard.wzt.zone/sard-uniapp-docs/components/icon)(sar没有home图标^_^) -->
-              <wd-icon :name="item.icon" size="20" />
-            </template>
-            <template v-if="item.iconType === 'unocss' || item.iconType === 'iconfont'">
-              <view :class="item.icon" class="text-20px" />
-            </template>
-            <template v-if="item.iconType === 'image'">
-              <image :src="getImageByIndex(index, item)" mode="scaleToFill" class="h-20px w-20px" />
-            </template>
-            <view class="mt-2px text-12px">
-              {{ item.text }}
-            </view>
-            <!-- 角标显示 -->
-            <view v-if="item.badge">
-              <template v-if="item.badge === 'dot'">
-                <view class="absolute right-0 top-0 h-2 w-2 rounded-full bg-#f56c6c" />
-              </template>
-              <template v-else>
-                <view class="absolute top-0 box-border h-5 min-w-5 center rounded-full bg-#f56c6c px-1 text-center text-xs text-white -right-3">
-                  {{ item.badge > 99 ? '99+' : item.badge }}
-                </view>
-              </template>
-            </view>
-          </view>
-        </view>
+        </template>
       </view>
 
       <view class="pb-safe" />

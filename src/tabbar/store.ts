@@ -5,6 +5,7 @@ import { reactive } from 'vue'
 import { isNeedLoginMode } from '@/router/config'
 import { FG_LOG_ENABLE, judgeIsExcludePath } from '@/router/interceptor'
 import { useTokenStore } from '@/store/token'
+import { useUserStore } from '@/store/user'
 import { tabbarList as _tabbarList, customTabbarEnable, selectedTabbarStrategy, TABBAR_STRATEGY_MAP } from './config'
 
 // TODO 1/2: 中间的鼓包tabbarItem的开关
@@ -59,6 +60,19 @@ function findTabbarIndexByPath(path?: string) {
   return tabbarList.findIndex(item => item.pagePath === normalizedPath)
 }
 
+export function isTabbarItemVisible(itemOrIndex?: CustomTabBarItem | number) {
+  const item = typeof itemOrIndex === 'number' ? tabbarList[itemOrIndex] : itemOrIndex
+  if (!item) {
+    return false
+  }
+  if (!item.roles?.length) {
+    return true
+  }
+  const userStore = useUserStore()
+  const userRoles = new Set(userStore.roles)
+  return item.roles.some(role => userRoles.has(role))
+}
+
 /**
  * 自定义 tabbar 的状态管理，原生 tabbar 无需关注本文件
  * tabbar 状态，增加 storageSync 保证刷新浏览器时在正确的 tabbar 页面
@@ -70,6 +84,9 @@ const tabbarStore = reactive({
   setCurIdx(idx: number) {
     const item = tabbarList[idx]
     if (!item) {
+      return
+    }
+    if (!isTabbarItemVisible(item)) {
       return
     }
     const tokenStore = useTokenStore().updateNowTime()
@@ -89,12 +106,18 @@ const tabbarStore = reactive({
     FG_LOG_ENABLE && console.log('index:', index, path)
     // console.log('tabbarList:', tabbarList)
     if (index >= 0) {
+      if (!isTabbarItemVisible(index)) {
+        return
+      }
       this.setCurIdx(index)
       return
     }
 
-    if (this.curIdx < 0 || this.curIdx >= tabbarList.length) {
-      this.setCurIdx(0)
+    if (this.curIdx < 0 || this.curIdx >= tabbarList.length || !isTabbarItemVisible(this.curIdx)) {
+      const firstVisibleIndex = tabbarList.findIndex(item => isTabbarItemVisible(item))
+      if (firstVisibleIndex >= 0) {
+        this.setCurIdx(firstVisibleIndex)
+      }
     }
   },
   syncCurIdxByCurrentPage() {
@@ -113,8 +136,12 @@ const tabbarStore = reactive({
     if (!item) {
       return false
     }
+    if (!isTabbarItemVisible(item)) {
+      return false
+    }
     return findTabbarIndexByPath(getCurrentPagePath()) === index
   },
+  isTabbarItemVisible,
   restorePrevIdx() {
     if (this.prevIdx === this.curIdx)
       return

@@ -46,6 +46,22 @@ git fetch unibest main
 | 2026-04 | [2026-04.md](./2026-04.md) | 已合并 `UniOptimization` 平台限制和 VS Code TypeScript SDK 配置；CLI Wot UI 2 提交跳过。 |
 | 2026-05 | [2026-05.md](./2026-05.md) | 已合并低风险配置修复，并部分合并 tabbar 同步专项。 |
 
+## 最终补录
+
+2026-06-07 复查 `uni-run/unibest` 后，发现若干 2026-01/02 已在上游 `main` 中、但此前按截图主线审计时遗漏的提交。本次作为“最终补录”处理，不视为新月份。
+
+| commit | 所属月份 | 处理 | 结论 |
+| --- | --- | --- | --- |
+| `717ebbdf` | 2026-01 | 完全合并 | `definePage` 的 `layout` 类型支持 `false`。 |
+| `adba83b3` | 2026-02 | 部分合并 | 只补当前项目真实存在的根配置、脚本和插件目录到 `tsconfig.include`；不加入不存在的 `openapi-ts-request.config.ts`。 |
+| `39150ce7` | 2026-02 | 部分合并 | 支持抖音开发者工具自动打开；上游误用 `mp-lark`，本地按 DCloud 平台标识适配 `mp-toutiao`。 |
+| `12c77d7b` | 2026-02 | 部分合并 | 引入微信小程序上传脚本和 `miniprogram-ci`，本地增加 `--dry-run` 与私钥路径环境变量。 |
+| `127d4f84`、`53397168`、`9876ae51` | 2026-02 | 部分合并 | 只吸收角色 tabbar 机制；保留当前项目 reactive 列表和原始 index，不引入 about demo。 |
+| `70767b49` | 2026-02 | 暂不合并 | 上游 diff 未真正规避 `@uni-helper/uni-env` 静态 import，先以 `build:mp-toutiao` 实测为准。 |
+| `d065e41a` | 2026-02 | 忽略 | 当前 `uno.config.ts` safelist 没有对应 typo。 |
+| `7410a59` | 2026-05 | 暂不合并 | 当前项目源码不使用 `$router.beforeEach`；保留 `allowRoute + onShow` 同步方案。 |
+| `f05992e` | 2026-05 | 忽略 | 仅上游模板版本号。 |
+
 ## 建议分支
 
 - 2026-05 低风险项：`codex/unibest-2026-05-low-risk`

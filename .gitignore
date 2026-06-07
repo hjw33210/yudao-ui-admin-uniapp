@@ -12,6 +12,8 @@ node_modules
 dist
 tmp/
 *.local
+private.key
+private.*.key
 
 # Editor directories and files
 .idea
