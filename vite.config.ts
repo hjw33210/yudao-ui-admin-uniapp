@@ -106,11 +106,8 @@ export default defineConfig(({ command, mode }) => {
       }),
       // UniOptimization 插件需要 page.json 文件，故应在 UniPages 插件之后执行
       UniOptimization({
-        enable: {
-          'optimization': true,
-          'async-import': true,
-          'async-component': true,
-        },
+        // 仅微信小程序开启，避免支付宝小程序运行报错
+        enable: UNI_PLATFORM === 'mp-weixin',
         dts: {
           base: 'src/types',
         },

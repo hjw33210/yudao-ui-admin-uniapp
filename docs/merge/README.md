@@ -43,7 +43,7 @@ git fetch unibest main
 | 2026-01 | [2026-01.md](./2026-01.md) | 已合并 dev-tools 输出目录选择和 router 路由不存在判断修复。 |
 | 2026-02 | [2026-02.md](./2026-02.md) | 已部分合并 `b9ef57a5` 的 token 响应式和 `SKIP_OPEN_DEVTOOLS`；未引入 CLI、demo、upload 和依赖升级。 |
 | 2026-03 | [2026-03.md](./2026-03.md) | 已部分合并 `7ccd1640` 的 `bump-version` 和 H5 dev Eruda；角色 tabbar 单独立需求。 |
-| 2026-04 | [2026-04.md](./2026-04.md) | 基本跳过，都是 CLI 的 Wot UI 2 支持/提示/元数据。 |
+| 2026-04 | [2026-04.md](./2026-04.md) | 已合并 `UniOptimization` 平台限制和 VS Code TypeScript SDK 配置；CLI Wot UI 2 提交跳过。 |
 | 2026-05 | [2026-05.md](./2026-05.md) | 先做低风险项；tabbar 同步单独专项。 |
 
 ## 建议分支
